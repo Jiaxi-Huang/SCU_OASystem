@@ -7,7 +7,7 @@
             <span>欢迎使用</span>
           </div>
           <div class="desc">
-            <span>SCU_OA办公管理系统</span>
+            <span>SCU_OA办公管理系统！</span>
           </div>
         </div>
         <div class="bottom">
