@@ -16,12 +16,13 @@ class Service {
    */
   static postLogin(data: any) {
     return request({
-      url: loginApi.userLogin,
+      url: 'http://localhost:8080/apa',//loginApi.userLogin,
       method: 'POST',
       json: true,
       data
     }).then((res) => {
       if (res.status === 0) {
+        console.log('11111')
         return Promise.resolve(res)
       }
       return Promise.reject(res)

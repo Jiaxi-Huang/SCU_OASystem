@@ -41,6 +41,7 @@ const getSwiperInfo = () => ({
   message: '成功'
 })
 
+/*
 Mock.mock('/api/auth/user/login', 'post', (option) => {
   const { email, password } = JSON.parse(option.body)
   console.log(email, password)
@@ -70,6 +71,7 @@ Mock.mock('/api/auth/user/login', 'post', (option) => {
     message: '账户或者密码错误'
   }
 })
+*/
 // 登录成功，查询用户信息，包括角色
 Mock.mock('/api/auth/user/userInfo', 'post', (option) => {
   const { email } = JSON.parse(option.body)
