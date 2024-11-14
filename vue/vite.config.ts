@@ -6,7 +6,7 @@
  * @Description:
  * @FilePath: /vue3.0-template-admin/vite.config.ts
  */
-import path from 'path'
+import { resolve } from 'path'
 import { ConfigEnv, loadEnv, UserConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import legacy from '@vitejs/plugin-legacy'
@@ -27,8 +27,8 @@ export default ({ mode }: ConfigEnv): UserConfig => {
     resolve: {
       // 类型：Record<string, string> | Array<{ find: string | RegExp, replacement: string }> 将会被传递到 @rollup/plugin-alias 作为它的 entries。
       alias: {
-        '~': path.resolve(__dirname, './'),
-        '@': path.resolve(__dirname, 'src')
+        '~': resolve(__dirname, './'),
+        '@': resolve(__dirname, 'src')
       },
       extensions: ['.js', '.ts', '.jsx', '.tsx', '.json', '.vue', '.mjs'] // 类型： string[] 导入时想要省略的扩展名列表。
     },
@@ -56,7 +56,7 @@ export default ({ mode }: ConfigEnv): UserConfig => {
       proxy: {
         // 类型： Record<string, string | ProxyOp 为开发服务器配置自定义代理规则
         '/api': {
-          target: 'http://106.12.45.247:3000/',
+          target: 'http://127.0.0.1:8080/',
           changeOrigin: true,
           secure: false,
           // eslint-disable-next-line no-shadow

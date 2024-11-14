@@ -1,13 +1,13 @@
 import request from '@/utils/request'
 
 const loginApi = {
-  userLogin: '/api/auth/user/login',
-  userRegister: '/api/auth/user/register',
-  sendCaptcha: '/api/auth/email/sendCaptcha',
-  forgetPassword: '/api/auth/email/forgot-password',
-  resetPassword: `/api/auth/user/reset-password`,
-  permissionRoutes: '/api/auth/permission/routes',
-  userInfo: '/api/auth/user/userInfo'
+userLogin: '/api/auth/user/login',
+userRegister: '/api/auth/user/register',
+sendCaptcha: '/api/auth/email/sendCaptcha',
+forgetPassword: '/api/auth/email/forgot-password',
+resetPassword: `/api/auth/user/reset-password`,
+permissionRoutes: '/api/auth/permission/routes',
+userInfo: '/api/auth/user/userInfo'
 }
 
 class Service {
@@ -16,13 +16,12 @@ class Service {
    */
   static postLogin(data: any) {
     return request({
-      url: 'http://localhost:8080/apa',//loginApi.userLogin,
+      url: 'http://localhost:8080/api/auth/user/login',//loginApi.userLogin,
       method: 'POST',
       json: true,
       data
     }).then((res) => {
       if (res.status === 0) {
-        console.log('11111')
         return Promise.resolve(res)
       }
       return Promise.reject(res)

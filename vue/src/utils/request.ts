@@ -21,15 +21,18 @@ const axios = Axios.create({
 // 允许携带cookie
 axios.defaults.withCredentials = true
 // 请求头信息
-axios.defaults.headers['X-Requested-With'] = 'XMLHttpRequest'
+axios.defaults.headers.post['X-Requested-With'] = 'XMLHttpRequest'
 // 默认使用 application/json 形式
-axios.defaults.headers.post['Content-Type'] = 'application/json'
+axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8'
+//允许跨源
+axios.defaults.headers.post['Access-Control-Allow-Origin']='*'
 
 // 请求拦截器
 axios.interceptors.request.use(
   (config: AxiosRequestConfig) => {
     if (sessionStorage.getItem('accessToken')) {
-      config.headers.Authorization = `Bearer ${sessionStorage.getItem('accessToken')}`
+      // @ts-ignore
+        config.headers.Authorization = `Bearer ${sessionStorage.getItem('accessToken')}`
     }
     return config
   },
