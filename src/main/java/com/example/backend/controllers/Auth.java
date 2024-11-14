@@ -56,6 +56,4 @@ public class Auth {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-    // 定义请求体的数据模型
-
 }
