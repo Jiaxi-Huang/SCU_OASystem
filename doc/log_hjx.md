@@ -26,5 +26,6 @@ org.springframework.beans.factory.BeanNotOfRequiredTypeException: Bean named 'dd
 这个包爆红，也就是说找不到该版本
 继续搜索，发现：
 https://blog.csdn.net/KUKUKAKASSAN/article/details/130046698
-![maven install](https://cdn.jsdelivr.net/gh/ToughMamba/PicRepo@main/20241114130145.png)
+
+![maven install](https://cdn.jsdelivr.net/gh/ToughMamba/PicRepo@main/20241114131018.png)
 之前一直被maven导包找不到版本号困扰，现在知道怎么解决了

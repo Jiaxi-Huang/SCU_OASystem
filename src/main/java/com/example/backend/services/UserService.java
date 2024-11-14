@@ -17,6 +17,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         User user = userMapper.findByEmail(email);
         if (user != null) {
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            System.out.println(encoder.encode(password));
             return encoder.matches(password, user.getPassword());
         }
         return false;

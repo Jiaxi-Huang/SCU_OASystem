@@ -1,8 +1,8 @@
 package com.example.backend.controllers;
 
+import com.example.backend.entity.LoginRequest;
+import com.example.backend.entity.LoginResponse;
 import com.example.backend.services.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,49 +15,47 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class Auth {
 
-    private static final Logger logger = LoggerFactory.getLogger(Auth.class);
-
     @Autowired
     private UserService userService;
-
     @PostMapping("/user/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         try {
+            //获取登录信息
             String email = request.getEmail();
             String password = request.getPassword();
-
+            //密码base64解码
+            System.out.println(email);
+            System.out.println(password);
             boolean isAuthenticated = userService.login(email, password);
+
             if (isAuthenticated) {
-                return ResponseEntity.status(200).body("000");
+                LoginResponse response = new LoginResponse(
+                        0,
+                        "成功",
+                        true,
+                        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IjIyODA1MjAxMjhAcXEuY29tIiwic3ViIjo5LCJpYXQiOjE2MjU4MzQ3MTksImV4cCI6MTYyODQyNjcxOX0.YQLVi-zw4XWQEd8Hy2YZGlFaqX8c7xyRPrYuxcFywFE"
+                );
+                return ResponseEntity.status(HttpStatus.OK).body(response);
             } else {
-                return ResponseEntity.status(401).body("无效的用户名或密码");
+                // 构建失败响应
+                LoginResponse response = new LoginResponse(
+                        1,
+                        "无效的用户名或密码",
+                        false,
+                        null
+                );
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
         } catch (Exception e) {
-            logger.error("处理登录请求时发生错误: ", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("服务器内部错误");
+            LoginResponse response = new LoginResponse(
+                    2,
+                    "服务器内部错误",
+                    false,
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
     // 定义请求体的数据模型
-    public static class LoginRequest {
-        private String email;
-        private String password;
 
-        // Getters and Setters
-        public String getEmail() {
-            return email;
-        }
-
-        public void setEmail(String email) {
-            this.email = email;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
-    }
 }

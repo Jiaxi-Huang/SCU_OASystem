@@ -142,7 +142,7 @@ export default defineComponent({
             const { email, password } = state.loginForm
             const data = {
               email,
-              // password
+              // password加密由后端处理
               password: encrypt(password)
             }
             const res = await Service.postLogin(data)

@@ -7,9 +7,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("users")
 public class User {
     @TableId(type = IdType.INPUT)
+    private String id;
     private String email;
     private String password;
-    private String name;
+    private String phone;
 
     // Getters and Setters
     public String getEmail() {
@@ -28,12 +29,12 @@ public class User {
         this.password = password;
     }
 
-    public String getName() {
-        return name;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setPhone(String name) {
+        this.phone = name;
     }
 }
 
