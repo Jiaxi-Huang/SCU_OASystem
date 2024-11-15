@@ -1,6 +1,6 @@
 -- 创建用户信息表
 CREATE TABLE user_infos (
-    user_id INT PRIMARY KEY,                    -- 用户ID，主键
+    id INT PRIMARY KEY,                    -- 用户ID，主键
     username VARCHAR(50),                        -- 用户名
     password VARCHAR(255),                       -- 密码，存储加密后的密码
     wechat_user_id VARCHAR(100),                 -- 微信用户ID

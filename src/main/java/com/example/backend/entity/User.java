@@ -1,18 +1,20 @@
 package com.example.backend.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 @TableName("users")
 public class User {
-    @TableId(type = IdType.INPUT)
-    private String id;
+
+    private int id;
     private String email;
     private String password;
     private String phone;
+    private String role;
 
     // Getters and Setters
+    public int getId() {
+        return id;
+    }
     public String getEmail() {
         return email;
     }
@@ -35,6 +37,14 @@ public class User {
 
     public void setPhone(String name) {
         this.phone = name;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }
 

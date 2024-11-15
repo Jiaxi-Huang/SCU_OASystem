@@ -13,13 +13,33 @@ public class UserService extends ServiceImpl<UserMapper, User> {
     @Autowired
     private UserMapper userMapper;
 
-    public boolean login(String email, String password) {
+    public int login(String email, String password) {
         User user = userMapper.findByEmail(email);
         if (user != null) {
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-            System.out.println(encoder.encode(password));
-            return encoder.matches(password, user.getPassword());
+            if(encoder.matches(password, user.getPassword())){
+                return user.getId();
+            }
         }
-        return false;
+        return 0;
+    }
+    public String role(String email) {
+        User user = userMapper.findByEmail(email);
+        if (user != null) {
+            return user.getRole();
+        }
+        return null;
+    }
+    public int register(String email, String password) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String passwordBCrypt = encoder.encode(password);
+        String role="worker";//默认为员工
+        return userMapper.insertUser(email, passwordBCrypt,role);
+    }
+    public int resetPassword(String email, String password) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String passwordBCrypt = encoder.encode(password);
+        System.out.println(passwordBCrypt);
+        return userMapper.updatePassword(email, passwordBCrypt);
     }
 }

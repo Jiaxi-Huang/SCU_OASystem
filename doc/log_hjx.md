@@ -29,3 +29,8 @@ https://blog.csdn.net/KUKUKAKASSAN/article/details/130046698
 
 ![maven install](https://cdn.jsdelivr.net/gh/ToughMamba/PicRepo@main/20241114131018.png)
 之前一直被maven导包找不到版本号困扰，现在知道怎么解决了
+
+- 时间:2024.11.15
+### 关于配置redis和qq邮箱用于验证码发送
+https://cloud.tencent.com/developer/article/2432650
+注意，需要修改端口为587，具体参考：https://www.cnblogs.com/blank-ys/p/15465877.html
