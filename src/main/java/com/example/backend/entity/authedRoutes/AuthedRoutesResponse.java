@@ -1,19 +1,19 @@
-package com.example.backend.entity.role;
+package com.example.backend.entity.authedRoutes;
 
-public class RoleResponse {
+import java.util.List;
+
+public class AuthedRoutesResponse {
     private int status;
     private String message;
     private boolean success;
     private Data data;
-
-    public RoleResponse(int status, String message, boolean success, String roleName) {
+    public AuthedRoutesResponse(int status, String message, boolean success, Data data) {
         this.status = status;
         this.message = message;
         this.success = success;
-        this.data = new Data(roleName);
+        this.data = data;
     }
-
-    // Getter 和 Setter 方法
+        // Getter 和 Setter 方法
     public int getStatus() {
         return status;
     }
@@ -45,21 +45,13 @@ public class RoleResponse {
     public void setData(Data data) {
         this.data = data;
     }
-
-    // 内部类 Data
-    public static class Data {
-        private String roleName;
-
-        public Data(String roleName) {
-            this.roleName = roleName;
+    public static class Data{
+        List<String> authedRoutes;
+        public List<String> getAuthedRoutes() {
+            return authedRoutes;
         }
-
-        public String getRoleName() {
-            return roleName;
-        }
-
-        public void setRoleName(String roleName) {
-            this.roleName = roleName;
+        public void setAuthedRoutes(List<String> authedRoutes) {
+            this.authedRoutes = authedRoutes;
         }
     }
 }

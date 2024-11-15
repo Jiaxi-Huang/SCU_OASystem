@@ -1,5 +1,7 @@
 package com.example.backend.controllers;
 
+import com.example.backend.entity.authedRoutes.AuthedRoutesRequest;
+import com.example.backend.entity.authedRoutes.AuthedRoutesResponse;
 import com.example.backend.entity.captcha.CaptchaRequest;
 import com.example.backend.entity.captcha.CaptchaResponse;
 import com.example.backend.entity.login.LoginRequest;
@@ -21,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 @RestController
@@ -110,6 +114,74 @@ public class Auth {
             }
         } catch (Exception e) {
             RoleResponse response = new RoleResponse(
+                    2,
+                    "服务器内部错误",
+                    false,
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    @PostMapping("/permission/routes")
+    public ResponseEntity<AuthedRoutesResponse> autheredRoutes(@RequestBody AuthedRoutesRequest request) {
+        //获取邮箱
+        try{
+            String email = request.getEmail();
+            String roleName = userService.role(email);
+            if (roleName != null) {
+                if (roleName == "admin") {
+                    AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
+                    List<String> authedRoutes = Arrays.asList(
+                            "/dashboard", "/guide", "/dragable", "/copy", "/role",
+                            "/menu", "/projectboard", "/table", "/todoList", "/form",
+                            "/cropper", "/personal");
+                    data.setAuthedRoutes(authedRoutes);
+                    AuthedRoutesResponse response = new AuthedRoutesResponse(
+                            0,
+                            "获取职位信息成功",
+                            true,
+                            data
+                    );
+                    return ResponseEntity.status(HttpStatus.OK).body(response);
+                } else if (roleName == "manager") {
+                    AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
+                    List<String> authedRoutes = Arrays.asList(
+                            "/dashboard", "/guide", "/dragable", "/calendar", "/copy",
+                            "/zip", "/excel", "/table", "/todoList", "/projectboard",
+                            "/form","/qrcode", "/editor", "/upload", "/cropper", "/personal");
+                    data.setAuthedRoutes(authedRoutes);
+                    AuthedRoutesResponse response = new AuthedRoutesResponse(
+                            0,
+                            "获取职位信息成功",
+                            true,
+                            data
+                    );
+                    return ResponseEntity.status(HttpStatus.OK).body(response);
+                } else {
+                    AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
+                    List<String> authedRoutes = Arrays.asList(
+                            "/dashboard", "/role", "/menu", "/personal");
+                    data.setAuthedRoutes(authedRoutes);
+                    AuthedRoutesResponse response = new AuthedRoutesResponse(
+                            0,
+                            "获取职位信息成功",
+                            true,
+                            data
+                    );
+                    return ResponseEntity.status(HttpStatus.OK).body(response);
+                }
+            } else {
+                // 构建失败响应
+                AuthedRoutesResponse response = new AuthedRoutesResponse(
+                        1,
+                        "获取职位信息失败",
+                        false,
+                        null
+                );
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+        }catch (Exception e) {
+            AuthedRoutesResponse response = new AuthedRoutesResponse(
                     2,
                     "服务器内部错误",
                     false,
@@ -273,4 +345,5 @@ public class Auth {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
 }

@@ -10,7 +10,7 @@ class Service {
    */
   static postAuthPermission(data: any) {
     return request({
-      url: roleApi.queryAuthedPermission,
+      url: 'http://localhost:8080/api/auth/permission/routes',//roleApi.queryAuthedPermission,
       method: 'POST',
       json: true,
       data

@@ -4,8 +4,8 @@ public class CaptchaResponse {
     private int status;
     private String message;
     private boolean success;
-    private CaptchaResponse.Data data;
-    public CaptchaResponse(int status, String message, boolean success, CaptchaResponse.Data data) {
+    private Data data;
+    public CaptchaResponse(int status, String message, boolean success, Data data) {
         this.status = status;
         this.message = message;
         this.success = success;
@@ -37,11 +37,11 @@ public class CaptchaResponse {
         this.success = success;
     }
 
-    public CaptchaResponse.Data getData() {
+    public Data getData() {
         return data;
     }
 
-    public void setData(CaptchaResponse.Data data) {
+    public void setData(Data data) {
         this.data = data;
     }
 
