@@ -1,4 +1,4 @@
-package com.example.backend.entity;
+package com.example.backend.entity.login;
 
 public class LoginResponse {
     private int status;
