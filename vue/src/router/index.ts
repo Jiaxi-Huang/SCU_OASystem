@@ -374,13 +374,26 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
       {
         path: '/todoList/todoTableList',
         name: 'todoTableList',
-        component: () => import(/* webpackChunkName: "personalCenter" */ '@/views/TodoList/components/tableList.vue'),
+        component: () => import('@/views/TodoList/components/tableList.vue'),
         meta: {
           title: {
             '/zh-CN': '待办事项',
             '/en-US': 'Todolist'
           },
           icon: 'ic ic-barrage-fill'
+        }
+      },
+      {
+        path: '/todoList/todoAdd',
+        name: 'todoAdd',
+        component: () => import( '@/views/TodoList/components/todoAdd.vue'),
+        meta: {
+          title: {
+            '/zh-CN': '添加待辦事項',
+            '/en-US': 'Add Todo'
+          },
+          icon: 'ic ic-stealth-fill',
+          hidden: true,
         }
       }
     ]

@@ -1,47 +1,28 @@
 <template>
   <div class="table-container">
     <el-form :inline="true" :model="formInline" class="form-inline">
-      <el-form-item label="待办事项筛选项1">
-        <el-input v-model="formInline.user" placeholder="审批人"></el-input>
-      </el-form-item>
-      <el-form-item label="待办事项筛选项2">
-        <el-select v-model="formInline.region" placeholder="活动区域">
-          <el-option label="区域一" value="shanghai"></el-option>
-          <el-option label="区域二" value="beijing"></el-option>
-        </el-select>
-      </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">查询</el-button>
+        <el-button type="primary" @click="onSubmit">添加待辦事項</el-button>
       </el-form-item>
     </el-form>
-    <el-table ref="filterTableRef" class="table-list" row-key="date" :data="tableData.filter((data) => !search || data.name.toLowerCase().includes(search.toLowerCase()))" style="width: 100%">
+    <el-table ref="filterTableRef" class="table-list" row-key="date" :data="tableData.filter((data) => !search || data.title.toLowerCase().includes(search.toLowerCase()))" style="width: 100%">
       <el-table-column
-        prop="date"
+        prop="ddl"
         label="截止日期"
         sortable
         width="180"
-        column-key="date"
-        :filters="[
-          { text: '2016-05-01', value: '2016-05-01' },
-          { text: '2016-05-02', value: '2016-05-02' },
-          { text: '2016-05-03', value: '2016-05-03' },
-          { text: '2016-05-04', value: '2016-05-04' }
-        ]"
-        :filter-method="filterHandler"
+        column-key="ddl"
       >
       </el-table-column>
-      <el-table-column prop="name" label="姓名" width="180"> </el-table-column>
-      <el-table-column prop="address" label="地址" :formatter="formatter"> </el-table-column>
+      <el-table-column prop="title" label="待办事项标题" width="180" truncated> </el-table-column>
+      <el-table-column prop="content" label="待办事项内容" truncated> </el-table-column>
       <el-table-column align="right">
         <template #header>
-          <el-input v-model="search" size="mini" placeholder="输入姓名字段关键字搜索" />
+          <el-input v-model="search" size="mini" placeholder="输入標題字段关键字搜索" />
         </template>
         <template #default="scope">
-          <el-button v-permission="['test:permission-btn3']" size="mini" @click="handleEdit(scope.$index, scope.row)">v-permission </el-button>
-
-          <el-button v-if="$isPermission(['test:permission-btn3'])" size="mini" @click="handleEdit(scope.$index, scope.row)">$isPermission </el-button>
-
-          <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
+          <el-button v-if="$isPermission(['test:permission-btn3'])" size="mini" @click="modifyPop(scope.row)">修改</el-button>
+          <el-button size="mini" @click="detailPop(scope.row)">查看詳情</el-button>
           <el-popconfirm confirm-button-text="确定" cancel-button-text="取消" icon="el-icon-info" icon-color="red" title="确定删除该条记录吗？" @confirm="handleDelete(scope.$index, scope.row)">
             <template #reference>
               <el-button size="mini" type="danger">删除</el-button>
@@ -50,21 +31,89 @@
         </template>
       </el-table-column>
       <el-table-column
-        prop="tag"
-        label="标签"
+        prop="status"
+        label="状态"
         width="100"
         :filters="[
-          { text: '家', value: '家' },
-          { text: '公司', value: '公司' }
+          { text: '已完成', value: '已完成' },
+          { text: '未完成', value: '未完成' }
         ]"
-        :filter-method="filterTag"
+        :filter-method="filterStatus"
         filter-placement="bottom-end"
       >
         <template #default="scope">
-          <el-tag :type="scope.row.tag === '家' ? 'primary' : 'success'" disable-transitions>{{ scope.row.tag }}</el-tag>
+          <el-tag :type="scope.row.status === '已完成' ? 'primary' : 'success'" disable-transitions>{{ scope.row.status }}</el-tag>
         </template>
       </el-table-column>
     </el-table>
+
+
+    <!--    V-MODEL!!!!!-->
+    <el-dialog v-model="modifyFormVisible" title="修改待辦事項">
+      <el-form :model="form">
+        <el-form-item label="標題" :label-width="formLabelWidth">
+          <el-input v-model="form.title" autocomplete="on"></el-input>
+        </el-form-item>
+        <el-form-item label="内容" :label-width="formLabelWidth">
+          <el-input v-model="form.content" autosize type="textarea"/>
+        </el-form-item>
+        <el-form-item label="截止日期" :label-width="formLabelWidth">
+          <el-input v-model="form.ddl" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="狀態" :label-width="formLabelWidth">
+          <el-input v-model="form.status" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="創建日期" :label-width="formLabelWidth">
+          <el-input v-model="form.crt" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="添加者ID" :label-width="formLabelWidth">
+          <el-text class="mx-1" type="info">{{ form.adder }}</el-text>
+        </el-form-item>
+        <el-form-item label="待辦事項ID" :label-width="formLabelWidth">
+          <el-text class="mx-1" type="info">{{ form.todo_id }}</el-text>
+        </el-form-item>
+        <el-form-item label="從屬用戶ID" :label-width="formLabelWidth">
+          <el-text class="mx-1" type="info">{{ form.user_id }}</el-text>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="modifyFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="handleEdit()">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog v-model="detailFormVisible" title="待辦事項詳情">
+      <el-form :model="form">
+        <el-form-item label="標題&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{ form.title }}
+        </el-form-item>
+        <el-form-item label="内容&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{ form.content }}
+        </el-form-item>
+        <el-form-item label="截止日期&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{ form.ddl }}
+        </el-form-item>
+        <el-form-item label="狀態&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{ form.status }}
+        </el-form-item>
+        <el-form-item label="創建日期&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{ form.crt }}
+        </el-form-item>
+        <el-form-item label="添加者ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{ form.adder }}
+        </el-form-item>
+        <el-form-item label="待辦事項ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{ form.todo_id }}
+        </el-form-item>
+        <el-form-item label="從屬用戶ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{form.user_id }}
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="detailFormVisible = false">确 定</el-button>
+      </div>
+    </el-dialog>
+
     <el-pagination
       :hide-on-single-page="false"
       :current-page="currentPage"
@@ -98,63 +147,18 @@ export default defineComponent({
     const state = reactive({
       tableData: [
         {
-          date: '2016-05-07',
-          name: '白小白宝宝宝宝宝宝宝宝宝宝宝宝不',
-          address: '上海市普陀区金沙江路 1518 弄',
-          tag: '家'
+          ddl: '2016-05-07',
+          title: '後臺沒打開',
+          status: '上海市普陀区金沙江路 1518 弄',
+          content: '家'
         },
-        {
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-          tag: '家'
-        },
-        {
-          date: '2016-05-04',
-          name: '李小胖',
-          address: '上海市普陀区金沙江路 1517 弄',
-          tag: '公司'
-        },
-        {
-          date: '2016-05-01',
-          name: '王老五',
-          address: '上海市普陀区金沙江路 1519 弄',
-          tag: '家'
-        },
-        {
-          date: '2016-07-03',
-          name: '王麻子',
-          address: '上海市普陀区金沙江路 1516 弄',
-          tag: '公司'
-        },
-        {
-          date: '2016-07-07',
-          name: '白小白',
-          address: '上海市普陀区金沙江路 1518 弄',
-          tag: '家'
-        },
-        {
-          date: '2016-07-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄',
-          tag: '家'
-        },
-        {
-          date: '2016-07-04',
-          name: '李小胖',
-          address: '上海市普陀区金沙江路 1517 弄',
-          tag: '公司'
-        },
-        {
-          date: '2016-07-01',
-          name: '王老五',
-          address: '上海市普陀区金沙江路 1519 弄',
-          tag: '家'
-        }
       ],
       currentPage: 1,
       pageSize: 5,
-      search: ''
+      search: '',
+      modifyFormVisible: false,
+      detailFormVisible: false,
+      form: {},
     })
     const formInline = reactive({
       user: '',
@@ -182,10 +186,14 @@ export default defineComponent({
             var data = res.data
             for (let i = 0; i < data.length; i++) {
               var record = {
-                date: data[i].todo_title,
-                name: data[i].todo_ctnt,
-                address: data[i].todo_id,
-                tag: '家',
+                ddl: data[i].todo_ddl,
+                title: data[i].todo_title,
+                status: data[i].todo_fin=='y'? '已完成':'未完成',
+                content: data[i].todo_ctnt,
+                crt: data[i].todo_crt,
+                adder: data[i].adder_id,
+                todo_id: data[i].todo_id,
+                user_id: data[i].user_id,
               }
               state.tableData.push(record)
             }
@@ -208,15 +216,45 @@ export default defineComponent({
     }
 
     const formatter = (row: { address: any }) => row.address
-    const filterTag = (value: any, row: { tag: any }) => row.tag === value
+    const filterTag = (value: any, row: { Tag: any }) => row.tag === value
+    const filterStatus = (value: any, row: { status: any }) => row.status === value
     const filterHandler = (value: any, row: { [x: string]: any }, column: { property: any }) => {
       const { property } = column
       return row[property] === value
     }
-    const handleEdit = (index: any, row: any) => {
+
+    const modifyPop = (row) => {
+      state.modifyFormVisible = true
+      state.form = row
+    }
+
+    const detailPop = (row) => {
+      state.detailFormVisible = true
+      state.form = row
+    }
+
+    const handleEdit = () => {
       // eslint-disable-next-line no-console
-      console.log(index, row)
-      router.replace('/form/advanceForm')
+      state.modifyFormVisible = false
+      const record = state.form
+      state.form = {}
+
+      try {
+        Service.postModifyTodo(record).then((res) => {
+          if (res) {
+            // console.log(res)
+            // getPersonalTodoList()
+            console.log('postModifyTodo SUC')
+          } else {
+            console.log('postModifyTodo RES MISS')
+          }
+        });
+      } catch (err) {
+        ElMessage({
+          type: 'warning',
+          message: err.message
+        })
+      }
     }
     const handleDelete = (index: any, row: any) => {
       // eslint-disable-next-line no-console
@@ -253,7 +291,10 @@ export default defineComponent({
       clearFilter,
       formatter,
       filterTag,
-      filterHandler
+      filterStatus,
+      filterHandler,
+      modifyPop,
+      detailPop,
     }
   }
 })
@@ -270,3 +311,4 @@ export default defineComponent({
 
 }
 </style>
+
