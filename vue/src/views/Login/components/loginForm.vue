@@ -146,7 +146,7 @@ export default defineComponent({
               password: encrypt(password)
             }
             const res = await Service.postLogin(data)
-            const userInfo = await Service.postAuthUserInfo({ email })
+            const userInfo = await Service.postAuthUserInfo({ email })//admin,manager
 
             const accessToken = res?.data?.accessToken ?? null
             if (accessToken) {
