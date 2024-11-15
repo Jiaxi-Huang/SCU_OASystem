@@ -359,7 +359,32 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
       }
     ]
   },
-
+  {
+    path: '/todoList',
+    component: layout,
+    redirect: '/todoList/todoTableList',
+    meta: {
+      title: {
+        '/zh-CN': '待办事项',
+        '/en-US': 'Todolist'
+      },
+      icon: 'ic ic-barrage-fill'
+    },
+    children: [
+      {
+        path: '/todoList/todoTableList',
+        name: 'todoTableList',
+        component: () => import(/* webpackChunkName: "personalCenter" */ '@/views/TodoList/components/tableList.vue'),
+        meta: {
+          title: {
+            '/zh-CN': '待办事项',
+            '/en-US': 'Todolist'
+          },
+          icon: 'ic ic-barrage-fill'
+        }
+      }
+    ]
+  },
   {
     path: '/form',
     component: layout,

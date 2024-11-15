@@ -126,6 +126,7 @@ Mock.mock('/api/auth/permission/routes', 'post', (option) => {
           '/projectboard',
           '/excel',
           '/table',
+          '/todoList',
           '/form',
           '/qrcode',
           '/editor',
@@ -151,7 +152,7 @@ Mock.mock('/api/auth/permission/routes', 'post', (option) => {
   return {
     status: 0,
     data: {
-      authedRoutes: ['/dashboard', '/guide', '/dragable', '/calendar', '/copy', '/zip', '/excel', '/table', '/form', '/qrcode', '/editor', '/upload', '/cropper', '/personal']
+      authedRoutes: ['/dashboard', '/guide', '/dragable', '/calendar', '/copy', '/zip', '/excel', '/table','/todoList', '/form', '/qrcode', '/editor', '/upload', '/cropper', '/personal']
     },
     success: true,
     message: '成功'
