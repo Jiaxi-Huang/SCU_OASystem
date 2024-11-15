@@ -12,7 +12,6 @@ public class TodoRecord {
     private int user_id;
 
     public TodoRecord(int id, String title, String content, int user_id) {
-        super();
         this.id = id;
         this.title = title;
         this.content = content;
