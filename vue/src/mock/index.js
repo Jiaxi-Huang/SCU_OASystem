@@ -10,7 +10,7 @@ Mock.setup({
 // mock 一组角色数据；
 const genRoles = () => ({
   status: 0,
-  data: ['super', 'admin', 'normal'],
+  data: ['admin','manager','worker'],
   message: '成功'
 })
 
@@ -40,6 +40,7 @@ const getSwiperInfo = () => ({
   ],
   message: '成功'
 })
+/*
 Mock.mock('/api/auth/user/login', 'post', (option) => {
   const { email, password } = JSON.parse(option.body)
   console.log(email, password)
@@ -106,10 +107,10 @@ Mock.mock('/api/auth/user/register', 'post', () => ({
   success: true,
   message: '成功'
 }))
-//
+ */
 Mock.mock('/api/auth/permission/routes', 'post', (option) => {
   const { roleName } = JSON.parse(option.body)
-  if (roleName === '超级管理员') {
+  if (roleName === 'admin') {
     return {
       status: 0,
       data: {
@@ -137,7 +138,7 @@ Mock.mock('/api/auth/permission/routes', 'post', (option) => {
       message: '成功'
     }
   }
-  if (roleName === '管理员') {
+  if (roleName === 'manager') {
     return {
       status: 0,
       data: {
@@ -166,20 +167,16 @@ Mock.mock('/api/auth/permission/permissions', 'post', () => ({
   message: '成功'
 }))
 
-// /api/auth/user/reset-password
-Mock.mock('/api/auth/user/reset-password', 'post', () => ({
-  status: 0,
-  data: {},
-  success: true,
-  message: '成功'
-}))
+/**
 //  /api/auth/email/forgot-password
+
 Mock.mock('/api/auth/email/forgot-password', 'post', () => ({
   status: 0,
   data: {},
   success: true,
   message: '成功'
 }))
+ */
 // /api/auth/user/reset-password
 Mock.mock('/api/auth/user/reset-password', 'post', () => ({
   status: 0,

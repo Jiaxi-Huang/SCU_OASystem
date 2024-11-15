@@ -2,14 +2,14 @@
   <div class="form-container">
     <el-form v-if="showReset" ref="resetRef" :model="resetForm" status-icon :hide-required-asterisk="true" :rules="rules" label-width="100px" class="login-form">
       <el-form-item label="邮箱" prop="email">
-        <el-input v-model="resetForm.email" autocomplete="off" placeholder="请输入注册邮箱">
+        <el-input v-model="resetForm.email" autocomplete="off" placeholder="请输入邮箱">
           <template #append>
             <el-button :disabled="sendingCode" @click="handleGetCaptcha">{{ codeText }}</el-button>
           </template>
         </el-input>
       </el-form-item>
-      <el-form-item label="验证码" prop="capcha">
-        <el-input v-model.number="resetForm.capcha" maxlength="6" autocomplete="off" placeholder="请输入验证码"></el-input>
+      <el-form-item label="验证码" prop="captcha">
+        <el-input v-model.number="resetForm.captcha" maxlength="6" autocomplete="off" placeholder="请输入验证码"></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="password">
         <el-input v-model="resetForm.password" type="password" autocomplete="off" placeholder="请输入密码"></el-input>
@@ -38,7 +38,7 @@ import Service from '../api/index'
 interface stateType {
   resetForm: {
     email: string
-    capcha: number | null
+    captcha: number | null
     password: string
     checkPass: string
   }
@@ -61,7 +61,7 @@ export default defineComponent({
     const state = reactive<stateType>({
       resetForm: {
         email: '',
-        capcha: null,
+        captcha: null,
         password: '',
         checkPass: ''
       }
@@ -102,7 +102,7 @@ export default defineComponent({
         const data = {
           email
         }
-        const res = await Service.postForgetPwd(data)
+        const res = await Service.postCaptcha(data)
         if (res.status === 0) {
           ElMessage({
             type: 'success',
@@ -129,12 +129,12 @@ export default defineComponent({
       resetRef.value.validate(async (valid: any) => {
         if (valid) {
           try {
-            const { email, password, capcha } = state.resetForm
+            const { email, password, captcha } = state.resetForm
             const data = {
               email,
               // password,
               password: encrypt(password),
-              capcha
+              captcha
             }
             const res = await Service.postResetPwd(data)
             if (res.status === 0) {
@@ -187,7 +187,7 @@ export default defineComponent({
         { required: true, message: '请输入注册邮箱', trigger: 'change' },
         { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
       ],
-      capcha: [{ required: true, message: '请输入验证码', trigger: 'blur' }]
+      captcha: [{ required: true, message: '请输入验证码', trigger: 'blur' }]
     }
     return {
       ...toRefs(state),

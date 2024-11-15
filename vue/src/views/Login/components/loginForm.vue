@@ -26,8 +26,8 @@
           </template>
         </el-input>
       </el-form-item>
-      <el-form-item label="验证码" prop="capcha">
-        <el-input v-model.number="registerForm.capcha" maxlength="10" autocomplete="off" placeholder="请输入验证码"></el-input>
+      <el-form-item label="验证码" prop="captcha">
+        <el-input v-model.number="registerForm.captcha" maxlength="10" autocomplete="off" placeholder="请输入验证码"></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="password">
         <el-input v-model="registerForm.password" type="password" autocomplete="off" placeholder="请输入密码"></el-input>
@@ -62,7 +62,7 @@ interface stateType {
   }
   registerForm: {
     email: string
-    capcha: number | null
+    captcha: number | null
     password: string
     checkPass: string
   }
@@ -89,7 +89,7 @@ export default defineComponent({
       },
       registerForm: {
         email: '',
-        capcha: null,
+        captcha: null,
         password: '',
         checkPass: ''
       },
@@ -126,7 +126,7 @@ export default defineComponent({
         { required: true, message: '请输入注册邮箱', trigger: 'change' },
         { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
       ],
-      capcha: [{ required: true, message: '请输入验证码', trigger: 'blur' }]
+      captcha: [{ required: true, message: '请输入验证码', trigger: 'blur' }]
     }
 
     // methods
@@ -188,10 +188,10 @@ export default defineComponent({
       registerRef.value.validate(async (valid: any) => {
         if (valid) {
           try {
-            const { email, password, capcha } = state.registerForm
+            const { email, password, captcha } = state.registerForm
             const data = {
               email,
-              capcha,
+              captcha,
               // password
               password: encrypt(password)
             }

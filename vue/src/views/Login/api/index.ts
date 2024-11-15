@@ -33,7 +33,7 @@ class Service {
    */
   static postRegister(data: any) {
     return request({
-      url: loginApi.userRegister,
+      url: "http://localhost:8080/api/auth/user/register",//loginApi.userRegister,
       method: 'POST',
       json: true,
       data
@@ -50,7 +50,7 @@ class Service {
    */
   static postCaptcha(data: any) {
     return request({
-      url: loginApi.sendCaptcha,
+      url: 'http://localhost:8080/api/auth/email/sendCaptcha',//loginApi.sendCaptcha,
       method: 'POST',
       json: true,
       data
@@ -65,6 +65,8 @@ class Service {
   /**
    * @description POST 忘记密码接口
    */
+
+  /**
   static postForgetPwd(data: any) {
     return request({
       url: loginApi.forgetPassword,
@@ -78,13 +80,14 @@ class Service {
       return Promise.reject(res)
     })
   }
+  */
 
   /**
    * @description /auth/user/reset-password/{token}
    */
   static postResetPwd(data: any) {
     return request({
-      url: loginApi.resetPassword,
+      url: 'http://localhost:8080/api/auth/user/reset-password',//loginApi.resetPassword,
       method: 'POST',
       json: true,
       data
@@ -120,7 +123,7 @@ class Service {
 
   static postAuthUserInfo(data: any) {
     return request({
-      url: loginApi.userInfo,
+      url: 'http://localhost:8080/api/auth/user/userInfo',//loginApi.userInfo,
       method: 'POST',
       json: true,
       data
