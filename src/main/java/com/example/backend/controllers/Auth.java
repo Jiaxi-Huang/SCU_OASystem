@@ -40,6 +40,7 @@ public class Auth {
             String email = request.getEmail();
             String password = request.getPassword();
             int authenticatedId = userService.login(email, password);
+            System.out.println(authenticatedId);
             if (authenticatedId>0) {//这里获取的ID必须大于0
                 String accessToken = accessService.generateAccessToken(32);
                 boolean isStored = accessService.storeAccessToken(authenticatedId,accessToken);

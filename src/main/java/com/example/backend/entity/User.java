@@ -1,10 +1,12 @@
 package com.example.backend.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-@TableName("users")
+@TableName("user_infos")
 public class User {
-
+    @TableId(type = IdType.INPUT)
     private int id;
     private String email;
     private String password;
