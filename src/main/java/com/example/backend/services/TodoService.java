@@ -28,4 +28,19 @@ public class TodoService extends ServiceImpl<TodoListMapper, TodoRecord> {
                 record.getTodo_ctnt(), record.getTodo_fin(), record.getTodo_crt(), record.getTodo_ddl());
         return res_code;
     }
+
+    public int insertTodoRecord(TodoRecord record) {
+//        System.out.println(record.getTodo_fin());
+        int res_code = todoListMapper.insertTodoRecord(
+                record.getUser_id(), record.getTodo_id(), record.getAdder_id(), record.getTodo_title(),
+                record.getTodo_ctnt(), record.getTodo_fin(), record.getTodo_crt(), record.getTodo_ddl());
+        return res_code;
+    }
+
+
+    public int deleteRecord(TodoRecord record) {
+//        System.out.println(record.getTodo_fin());
+        int res_code = todoListMapper.deleteRecord(record.getTodo_id());
+        return res_code;
+    }
 }

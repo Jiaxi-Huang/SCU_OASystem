@@ -2,7 +2,7 @@
   <div class="table-container">
     <el-form :inline="true" :model="formInline" class="form-inline">
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">添加待辦事項</el-button>
+        <el-button type="primary" @click="onAddTodo">添加待辦事項</el-button>
       </el-form-item>
     </el-form>
     <el-table ref="filterTableRef" class="table-list" row-key="date" :data="tableData.filter((data) => !search || data.title.toLowerCase().includes(search.toLowerCase()))" style="width: 100%">
@@ -115,7 +115,7 @@
     </el-dialog>
 
     <el-pagination
-      :hide-on-single-page="false"
+      :hide-on-single-page="true"
       :current-page="currentPage"
       :page-sizes="[5, 10, 15, 20, 25]"
       :page-size="pageSize"
@@ -125,6 +125,7 @@
       @current-change="handleCurrentChange"
     >
     </el-pagination>
+
   </div>
 </template>
 <script lang="ts">
@@ -164,7 +165,9 @@ export default defineComponent({
       user: '',
       region: ''
     })
-    const total = computed(() => state.tableData.length)
+    // const total = computed(() => state.tableData.length)
+    // A quick fix here
+    const total = 1
 
     onMounted(() => {
       // eslint-disable-next-line no-console
@@ -255,6 +258,22 @@ export default defineComponent({
     const handleDelete = (index: any, row: any) => {
       // eslint-disable-next-line no-console
       console.log(index, row)
+      let record = {
+        todo_id: row.todo_id
+      }
+      try {
+        Service.deleteTodo(record).then((res) => {
+          if (res) {
+            // console.log(res)
+          } else {
+          }
+        });
+      } catch (err) {
+        ElMessage({
+          type: 'warning',
+          message: err.message
+        })
+      }
       state.tableData.splice(index, 1)
     }
     const handleSizeChange = (val: any) => {
@@ -263,6 +282,24 @@ export default defineComponent({
       state.pageSize = val
       // request api to change tableData
     }
+
+     // 分页数据处理
+     // @param data [Array] 需要分页的数据
+     //  @param num [Number] 当前第几页
+     //  @param size [Number] 每页显示多少条
+    // const getList = (data, num, size) => {
+    //   let list, start, end
+    //   start = (num - 1) * size
+    //   end = start + size
+    //   list = data.filter((item, index) => {
+    //     return index >= start && index < end
+    //   })
+    //   list.forEach((item, index) => {
+    //     item.seq = index + start
+    //   })
+    //   return list
+    // }
+
     const handleCurrentChange = (val: any) => {
       // eslint-disable-next-line no-console
       console.log(`当前页: ${val}`)
@@ -273,6 +310,12 @@ export default defineComponent({
       // eslint-disable-next-line no-console
       console.log('submit!')
     }
+
+    const onAddTodo = () => {
+      // eslint-disable-next-line no-console
+      router.replace('/todoList/todoAdd')
+    }
+
     return {
       formInline,
       total,
@@ -280,6 +323,7 @@ export default defineComponent({
       handleCurrentChange,
       handleSizeChange,
       onSubmit,
+      onAddTodo,
       handleEdit,
       handleDelete,
       filterTableRef,

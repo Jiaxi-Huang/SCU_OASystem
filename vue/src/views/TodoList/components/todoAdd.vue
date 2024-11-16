@@ -1,50 +1,49 @@
 <template>
   <div class="FormInfo">
-    <div class="info">
-      <el-divider content-position="left">高级表单</el-divider>
-      <span style="text-align: left">高级表单常见于一次性输入和提交大批量数据的场景。</span>
-    </div>
-
     <el-row>
       <el-col :offset="1" :span="22">
         <div class="grid-content bg-purple-dark">
           <el-card class="box-card">
             <div style="text-align: left">
-              <span>活动管理</span>
+              <span>待办事项添加</span>
               <el-divider></el-divider>
             </div>
             <el-form ref="activityForm" style="text-align: left" :model="sizeForm" label-width="80px" size="mini">
-              <el-form-item label="活动名称">
-                <el-input v-model="sizeForm.name"></el-input>
+              <el-form-item label="标题">
+                <el-input v-model="sizeForm.todo_title"></el-input>
               </el-form-item>
-              <el-form-item label="活动区域">
-                <el-select v-model="sizeForm.region" placeholder="请选择活动区域">
-                  <el-option label="区域一" value="shanghai"></el-option>
-                  <el-option label="区域二" value="beijing"></el-option>
-                </el-select>
+              <el-form-item label="内容" :label-width="formLabelWidth">
+                <el-input v-model="sizeForm.todo_ctnt" autosize type="textarea"/>
               </el-form-item>
-              <el-form-item label="活动时间">
+              <el-form-item label="截止时间">
                 <el-col :span="11">
-                  <el-date-picker v-model="sizeForm.date1" type="date" placeholder="选择日期" style="width: 100%"></el-date-picker>
+                  <el-date-picker v-model="sizeForm.date1"
+                                  type="date" placeholder="选择日期" style="width: 100%"
+                                  value-format="YYYY-MM-DD"
+                  ></el-date-picker>
                 </el-col>
-                <el-col class="line" :span="2">-</el-col>
-                <el-col :span="11">
-                  <el-time-picker v-model="sizeForm.date2" placeholder="选择时间" style="width: 100%"></el-time-picker>
+                <el-col class="line" :span="1">&nbsp;&nbsp;&nbsp;&nbsp;-</el-col>
+                <el-col :span="12">
+                  <el-time-picker v-model="sizeForm.date2" placeholder="选择时间" style="width: 100%"
+                                  format="HH:mm" value-format="HH:mm"
+                  ></el-time-picker>
                 </el-col>
               </el-form-item>
-              <el-form-item label="活动性质">
+              <el-form-item label="从属">
                 <el-checkbox-group v-model="sizeForm.type">
-                  <el-checkbox-button label="美食/餐厅线上活动" name="type"></el-checkbox-button>
-                  <el-checkbox-button label="地推活动" name="type"></el-checkbox-button>
-                  <el-checkbox-button label="线下主题活动" name="type"></el-checkbox-button>
+                  <el-checkbox-button label="为自己添加"></el-checkbox-button>
+                  <el-checkbox-button label="为他人添加"></el-checkbox-button>
                 </el-checkbox-group>
               </el-form-item>
-              <el-form-item label="特殊资源">
-                <el-radio-group v-model="sizeForm.resource" size="medium">
-                  <el-radio border label="线上品牌商赞助"></el-radio>
-                  <el-radio border label="线下场地免费"></el-radio>
-                </el-radio-group>
+
+              <el-form-item label="自己的ID" v-show="forSelf">
+                <el-input v-model="sizeForm.adder_id" placeholder="暂时这样，以后会自动填入且无法修改"></el-input>
               </el-form-item>
+
+              <el-form-item label="别人的ID" v-show="forOther">
+                <el-input v-model="sizeForm.user_id" placeholder="这个地方没想好怎么填起来方便"></el-input>
+              </el-form-item>
+
               <el-form-item size="large">
                 <el-button type="primary" @click="submitForm">立即创建</el-button>
                 <el-button>取消</el-button>
@@ -57,10 +56,11 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, onMounted, reactive, ref } from 'vue'
+import {computed, defineComponent, onMounted, reactive, ref} from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Edit, DeleteFilled, Check, ArrowLeft } from '@element-plus/icons-vue'
+import Service from "@/views/TodoList/api";
 
 export default defineComponent({
   name: 'AdvanceForm',
@@ -73,43 +73,21 @@ export default defineComponent({
   setup() {
     const router = useRouter()
 
-    const tableData = reactive([
-      {
-        province: '上海市',
-        city: '浦东新区',
-        name: '王小虎1',
-        address: '上海市普陀区金沙江路 1518 弄',
-        edit: false
-      },
-      { province: '上海市', city: '浦东新区', name: '王小虎2', address: '上海市普陀区金沙江路 1517 弄', edit: false },
-      {
-        province: '上海市',
-        city: '浦东新区',
-        name: '王小虎3',
-        address: '上海市普陀区金沙江路 1519 弄',
-        edit: false
-      },
-      {
-        province: '上海市',
-        city: '浦东新区',
-        name: '王小虎4',
-        address: '上海市普陀区金沙江路 1516 弄',
-        edit: true
-      }
-    ])
-
     const sizeForm = reactive({
-      name: '',
-      region: '',
+      todo_title: '',
+      todo_ctnt: '',
       date1: '',
       date2: '',
-      delivery: false,
       type: [],
-      resource: '',
-      desc: ''
+      adder_id: '',
+      user_id: '',
     })
 
+    const forSelf = computed(() => sizeForm.type.includes('为自己添加'));
+    const forOther = computed(() => sizeForm.type.includes('为他人添加'));
+
     const activityForm = ref()
+
     onMounted(() => {
       // eslint-disable-next-line no-console
       console.log('show sizeFormRef.value', activityForm.value)
@@ -118,14 +96,39 @@ export default defineComponent({
     const submitForm = () => {
       activityForm.value.validate((valid: any): boolean => {
         if (valid) {
-          ElMessage({
-            type: 'success',
-            message: '创建成功'
-          })
+          let record = {
+            todo_title: sizeForm.todo_title,
+            todo_ctnt: sizeForm.todo_ctnt,
+            todo_ddl: sizeForm.date1 + "-" + sizeForm.date2,
+            adder_id: sizeForm.adder_id,
+            user_id: sizeForm.user_id,
+          }
+          try {
+            Service.addTodo(record).then((res) => {
+
+            });
+            ElMessage({
+              type: 'success',
+              message: '创建成功'
+            })
+          } catch (err) {
+            ElMessage({
+              type: 'warning',
+              message: err.message
+            })
+            console.log('submit error')
+            return false
+          }
+          sizeForm.todo_title = ''
+          sizeForm.todo_ctnt = ''
+          sizeForm.date1 = ''
+          sizeForm.date2 = ''
+          sizeForm.type = []
+          sizeForm.adder_id = ''
+          sizeForm.user_id = ''
           return true
         }
-        // eslint-disable-next-line no-console
-        console.log('error submit!!')
+        console.log('submit error')
         return false
       })
     }
@@ -183,12 +186,13 @@ export default defineComponent({
       handleEdit,
       handleSave,
       handleDelete,
-      tableData,
       handleBack,
       sizeForm,
       activityForm,
       submitForm,
-      resetForm
+      resetForm,
+      forSelf,
+      forOther,
     }
   }
 })

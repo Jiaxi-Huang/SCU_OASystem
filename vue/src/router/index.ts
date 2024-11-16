@@ -389,7 +389,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
         component: () => import( '@/views/TodoList/components/todoAdd.vue'),
         meta: {
           title: {
-            '/zh-CN': '添加待辦事項',
+            '/zh-CN': '添加待办事项',
             '/en-US': 'Add Todo'
           },
           icon: 'ic ic-stealth-fill',

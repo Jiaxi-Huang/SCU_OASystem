@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.backend.mapper.TodoListMapper;
 import com.example.backend.services.TodoService;
-
 import java.util.List;
 
 @RestController
@@ -35,6 +34,22 @@ public class TodoListCon {
     public ReponseBase modifyRec(@RequestBody TodoRecord record) {
         int res_code = my_service.updateTodoRecord(record);
 //        System.out.println("modifyRec res_code: " + res_code);
+        return new ReponseBase();
+    }
+
+    @PostMapping("/add")
+    public ReponseBase addRec(@RequestBody TodoRecord record) {
+        int res_code = my_service.insertTodoRecord(record);
+        System.out.println("addRec res_code: " + res_code);
+        return new ReponseBase();
+    }
+
+
+    @PostMapping("/deleteTodo")
+    public ReponseBase deleteRec(@RequestBody TodoRecord record) {
+        System.out.println("deleteRecord " + record.getTodo_id());
+        int res_code = my_service.deleteRecord(record);
+        System.out.println("deleteRecord res_code: " + res_code);
         return new ReponseBase();
     }
 }
