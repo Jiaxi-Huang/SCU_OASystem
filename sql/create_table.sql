@@ -73,7 +73,7 @@ CREATE TABLE notification_chain (
 -- 创建用户和待办事项表
 CREATE TABLE UserTodo (
     user_id INT NOT NULL,                              -- 用户ID，外键，参照用户表
-    todo_id INT PRIMARY KEY,                  -- 待办事项ID，主键且外键，参照待办事项表
+    todo_id INT PRIMARY KEY AUTO_INCREMENT,                  -- 待办事项ID，主键且外键，参照待办事项表
     adder_id INT,                             -- 添加人ID，外键，参照用户表
     todo_title VARCHAR(255),                  -- 待办事项名
     todo_ctnt VARCHAR(255),                   -- 内容
