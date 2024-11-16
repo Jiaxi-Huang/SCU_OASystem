@@ -107,7 +107,7 @@ Mock.mock('/api/auth/user/register', 'post', () => ({
   success: true,
   message: '成功'
 }))
- */
+
 Mock.mock('/api/auth/permission/routes', 'post', (option) => {
   const { roleName } = JSON.parse(option.body)
   if (roleName === 'admin') {
@@ -158,7 +158,7 @@ Mock.mock('/api/auth/permission/routes', 'post', (option) => {
     message: '成功'
   }
 })
-
+ */
 Mock.mock('/api/auth/permission/permissions', 'post', () => ({
   status: 0,
   data: {
@@ -179,13 +179,14 @@ Mock.mock('/api/auth/email/forgot-password', 'post', () => ({
 }))
  */
 // /api/auth/user/reset-password
+/*
 Mock.mock('/api/auth/user/reset-password', 'post', () => ({
   status: 0,
   data: {},
   success: true,
   message: '成功'
 }))
-
+*/
 Mock.mock('/api/setting/basicInfo', 'post', (option) => {
   const { email, nickname, desc, mobile } = JSON.parse(option.body)
   return {

@@ -104,7 +104,7 @@ class Service {
    */
   static postAuthPermission(data: any) {
     return request({
-      url: loginApi.permissionRoutes,
+      url: 'http://localhost:8080/api/auth/permission/routes',//loginApi.permissionRoutes,
       method: 'POST',
       json: true,
       data
