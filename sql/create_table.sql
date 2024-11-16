@@ -1,10 +1,10 @@
 -- 创建用户信息表
 CREATE TABLE user_infos (
-    user_id INT PRIMARY KEY,                    -- 用户ID，主键
+    user_id INT PRIMARY KEY AUTO_INCREMENT,                   -- 用户ID，主键
     username VARCHAR(50),                        -- 用户名
     password VARCHAR(255),                       -- 密码，存储加密后的密码
     wechat_user_id VARCHAR(100),                 -- 微信用户ID
-    email VARCHAR(64) CHECK (email LIKE '%_@__%.__%'),  -- 邮箱，约束邮箱格式
+    email VARCHAR(64) UNIQUE CHECK (email LIKE '%_@__%.__%'), -- 邮箱，唯一且约束格式
     department VARCHAR(64),                      -- 部门
     role VARCHAR(64),                            -- 职能
     intro VARCHAR(256)                           -- 自我介绍
@@ -109,4 +109,6 @@ CREATE TABLE UserMeetings (
     FOREIGN KEY (mtin_id) REFERENCES Meetings(mtin_id),            -- 外键，关联会议表
     FOREIGN KEY (adder_id) REFERENCES user_infos(user_id)          -- 外键，关联用户表
 );
+
+
 
