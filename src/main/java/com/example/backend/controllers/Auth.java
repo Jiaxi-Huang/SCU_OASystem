@@ -127,7 +127,7 @@ public class Auth {
         try{
             String roleName = request.getRoleName();
             if (roleName != null) {
-                if (roleName == "admin") {
+                if (roleName.equals("admin")) {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
                             "/dashboard", "/guide", "/dragable", "/copy", "/role",
@@ -141,7 +141,7 @@ public class Auth {
                             data
                     );
                     return ResponseEntity.status(HttpStatus.OK).body(response);
-                } else if (roleName == "manager") {
+                } else if (roleName.equals("manager")) {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
                             "/dashboard", "/guide", "/dragable", "/calendar", "/copy",
