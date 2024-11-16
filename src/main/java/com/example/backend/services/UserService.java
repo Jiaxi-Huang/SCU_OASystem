@@ -18,7 +18,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         if (user != null) {
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
             if(encoder.matches(password, user.getPassword())){
-                return user.getId();
+                return user.getUserId();
             }
         }
         return 0;
