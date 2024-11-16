@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 @TableName("user_infos")
 public class User {
-    @TableId(type = IdType.INPUT)
+    @TableId(type = IdType.AUTO)
     private int user_id;
     private String email;
     private String password;
@@ -14,8 +14,11 @@ public class User {
     private String role;
 
     // Getters and Setters
-    public int getId() {
+    public int getUserId() {
         return user_id;
+    }
+    public void setUserId(int user_id) {
+        this.user_id = user_id;
     }
     public String getEmail() {
         return email;
