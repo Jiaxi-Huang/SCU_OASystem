@@ -77,7 +77,7 @@ CREATE TABLE UserTodo (
     adder_id INT,                             -- 添加人ID，外键，参照用户表
     todo_title VARCHAR(255),                  -- 待办事项名
     todo_ctnt VARCHAR(255),                   -- 内容
-    todo_fin VARCHAR(4),                            -- 已完成，布尔类型
+    todo_fin VARCHAR(4),                      -- 已完成
     todo_crt VARCHAR(255),                    -- 创建日期
     todo_ddl VARCHAR(255),                    -- 截止日期
     FOREIGN KEY (user_id) REFERENCES user_infos(user_id),          -- 外键，关联用户表
@@ -86,10 +86,10 @@ CREATE TABLE UserTodo (
 
 -- 创建会议表
 CREATE TABLE Meetings (
-    mtin_id INT PRIMARY KEY,                   -- 会议ID，主键
+    mtin_id INT PRIMARY KEY,                    -- 会议ID，主键
     mtin_title VARCHAR(255),                    -- 会议名
     mtin_ctnt VARCHAR(255),                     -- 会议简介
-    mtin_fin BOOL,                              -- 已完成，布尔类型
+    mtin_fin VARCHAR(4),                        -- 已完成
     mtin_st VARCHAR(255),                       -- 会议时间
     mtin_len VARCHAR(255),                      -- 会议长度
     mtin_host VARCHAR(255),                     -- 会议发起人
