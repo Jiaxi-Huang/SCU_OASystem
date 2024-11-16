@@ -13,8 +13,8 @@ public interface UserMapper extends BaseMapper<User>{
     @Options(useGeneratedKeys = true, keyProperty = "id")
     //返回int,boolean等值的时候，尽量表明正常的情况返回什么值
     //int insertUser(String email, String password, String role)这样是不会正常返回的
-
     int insertUser(String email, String password, String role);
+
     @Update("UPDATE user_infos SET password = #{password} WHERE email = #{email}")
     int updatePassword(String email, String password);
 }

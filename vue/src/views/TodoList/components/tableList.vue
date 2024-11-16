@@ -49,9 +49,9 @@
 
 
     <!--    V-MODEL!!!!!-->
-    <el-dialog v-model="modifyFormVisible" title="修改待辦事項">
+    <el-dialog v-model="modifyFormVisible" title="修改待办事项">
       <el-form :model="form">
-        <el-form-item label="標題" :label-width="formLabelWidth">
+        <el-form-item label="标题" :label-width="formLabelWidth">
           <el-input v-model="form.title" autocomplete="on"></el-input>
         </el-form-item>
         <el-form-item label="内容" :label-width="formLabelWidth">
@@ -60,19 +60,19 @@
         <el-form-item label="截止日期" :label-width="formLabelWidth">
           <el-input v-model="form.ddl" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="狀態" :label-width="formLabelWidth">
+        <el-form-item label="状态" :label-width="formLabelWidth">
           <el-input v-model="form.status" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="創建日期" :label-width="formLabelWidth">
+        <el-form-item label="创建日期" :label-width="formLabelWidth">
           <el-input v-model="form.crt" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="添加者ID" :label-width="formLabelWidth">
           <el-text class="mx-1" type="info">{{ form.adder }}</el-text>
         </el-form-item>
-        <el-form-item label="待辦事項ID" :label-width="formLabelWidth">
+        <el-form-item label="待办事项ID" :label-width="formLabelWidth">
           <el-text class="mx-1" type="info">{{ form.todo_id }}</el-text>
         </el-form-item>
-        <el-form-item label="從屬用戶ID" :label-width="formLabelWidth">
+        <el-form-item label="从属用戶ID" :label-width="formLabelWidth">
           <el-text class="mx-1" type="info">{{ form.user_id }}</el-text>
         </el-form-item>
       </el-form>
@@ -82,7 +82,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog v-model="detailFormVisible" title="待辦事項詳情">
+    <el-dialog v-model="detailFormVisible" title="待办事项详情">
       <el-form :model="form">
         <el-form-item label="標題&nbsp;&nbsp;" :label-width="formLabelWidth">
           {{ form.title }}
@@ -188,7 +188,7 @@ export default defineComponent({
               var record = {
                 ddl: data[i].todo_ddl,
                 title: data[i].todo_title,
-                status: data[i].todo_fin=='y'? '已完成':'未完成',
+                status: data[i].todo_fin,
                 content: data[i].todo_ctnt,
                 crt: data[i].todo_crt,
                 adder: data[i].adder_id,
@@ -236,17 +236,13 @@ export default defineComponent({
     const handleEdit = () => {
       // eslint-disable-next-line no-console
       state.modifyFormVisible = false
-      const record = state.form
+      let record = state.form
       state.form = {}
-
       try {
         Service.postModifyTodo(record).then((res) => {
           if (res) {
             // console.log(res)
-            // getPersonalTodoList()
-            console.log('postModifyTodo SUC')
           } else {
-            console.log('postModifyTodo RES MISS')
           }
         });
       } catch (err) {

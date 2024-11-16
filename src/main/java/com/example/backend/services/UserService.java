@@ -39,7 +39,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
     public int resetPassword(String email, String password) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String passwordBCrypt = encoder.encode(password);
-        System.out.println(passwordBCrypt);
+//        System.out.println(passwordBCrypt);
         return userMapper.updatePassword(email, passwordBCrypt);
     }
 }

@@ -26,14 +26,24 @@ class Service {
   }
 
   static postModifyTodo(record:any) {
+    let todoList = {
+      todo_ddl: record.ddl ,
+      todo_title: record.title ,
+      todo_fin: record.status ,
+      todo_ctnt: record.content ,
+      todo_crt: record.crt ,
+      adder_id: record.adder ,
+      todo_id: record.todo_id ,
+      user_id: record.user_id ,
+    }
+    console.log(todoList)
     return request({
       url: todolistApi.localHost + todolistApi.modifyTodolist,
       method: 'POST',
       json: true,
-      data: record,
+      data: todoList,
     }).then((res) => {
       if (res.status === 0) {
-        console.log("postModifyTodo success")
         return res
       }
       return null
