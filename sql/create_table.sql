@@ -4,7 +4,7 @@ CREATE TABLE user_infos (
     username VARCHAR(50),                        -- 用户名
     password VARCHAR(255),                       -- 密码，存储加密后的密码
     wechat_user_id VARCHAR(100),                 -- 微信用户ID
-    email VARCHAR(64) CHECK (email LIKE '%_@__%.__%'),  -- 邮箱，约束邮箱格式
+    email VARCHAR(64) UNIQUE CHECK (email LIKE '%_@__%.__%'), -- 邮箱，唯一且约束格式
     department VARCHAR(64),                      -- 部门
     role VARCHAR(64),                            -- 职能
     intro VARCHAR(256)                           -- 自我介绍
