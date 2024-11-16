@@ -44,7 +44,6 @@ public class Auth {
             String email = request.getEmail();
             String password = request.getPassword();
             int authenticatedId = userService.login(email, password);
-            System.out.println(authenticatedId);
             if (authenticatedId>0) {//这里获取的ID必须大于0
                 String accessToken = accessService.generateAccessToken(32);
                 boolean isStored = accessService.storeAccessToken(authenticatedId,accessToken);
@@ -126,8 +125,7 @@ public class Auth {
     public ResponseEntity<AuthedRoutesResponse> autheredRoutes(@RequestBody AuthedRoutesRequest request) {
         //获取邮箱
         try{
-            String email = request.getEmail();
-            String roleName = userService.role(email);
+            String roleName = request.getRoleName();
             if (roleName != null) {
                 if (roleName == "admin") {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();

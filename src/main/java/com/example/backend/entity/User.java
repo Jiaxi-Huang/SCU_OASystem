@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 @TableName("user_infos")
 public class User {
-    @TableId(type = IdType.AUTO)
+    @TableId(type = IdType.INPUT)
     private int user_id;
     private String email;
     private String password;

@@ -5,5 +5,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AuthedRoutesRequest {
-    private String email;
+    private String roleName;
 }
