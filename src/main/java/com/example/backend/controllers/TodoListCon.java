@@ -21,7 +21,7 @@ public class TodoListCon {
 
     @PostMapping("/getRec")
     public ReponseBase getRec() {
-        System.out.println("[getRec] receive");
+//        System.out.println("[getRec] receive");
         ReponseBase res = new ReponseBase();
         List<TodoRecord> records = my_service.getAllRecords();
 
@@ -32,9 +32,9 @@ public class TodoListCon {
     }
 
     @PostMapping("/modifyRec")
-    public ReponseBase modifyRec(@RequestBody Object res) {
-        System.out.println("modifyRec knows");
-
+    public ReponseBase modifyRec(@RequestBody TodoRecord record) {
+        int res_code = my_service.updateTodoRecord(record);
+//        System.out.println("modifyRec res_code: " + res_code);
         return new ReponseBase();
     }
 }
