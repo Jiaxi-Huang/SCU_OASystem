@@ -7,7 +7,8 @@ CREATE TABLE user_infos (
     email VARCHAR(64) CHECK (email LIKE '%_@__%.__%'),  -- 邮箱，约束邮箱格式
     department VARCHAR(64),                      -- 部门
     role VARCHAR(64),                            -- 职能
-    intro VARCHAR(256)                           -- 自我介绍
+    intro VARCHAR(256),                          -- 自我介绍
+    phone VARCHAR(11)
 );
 
 
