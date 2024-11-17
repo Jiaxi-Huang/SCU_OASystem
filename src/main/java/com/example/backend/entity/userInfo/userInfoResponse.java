@@ -52,6 +52,14 @@ public class userInfoResponse {
         private String roleName;
         private String userDepartment;
         private String userIntro;
+        private String userPhone;
+        public String getUserPhone() {
+            return userPhone;
+        }
+
+        public void setUserPhone(String userPhone) {
+            this.userPhone = userPhone;
+        }
 
         public String getUserName() {
             return userName;

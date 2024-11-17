@@ -98,6 +98,7 @@ public class Auth {
                 userInfoResponseData.setRoleName(userInfo.getRole());
                 userInfoResponseData.setUserName(userInfo.getUsername());
                 userInfoResponseData.setUserIntro(userInfo.getIntro());
+                userInfoResponseData.setUserPhone(userInfo.getPhone());
                 userInfoResponseData.setUserDepartment(userInfo.getDepartment());
                 userInfoResponse response = new userInfoResponse(
                         0,

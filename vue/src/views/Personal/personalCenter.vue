@@ -42,6 +42,13 @@
               <el-descriptions-item>
                 <template #label>
                   <i class="el-icon-chat-dot-round"></i>
+                  手机号:
+                </template>
+                {{phone}}
+              </el-descriptions-item>
+              <el-descriptions-item>
+                <template #label>
+                  <i class="el-icon-chat-dot-round"></i>
                   自我介绍:
                 </template>
                 {{intro}}
@@ -102,6 +109,7 @@ export default defineComponent({
     const username = computed(() => store.state.permissionModule.username)
     const role = computed(() => store.state.permissionModule.role)
     const department = computed(() => store.state.permissionModule.department)
+    const phone = computed(() => store.state.permissionModule.phone)
     const intro = computed(() => store.state.permissionModule.intro)
     // mothods
     /**
@@ -149,6 +157,7 @@ export default defineComponent({
       username,
       role,
       department,
+      phone,
       intro,
       showDesc,
       handleClose

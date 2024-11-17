@@ -34,3 +34,6 @@ https://blog.csdn.net/KUKUKAKASSAN/article/details/130046698
 ### 关于配置redis和qq邮箱用于验证码发送
 https://cloud.tencent.com/developer/article/2432650
 注意，需要修改端口为587，具体参考：https://www.cnblogs.com/blank-ys/p/15465877.html
+
+- 时间:2024.11.17
+### 完善了用户信息修改模块（即是菜单栏的个人页）部分功能

@@ -20,20 +20,15 @@
                 <div class="set-info">
                   <div class="form-info">
                     <el-form ref="settingFormRef" :model="settingForm" :rules="rules" label-width="100px" class="demo-ruleForm">
-                      <el-form-item label="邮箱" prop="email">
-                        <el-input v-model="settingForm.email" placeholder="请输入邮箱"></el-input>
+                      <el-form-item label="用户名称" prop="nickname">
+                        <el-input v-model="settingForm.username" placeholder="请输入用户名" maxlength="10"></el-input>
                       </el-form-item>
-                      <el-form-item label="昵称" prop="nickname">
-                        <el-input v-model="settingForm.nickname" placeholder="请输入昵称" maxlength="10"></el-input>
+                      <el-form-item label="联系电话" prop="mobile">
+                        <el-input v-model="settingForm.phone" placeholder="请输入11位大陆手机号码"></el-input>
                       </el-form-item>
                       <el-form-item label="个人简介" prop="desc">
-                        <el-input v-model="settingForm.desc" type="textarea" placeholder="个人简介" maxlength="120"></el-input>
+                        <el-input v-model="settingForm.intro" type="textarea" placeholder="个人简介" maxlength="120"></el-input>
                       </el-form-item>
-
-                      <el-form-item label="联系电话" prop="mobile">
-                        <el-input v-model="settingForm.mobile" placeholder="请输入11位大陆手机号码"></el-input>
-                      </el-form-item>
-
                       <el-form-item>
                         <el-button type="primary" :loading="updateLoading" @click="submitForm()">更新基本信息</el-button>
                         <el-button @click="resetForm()">重置</el-button>
@@ -125,8 +120,9 @@
 import { ElMessage } from 'element-plus'
 import { defineComponent, onMounted, reactive, ref, toRefs } from 'vue'
 import { useRouter } from 'vue-router'
+import { useStore } from '@/store'
 import Service from './api/index'
-
+import LoginService from '../Login/api/index'
 // eslint-disable-next-line no-unused-vars
 type VoidNoop = (arg0?: Error) => void
 export default defineComponent({
@@ -135,16 +131,18 @@ export default defineComponent({
     const router = useRouter()
     const tabPosition = ref('left')
     const settingFormRef = ref()
+    const store = useStore()
     const noticeSwitch = reactive({
       userSwitch: false,
       sysSwitch: true,
       taskSwitch: true
     })
     const settingForm = reactive({
-      email: '',
-      nickname: '',
-      desc: '',
-      mobile: ''
+      //email:'',
+      username: '',
+      intro: '',
+      phone: '',
+      accessToken: sessionStorage.getItem('accessToken')
     })
     const imageUrl = ref()
     const updateLoading = ref(false)
@@ -165,13 +163,15 @@ export default defineComponent({
 
     //
     const rules = {
+      /*
       email: [
         { required: true, message: '请输入邮箱地址', trigger: 'blur' },
         { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
       ],
-      nickname: { required: true, message: '请输入昵称', trigger: ['blur', 'change'] },
-      desc: { required: true, message: '请输入个人简介', trigger: ['blur', 'change'] },
-      mobile: { required: true, validator: validateMobile, trigger: ['blur', 'change'] }
+      */
+      username: { required: true, message: '请输入昵称', trigger: ['blur', 'change'] },
+      intro: { required: true, message: '请输入个人简介', trigger: ['blur', 'change'] },
+      phone: { required: true, validator: validateMobile, trigger: ['blur', 'change'] }
     }
     onMounted(() => {})
     // methods
@@ -189,6 +189,7 @@ export default defineComponent({
             }
             const res = await Service.postSetBasicInfo(data)
             console.log(res)
+            store.dispatch('permissionModule/getUserInfos', res.data)
             updateLoading.value = false
             ElMessage({
               type: 'success',

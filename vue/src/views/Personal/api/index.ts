@@ -11,7 +11,7 @@ class Service {
    */
   static postSetBasicInfo(data: any) {
     return request({
-      url: personalApi.basicInfo,
+      url: 'http://localhost:8080/api/setting/basicInfo',//personalApi.basicInfo,
       method: 'post',
       json: true,
       data

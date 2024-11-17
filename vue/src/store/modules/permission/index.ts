@@ -10,6 +10,7 @@ const username = localStorage.getItem('username') || ''
 const role = localStorage.getItem('role') || ''
 const department = localStorage.getItem('department') || ''
 const intro = localStorage.getItem('intro') || ''
+const phone = localStorage.getItem('phone') || ''
 // create a new Store Modules.
 const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
   namespaced: true,
@@ -18,6 +19,7 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
     role, // 用户包含的角色,
     department,//用户部门
     intro,//用户介绍
+    phone,// 用户手机号
     permissions: [], // 用户指定局部操作权限
     accessRoutes: constantRoutes, // 可访问路由集合
     routes: constantRoutes, // 所有路由集合
@@ -39,6 +41,10 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
     setIntro: (state: permissionStateTypes, { userIntro }) => {
       state.intro = userIntro
       console.log(state.intro)
+    },
+    setPhone: (state: permissionStateTypes, { userPhone }) => {
+      state.phone = userPhone
+      console.log(state.phone)
     },
     setAccessRoutes: (state: permissionStateTypes, routes) => {
       state.accessRoutes = constantRoutes.concat(routes)
@@ -62,7 +68,8 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
         userName: payload.userName,
         roleName: payload.roleName,
         userDepartment: payload.userDepartment,
-        userIntro: payload.userIntro
+        userIntro: payload.userIntro,
+        userPhone:payload.userPhone
       }
       // 后端根据角色名称，查询授权菜单
       Service.postAuthPermission(data).then((res) => {
@@ -126,15 +133,29 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
     // 授权角色
     getPermissonRoles({ commit }, payload: any) {
       // api request
-      localStorage.setItem('username', payload.userName)
-      commit('setUsername', payload)
       localStorage.setItem('role', payload.roleName)
       commit('setRoles', payload)
-      localStorage.setItem('department', payload.userDepartment)
-      commit('setDepartment', payload)
-      localStorage.setItem('intro', payload.userIntro)
-      commit('setIntro', payload)
+
+    },
+    getUserInfos({ commit }, payload: any) {
+      if ('userName' in payload) {
+        localStorage.setItem('username', payload.userName);
+        commit('setUsername', payload);
+      }
+      if ('userDepartment' in payload) {
+        localStorage.setItem('department', payload.userDepartment);
+        commit('setDepartment', payload);
+      }
+      if ('userPhone' in payload) {
+        localStorage.setItem('phone', payload.userPhone);
+        commit('setPhone', payload);
+      }
+      if ('userIntro' in payload) {
+        localStorage.setItem('intro', payload.userIntro);
+        commit('setIntro', payload);
+      }
     }
+
   },
   getters: {
     getAccessRoutes(state: permissionStateTypes) {
@@ -154,6 +175,9 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
     },
     getIntro(state: permissionStateTypes) {
       return state.intro
+    },
+    getPhone(state: permissionStateTypes) {
+      return state.phone
     },
     getPermission(state: permissionStateTypes) {
       return state.permissions

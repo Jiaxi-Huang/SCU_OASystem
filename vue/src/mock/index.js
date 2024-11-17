@@ -186,7 +186,7 @@ Mock.mock('/api/auth/user/reset-password', 'post', () => ({
   success: true,
   message: '成功'
 }))
-*/
+
 Mock.mock('/api/setting/basicInfo', 'post', (option) => {
   const { email, nickname, desc, mobile } = JSON.parse(option.body)
   return {
@@ -200,6 +200,7 @@ Mock.mock('/api/setting/basicInfo', 'post', (option) => {
     message: '更新成功'
   }
 })
+*/
 
 Mock.mock('/api/personal/tags', 'get', () => ({
   status: 0,

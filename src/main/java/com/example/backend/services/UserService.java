@@ -30,7 +30,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         }
         return 0; // 用户名或密码错误
     }
-
+    //返回登录的用户相关信息
     public User userInfo(String email) {
         try {
             User user = userMapper.findByEmail(email);
@@ -44,6 +44,21 @@ public class UserService extends ServiceImpl<UserMapper, User> {
             return null; // 表示查询失败
         }
         return null; // 用户不存在
+    }
+    //个人设置信息更改
+    public int basicInfoSetting(String username,String phone,String intro,int user_id) {
+    try {
+        User user = userMapper.findByUserId(user_id);
+        if (user != null) {
+            return userMapper.updateUserInfo(username, phone, intro, user_id);
+        }
+        return -1;
+    } catch (Exception e) {
+        // 记录异常信息
+        e.printStackTrace();
+        // 可以选择返回一个特定的错误码或抛出自定义异常
+        return -1; // 表示更改失败
+        }
     }
 
     public int register(String email, String password) {
