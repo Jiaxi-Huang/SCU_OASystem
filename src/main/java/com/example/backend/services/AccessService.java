@@ -22,4 +22,7 @@ public class AccessService {
         redisTemplate.opsForValue().set(accessToken,authenticatedId, 24, TimeUnit.HOURS);
         return true;
     }
+    public Integer getAuthenticatedId(String accessToken) {
+        return redisTemplate.opsForValue().get(accessToken);
+    }
 }
