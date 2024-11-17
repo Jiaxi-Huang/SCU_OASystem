@@ -23,31 +23,32 @@
                   <i class="el-icon-user"></i>
                   用户名:
                 </template>
-                sara
+                {{username}}
               </el-descriptions-item>
               <el-descriptions-item>
                 <template #label>
                   <i class="el-icon-user"></i>
                   角色:
                 </template>
-                {{ roles }}
+                {{ role }}
               </el-descriptions-item>
               <el-descriptions-item>
                 <template #label>
                   <i class="el-icon-chat-dot-round"></i>
-                  状态:
+                  部门:
                 </template>
-                在职
+                {{department}}
               </el-descriptions-item>
               <el-descriptions-item>
                 <template #label>
-                  <i class="el-icon-location-information"></i>
-                  地址:
+                  <i class="el-icon-chat-dot-round"></i>
+                  自我介绍:
                 </template>
-                上海市虹口区
+                {{intro}}
               </el-descriptions-item>
             </el-descriptions>
           </div>
+          <!--
           <div class="divider divider-dashed"></div>
           <div class="tag-title"><span>标签</span></div>
           <div class="tag-dynamic">
@@ -58,6 +59,7 @@
             <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>
             <div class="divider divider-dashed"></div>
           </div>
+          -->
         </el-card>
       </el-col>
 
@@ -97,7 +99,10 @@ export default defineComponent({
     const size = ref('medium')
     const showDesc = ref(true)
     const store = useStore()
-    const roles = computed(() => store.state.permissionModule.roles)
+    const username = computed(() => store.state.permissionModule.username)
+    const role = computed(() => store.state.permissionModule.role)
+    const department = computed(() => store.state.permissionModule.department)
+    const intro = computed(() => store.state.permissionModule.intro)
     // mothods
     /**
      * @description 关闭tag标签
@@ -141,7 +146,10 @@ export default defineComponent({
       handleInputConfirm,
       ...toRefs(state),
       size,
-      roles,
+      username,
+      role,
+      department,
+      intro,
       showDesc,
       handleClose
     }

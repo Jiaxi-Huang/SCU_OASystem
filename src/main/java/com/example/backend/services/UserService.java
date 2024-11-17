@@ -31,11 +31,11 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         return 0; // 用户名或密码错误
     }
 
-    public String role(String email) {
+    public User userInfo(String email) {
         try {
             User user = userMapper.findByEmail(email);
             if (user != null) {
-                return user.getRole();
+                return user;
             }
         } catch (Exception e) {
             // 记录异常信息

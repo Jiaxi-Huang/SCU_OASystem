@@ -244,7 +244,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
     ]
   },
   {
-    path: '/role',
+    path: '/userInfo',
     component: layout,
     redirect: '/Role/roleManage',
     meta: {

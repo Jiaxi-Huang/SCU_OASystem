@@ -12,6 +12,9 @@ public class User {
     private String password;
     private String phone;
     private String role;
+    private String department;
+    private String username;
+    private String intro;
 
     // Getters and Setters
     public int getUserId() {
@@ -51,5 +54,29 @@ public class User {
     public void setRole(String role) {
         this.role = role;
     }
+        public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getIntro() {
+        return intro;
+    }
+
+    public void setIntro(String intro) {
+        this.intro = intro;
+    }
+
 }
 

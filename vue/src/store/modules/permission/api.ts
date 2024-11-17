@@ -28,7 +28,7 @@ class Service {
    */
   static postPermissions(data: any) {
     return request({
-      url: permissionApi.queryPermissions,
+      url: permissionApi.queryPermissions,//'http://localhost:8080/api/auth/permission/permissions'
       method: 'POST',
       json: true,
       data

@@ -9,7 +9,7 @@ public interface UserMapper extends BaseMapper<User>{
     @Select("SELECT * FROM user_infos WHERE email = #{email}")
     User findByEmail(String email);
 
-    @Insert("INSERT INTO user_infos (email, password, role) VALUES(#{email}, #{password}, #{role})")
+    @Insert("INSERT INTO user_infos (email, password, userInfo) VALUES(#{email}, #{password}, #{userInfo})")
     //@Options(useGeneratedKeys = true, keyProperty = "user_id")
     int insertUser(String email, String password, String role);
     @Update("UPDATE user_infos SET password = #{password} WHERE email = #{email}")

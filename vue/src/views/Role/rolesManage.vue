@@ -106,10 +106,10 @@ export default defineComponent({
   setup() {
     const state = reactive({
       url: {
-        c: '/role/add',
-        r: '/role/list',
-        u: '/role/update',
-        d: '/role/delete'
+        c: '/userInfo/add',
+        r: '/userInfo/list',
+        u: '/userInfo/update',
+        d: '/userInfo/delete'
       },
       param: {
         limit: 10,
@@ -117,8 +117,8 @@ export default defineComponent({
       },
       data: [
         { roleName: '超级管理员', remark: '拥有删除和创建等操作的权限', state: 0 },
-        { roleName: '管理员', remark: '拥有创建和权限分配的权限', state: 0 },
-        { roleName: '游客', remark: '只拥有操作部分菜单的权限', state: 1 }
+        { roleName: '部门经理', remark: '只拥有操作部分菜单的权限和部分创建和权限分配的权限', state: 0 },
+        { roleName: '员工', remark: '只拥有操作部分菜单的权限', state: 1 }
       ],
       loading: false,
       is_search: false,

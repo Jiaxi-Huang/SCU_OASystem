@@ -6,21 +6,39 @@ import permissionStateTypes from './types'
 import RootStateTypes from '../../types'
 import Service from './api'
 
-const roles = localStorage.getItem('role') || ''
+const username = localStorage.getItem('username') || ''
+const role = localStorage.getItem('role') || ''
+const department = localStorage.getItem('department') || ''
+const intro = localStorage.getItem('intro') || ''
 // create a new Store Modules.
 const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
   namespaced: true,
   state: {
-    roles, // 用户包含的角色,
+    username,//用户名
+    role, // 用户包含的角色,
+    department,//用户部门
+    intro,//用户介绍
     permissions: [], // 用户指定局部操作权限
     accessRoutes: constantRoutes, // 可访问路由集合
     routes: constantRoutes, // 所有路由集合
     authedRoutes: []
   },
   mutations: {
+    setUsername: (state: permissionStateTypes, { userName }) => {
+      state.username = userName
+      console.log(state.username)
+    },
     setRoles: (state: permissionStateTypes, { roleName }) => {
-      state.roles = roleName
-      console.log(state.roles)
+      state.role = roleName
+      console.log(state.role)
+    },
+    setDepartment: (state: permissionStateTypes, { userDepartment }) => {
+      state.department = userDepartment
+      console.log(state.department)
+    },
+    setIntro: (state: permissionStateTypes, { userIntro }) => {
+      state.intro = userIntro
+      console.log(state.intro)
     },
     setAccessRoutes: (state: permissionStateTypes, routes) => {
       state.accessRoutes = constantRoutes.concat(routes)
@@ -41,7 +59,10 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
     getPermissonRoutes({ commit }, payload: any) {
       // api request
       const data = {
-        roleName: payload.roleName
+        userName: payload.userName,
+        roleName: payload.roleName,
+        userDepartment: payload.userDepartment,
+        userIntro: payload.userIntro
       }
       // 后端根据角色名称，查询授权菜单
       Service.postAuthPermission(data).then((res) => {
@@ -105,8 +126,14 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
     // 授权角色
     getPermissonRoles({ commit }, payload: any) {
       // api request
+      localStorage.setItem('username', payload.userName)
+      commit('setUsername', payload)
       localStorage.setItem('role', payload.roleName)
       commit('setRoles', payload)
+      localStorage.setItem('department', payload.userDepartment)
+      commit('setDepartment', payload)
+      localStorage.setItem('intro', payload.userIntro)
+      commit('setIntro', payload)
     }
   },
   getters: {
@@ -116,8 +143,17 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
     authedRoutes(state: permissionStateTypes) {
       return state.authedRoutes
     },
+    getUsername(state: permissionStateTypes) {
+      return state.username
+    },
     getRoles(state: permissionStateTypes) {
-      return state.roles
+      return state.role
+    },
+    getDepartment(state: permissionStateTypes) {
+      return state.department
+    },
+    getIntro(state: permissionStateTypes) {
+      return state.intro
     },
     getPermission(state: permissionStateTypes) {
       return state.permissions

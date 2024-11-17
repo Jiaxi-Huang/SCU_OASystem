@@ -253,7 +253,7 @@ Mock.mock('/api/personal/tasks', 'get', () => ({
   },
   message: '更新成功'
 }))
-Mock.mock('/api/auth/roles', 'get', genRoles)
+//Mock.mock('/api/auth/roles', 'get', genRoles)
 Mock.mock('/api/home/swiperInfo', 'get', getSwiperInfo)
 
 // 项目看板数据

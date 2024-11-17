@@ -1,16 +1,16 @@
-package com.example.backend.entity.role;
+package com.example.backend.entity.userInfo;
 
-public class RoleResponse {
+public class userInfoResponse {
     private int status;
     private String message;
     private boolean success;
     private Data data;
 
-    public RoleResponse(int status, String message, boolean success, String roleName) {
+    public userInfoResponse(int status, String message, boolean success, Data data) {
         this.status = status;
         this.message = message;
         this.success = success;
-        this.data = new Data(roleName);
+        this.data = data;
     }
 
     // Getter 和 Setter 方法
@@ -48,10 +48,36 @@ public class RoleResponse {
 
     // 内部类 Data
     public static class Data {
+        private String userName;
         private String roleName;
+        private String userDepartment;
+        private String userIntro;
 
-        public Data(String roleName) {
-            this.roleName = roleName;
+        public String getUserName() {
+            return userName;
+        }
+
+        public void setUserName(String userName) {
+            this.userName = userName;
+        }
+
+        public String getUserDepartment() {
+            return userDepartment;
+        }
+
+        public void setUserDepartment(String userDepartment) {
+            this.userDepartment = userDepartment;
+        }
+
+        public String getUserIntro() {
+            return userIntro;
+        }
+
+        public void setUserIntro(String userIntro) {
+            this.userIntro = userIntro;
+        }
+
+        public Data() {
         }
 
         public String getRoleName() {

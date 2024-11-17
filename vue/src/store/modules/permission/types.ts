@@ -1,7 +1,10 @@
 import { RouteRecordRaw } from 'vue-router'
 
 export default interface permissionStateTypes {
-  roles: String
+  username: String
+  role: String
+  department: String
+  intro: String
   permissions: String[]
   accessRoutes: Array<RouteRecordRaw>
   routes: Array<RouteRecordRaw>

@@ -1,5 +1,6 @@
 package com.example.backend.controllers;
 
+import com.example.backend.entity.User;
 import com.example.backend.entity.authedRoutes.AuthedRoutesRequest;
 import com.example.backend.entity.authedRoutes.AuthedRoutesResponse;
 import com.example.backend.entity.captcha.CaptchaRequest;
@@ -10,8 +11,8 @@ import com.example.backend.entity.register.RegisterRequest;
 import com.example.backend.entity.register.RegisterResponse;
 import com.example.backend.entity.resetPassword.resetPasswordRequest;
 import com.example.backend.entity.resetPassword.resetPasswordResponse;
-import com.example.backend.entity.role.RoleRequest;
-import com.example.backend.entity.role.RoleResponse;
+import com.example.backend.entity.userInfo.userInfoRequest;
+import com.example.backend.entity.userInfo.userInfoResponse;
 import com.example.backend.services.AccessService;
 import com.example.backend.services.CaptchaService;
 import com.example.backend.services.UserService;
@@ -87,23 +88,27 @@ public class Auth {
     }
 
     @PostMapping("/user/userInfo")
-    public ResponseEntity<RoleResponse> role(@RequestBody RoleRequest request) {
+    public ResponseEntity<userInfoResponse> userInfo(@RequestBody userInfoRequest request) {
         try {
             //获取邮箱
             String email = request.getEmail();
-            String roleName = userService.role(email);
-
-            if (roleName!=null) {
-                RoleResponse response = new RoleResponse(
+            User userInfo = userService.userInfo(email);
+            if (userInfo!=null) {
+                userInfoResponse.Data userInfoResponseData = new userInfoResponse.Data();
+                userInfoResponseData.setRoleName(userInfo.getRole());
+                userInfoResponseData.setUserName(userInfo.getUsername());
+                userInfoResponseData.setUserIntro(userInfo.getIntro());
+                userInfoResponseData.setUserDepartment(userInfo.getDepartment());
+                userInfoResponse response = new userInfoResponse(
                         0,
                         "获取职位信息成功",
                         true,
-                        roleName
+                        userInfoResponseData
                 );
                 return ResponseEntity.status(HttpStatus.OK).body(response);
             } else {
                 // 构建失败响应
-                RoleResponse response = new RoleResponse(
+                userInfoResponse response = new userInfoResponse(
                         1,
                         "获取职位信息失败",
                         false,
@@ -112,7 +117,7 @@ public class Auth {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
         } catch (Exception e) {
-            RoleResponse response = new RoleResponse(
+            userInfoResponse response = new userInfoResponse(
                     2,
                     "服务器内部错误",
                     false,
@@ -130,7 +135,7 @@ public class Auth {
                 if (roleName.equals("admin")) {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
-                            "/dashboard", "/guide", "/dragable", "/copy", "/role",
+                            "/dashboard", "/guide", "/dragable", "/copy", "/userInfo",
                             "/menu", "/projectboard", "/table", "/todoList", "/form",
                             "/cropper", "/personal");
                     data.setAuthedRoutes(authedRoutes);
@@ -158,7 +163,7 @@ public class Auth {
                 } else {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
-                            "/dashboard", "/role", "/menu", "/personal");
+                            "/dashboard", "/userInfo", "/menu", "/personal","/dragable");
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
                             0,
