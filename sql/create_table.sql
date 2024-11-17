@@ -4,7 +4,7 @@ CREATE TABLE user_infos (
     username VARCHAR(50),                        -- 用户名
     password VARCHAR(255),                       -- 密码，存储加密后的密码
     wechat_user_id VARCHAR(100),                 -- 微信用户ID
-    email VARCHAR(64) UNIQUE CHECK (email LIKE '%_@__%.__%'), -- 邮箱，唯一且约束格式
+    email VARCHAR(64) CHECK (email LIKE '%_@__%.__%'),  -- 邮箱，约束邮箱格式
     department VARCHAR(64),                      -- 部门
     role VARCHAR(64),                            -- 职能
     intro VARCHAR(256)                           -- 自我介绍
@@ -13,7 +13,7 @@ CREATE TABLE user_infos (
 
 -- 创建部门信息表
 CREATE TABLE department_infos (
-    department_id INT PRIMARY KEY,
+    department_id INT PRIMARY KEY AUTO_INCREMENT,
     department_name VARCHAR(50)
 );
 
@@ -35,7 +35,7 @@ CREATE TABLE user_permission_infos (
 
 -- 创建请假申请表
 CREATE TABLE leave_requests (
-    leave_id INT PRIMARY KEY,               -- 请假申请的唯一标识符
+    leave_id INT PRIMARY KEY AUTO_INCREMENT,               -- 请假申请的唯一标识符
     user_id INT,                            -- 提交申请的用户ID
     start_date DATETIME,                    -- 请假的开始时间
     end_date DATETIME,                      -- 请假的结束时间
@@ -48,7 +48,7 @@ CREATE TABLE leave_requests (
 
 -- 创建报销申请表
 CREATE TABLE reimbursement_requests (
-    reimbursement_id INT PRIMARY KEY,         -- 报销申请的唯一标识符
+    reimbursement_id INT PRIMARY KEY AUTO_INCREMENT,         -- 报销申请的唯一标识符
     user_id INT,                              -- 提交申请的用户ID
     amount DECIMAL(10, 2),                     -- 报销金额，精度为 10，总共 10 位，其中 2 位小数
     description VARCHAR(255),                  -- 报销描述
@@ -60,7 +60,7 @@ CREATE TABLE reimbursement_requests (
 
 -- 创建抄送链表
 CREATE TABLE notification_chain (
-    notification_id INT PRIMARY KEY,               -- 抄送记录的唯一标识符
+    notification_id INT PRIMARY KEY AUTO_INCREMENT,               -- 抄送记录的唯一标识符
     notified_user_id INT,                          -- 被抄送的用户ID
     request_type VARCHAR(20),                       -- 申请类型（请假申请、报销申请）
     request_id INT,                                -- 对应的申请ID，关联 leave_requests 或 reimbursement_requests 的 ID
@@ -73,11 +73,11 @@ CREATE TABLE notification_chain (
 -- 创建用户和待办事项表
 CREATE TABLE UserTodo (
     user_id INT NOT NULL,                              -- 用户ID，外键，参照用户表
-    todo_id INT PRIMARY KEY AUTO_INCREMENT,                  -- 待办事项ID，主键
+    todo_id INT PRIMARY KEY AUTO_INCREMENT,                  -- 待办事项ID，主键且外键，参照待办事项表
     adder_id INT,                             -- 添加人ID，外键，参照用户表
     todo_title VARCHAR(255),                  -- 待办事项名
     todo_ctnt VARCHAR(255),                   -- 内容
-    todo_fin VARCHAR(4),                      -- 已完成
+    todo_fin VARCHAR(4),                            -- 已完成，布尔类型
     todo_crt VARCHAR(255),                    -- 创建日期
     todo_ddl VARCHAR(255),                    -- 截止日期
     FOREIGN KEY (user_id) REFERENCES user_infos(user_id),          -- 外键，关联用户表
@@ -86,10 +86,10 @@ CREATE TABLE UserTodo (
 
 -- 创建会议表
 CREATE TABLE Meetings (
-    mtin_id INT PRIMARY KEY,                    -- 会议ID，主键
+    mtin_id INT PRIMARY KEY AUTO_INCREMENT,                   -- 会议ID，主键
     mtin_title VARCHAR(255),                    -- 会议名
     mtin_ctnt VARCHAR(255),                     -- 会议简介
-    mtin_fin VARCHAR(4),                        -- 已完成
+    mtin_fin BOOL,                              -- 已完成，布尔类型
     mtin_st VARCHAR(255),                       -- 会议时间
     mtin_len VARCHAR(255),                      -- 会议长度
     mtin_host VARCHAR(255),                     -- 会议发起人
