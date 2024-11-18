@@ -6,7 +6,7 @@ export default interface permissionStateTypes {
   department: String
   intro: String
   phone: String
-  permissions: String[]
+  //permissions: String[]
   accessRoutes: Array<RouteRecordRaw>
   routes: Array<RouteRecordRaw>
   authedRoutes: String[]

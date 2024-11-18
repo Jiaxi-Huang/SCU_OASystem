@@ -40,7 +40,7 @@ const getSwiperInfo = () => ({
   ],
   message: '成功'
 })
-/*
+/**
 Mock.mock('/api/auth/user/login', 'post', (option) => {
   const { email, password } = JSON.parse(option.body)
   console.log(email, password)
@@ -158,7 +158,6 @@ Mock.mock('/api/auth/permission/routes', 'post', (option) => {
     message: '成功'
   }
 })
- */
 Mock.mock('/api/auth/permission/permissions', 'post', () => ({
   status: 0,
   data: {
@@ -168,7 +167,6 @@ Mock.mock('/api/auth/permission/permissions', 'post', () => ({
   message: '成功'
 }))
 
-/**
 //  /api/auth/email/forgot-password
 
 Mock.mock('/api/auth/email/forgot-password', 'post', () => ({

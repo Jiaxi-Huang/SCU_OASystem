@@ -17,15 +17,10 @@
       </el-row>
       <br />
       <el-table v-loading="loading" :data="data" stripe class="table">
-        <el-table-column prop="roleName" label="角色名称" align="center"></el-table-column>
-        <el-table-column prop="state" label="角色状态" align="center">
-          <template #default="scope">
-            <el-tag v-if="scope.row.state == 0" size="mini" type="info"><i class="ic ic-lock"></i> 锁定</el-tag>
-            <el-tag v-else-if="scope.row.state == 1" size="mini" type="success">正常</el-tag>
-            <el-tag v-else size="mini" type="danger">未知</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="remark" label="备注" align="center"></el-table-column>
+        <el-table-column prop="userName" label="用户名" align="center"></el-table-column>
+        <el-table-column prop="userDepartment" label="部门" align="center"></el-table-column>
+        <el-table-column prop="userRole" label="职位" align="center"></el-table-column>
+        <el-table-column prop="userPhone" label="电话号码" align="center"></el-table-column>
 
         <el-table-column label="操作" align="center">
           <template #default="scope">
@@ -34,7 +29,7 @@
                 <el-icon><edit /></el-icon>
               </el-button>
             </el-tooltip>
-            <el-tooltip v-if="scope.row.state != 0" class="item" effect="dark" content="删除" placement="bottom">
+            <el-tooltip  class="item" effect="dark" content="删除" placement="bottom">
               <el-button circle plain type="danger" size="small" @click="onDelete(scope.$index, scope.row)">
                 <el-icon><minus /></el-icon>
               </el-button>
@@ -71,7 +66,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Edit, Minus, Plus, Refresh } from '@element-plus/icons-vue'
 import RoleEdit from './rolesEdit.vue'
 import RoleNew from './rolesNew.vue'
-
+import Service from './api/index'
 const useConfirmDelete = (index: any) => {
   console.log(index)
   ElMessageBox.confirm('此操作将永久删除该数据, 是否继续?', '提示', {
@@ -116,9 +111,7 @@ export default defineComponent({
         page: 1
       },
       data: [
-        { roleName: '超级管理员', remark: '拥有删除和创建等操作的权限', state: 0 },
-        { roleName: '部门经理', remark: '只拥有操作部分菜单的权限和部分创建和权限分配的权限', state: 0 },
-        { roleName: '员工', remark: '只拥有操作部分菜单的权限', state: 1 }
+        //{ userName: '超级管理员', userDepartment:'',userRole:'',userPhone:''},
       ],
       loading: false,
       is_search: false,
@@ -137,7 +130,13 @@ export default defineComponent({
     /**
      * @description 请求接口获取当前设置角色，默认始终有超级管理员角色
      */
-    const fetchData = () => {}
+    const fetchData = async() => {
+      const data = {'accessToken':sessionStorage.getItem('accessToken')}
+      const adminUserInfo = await Service.postAdminQueryUserList(data)
+      if (adminUserInfo.status === 0) {
+        state.data = adminUserInfo.data
+      }
+    }
     const onCurrentChange = () => {
       fetchData()
     }
@@ -150,7 +149,7 @@ export default defineComponent({
     }
     const onCreateSuccess = (val: any) => {
       console.log(val)
-      const newRole = { roleName: val.roleName, remark: val.remark, state: 1 }
+      const newRole = { roleName: val.roleName, remark: val.remark}
       state.data.push(newRole)
       state.add_visible = false
       fetchData()
@@ -185,7 +184,8 @@ export default defineComponent({
       onEditSuccess,
       onRefresh,
       onEdit,
-      onDelete
+      onDelete,
+      fetchData
     }
   }
 })

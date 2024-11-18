@@ -20,7 +20,7 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
     department,//用户部门
     intro,//用户介绍
     phone,// 用户手机号
-    permissions: [], // 用户指定局部操作权限
+    //暂时不用permissions: [],
     accessRoutes: constantRoutes, // 可访问路由集合
     routes: constantRoutes, // 所有路由集合
     authedRoutes: []
@@ -56,9 +56,11 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
       state.authedRoutes = authedRoutes
       localStorage.setItem('authedRoutes', JSON.stringify(authedRoutes))
     },
+    /**
     setPermissions: (state: permissionStateTypes, permissions: string[]) => {
       state.permissions = permissions
     }
+     */
   },
   actions: {
     // 异步接口请求，动态添加路由
@@ -99,6 +101,7 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
         })
       })
     },
+    /**
     getPermissions({ commit }) {
       // 后端根据角色名称，查询授权菜单
       Service.postPermissions({}).then((res) => {
@@ -106,7 +109,7 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
         commit('setPermissions', permissions)
       })
     },
-
+    */
     getRoutes({ commit }) {
       // api request
       // 动态添加路由  vue-router4.x 暂时没有addRoutes
@@ -179,9 +182,11 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
     getPhone(state: permissionStateTypes) {
       return state.phone
     },
+    /**
     getPermission(state: permissionStateTypes) {
       return state.permissions
     }
+     */
   }
 }
 export default permissionModule
