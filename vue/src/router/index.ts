@@ -399,6 +399,45 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
     ]
   },
   {
+    path: '/leaveApproval',
+    component: layout,
+    redirect: '/leaveApproval/leaveList',
+    meta: {
+      title: {
+        '/zh-CN': '请假审批',
+        '/en-US': 'Leave approval'
+      },
+      icon: 'ic ic-barrage-fill'
+    },
+    children: [
+      {
+        path: '/leaveApproval/leaveList',
+        name: 'leaveList',
+        component: () => import('@/views/LeaveApproval/components/leaveList.vue'),
+        meta: {
+          title: {
+            '/zh-CN': '请假',
+            '/en-US': 'Leave list'
+          },
+          icon: 'ic ic-barrage-fill'
+        }
+      },
+      {
+        path: '/leaveApproval/leaveRequest',
+        name: 'leaveRequest',
+        component: () => import( '@/views/LeaveApproval/components/leaveRequest.vue'),
+        meta: {
+          title: {
+            '/zh-CN': '请假申请',
+            '/en-US': 'Leave request'
+          },
+          icon: 'ic ic-stealth-fill',
+          hidden: true,
+        }
+      }
+    ]
+  },
+  {
     path: '/form',
     component: layout,
     redirect: '/form/formInfo',

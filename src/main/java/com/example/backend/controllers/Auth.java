@@ -136,8 +136,13 @@ public class Auth {
                 if (roleName.equals("admin")) {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
+<<<<<<< Updated upstream
                             "/dashboard", "/guide", "/dragable", "/copy", "/userInfo",
                             "/menu", "/projectboard", "/table", "/todoList", "/form",
+=======
+                            "/dashboard", "/guide", "/dragable", "/copy", "/role",
+                            "/menu", "/projectboard", "/table", "/todoList", "/leaveApproval", "/form",
+>>>>>>> Stashed changes
                             "/cropper", "/personal");
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
@@ -151,7 +156,7 @@ public class Auth {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
                             "/dashboard", "/guide", "/dragable", "/calendar", "/copy",
-                            "/zip", "/excel", "/table", "/todoList", "/projectboard",
+                            "/zip", "/excel", "/table", "/todoList", "/leaveApproval", "/projectboard",
                             "/form","/qrcode", "/editor", "/upload", "/cropper", "/personal");
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
