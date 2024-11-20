@@ -52,8 +52,8 @@
       </div>
     </el-card>
 
-    <el-dialog v-model="edit_visible" center :title="posted.role.roleName">
-      <role-edit :current-role="posted" @success="onEditSuccess"></role-edit>
+    <el-dialog v-model="edit_visible" center :title="posted.userRow.userRole">
+      <role-edit :current-row="posted.userRow" @success="onEditSuccess"></role-edit>
     </el-dialog>
     <el-dialog v-model="add_visible" title="新增角色">
       <role-new @success="onCreateSuccess"></role-new>
@@ -119,9 +119,10 @@ export default defineComponent({
       edit_visible: false,
       detail_visible: false,
       posted: {
-        role: {
-          roleName: '',
-          state: 1
+        userRow: {
+          userName:'',
+          userRole: '',
+          userDepartment:''
         }
       }
     })
@@ -149,8 +150,8 @@ export default defineComponent({
     }
     const onCreateSuccess = (val: any) => {
       console.log(val)
-      const newRole = { roleName: val.roleName, remark: val.remark}
-      state.data.push(newRole)
+      const newRow = { userRole: val.userRole}
+      state.data.push(newRow)
       state.add_visible = false
       fetchData()
     }
@@ -167,7 +168,9 @@ export default defineComponent({
      */
     const onEdit = (index: any, row: any) => {
       console.log('row', row)
-      state.posted.role = row
+      state.posted.userRow.userName = row.userName
+      state.posted.userRow.userRole = row.userRole
+      state.posted.userRow.userDepartment = row.userDepartment
       state.edit_visible = true
     }
     const onDelete = (index: any, row: any) => {

@@ -1,2 +1,4 @@
-package com.example.backend.entity.userInfo;public class RequestBase {
+package com.example.backend.entity;
+
+public class RequestBase {
 }

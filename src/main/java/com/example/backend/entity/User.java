@@ -54,7 +54,7 @@ public class User {
     public void setRole(String role) {
         this.role = role;
     }
-        public String getDepartment() {
+    public String getDepartment() {
         return department;
     }
 

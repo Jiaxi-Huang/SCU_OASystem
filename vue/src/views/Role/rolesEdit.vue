@@ -6,7 +6,7 @@
           <div class="card-header">
             <el-form label-position="left" inline class="info-table">
               <el-form-item label="名称">
-                <span>{{ role.roleName }}</span>
+                <span v-if="row && row.userName">{{ row.userName }}</span>
               </el-form-item>
             </el-form>
           </div>
@@ -16,7 +16,7 @@
     </el-card>
     <br />
     <el-row class="btns">
-      <el-button size="mini" type="primary" :disabled="role.state == 0" @click="saveData"> <i class="fa fa-check"> </i> 确认修改 </el-button>
+      <el-button size="mini" type="primary" @click="saveData"> <i class="fa fa-check"> </i> 确认修改 </el-button>
     </el-row>
   </div>
 </template>
@@ -40,16 +40,16 @@ interface stateTypes {
 export default defineComponent({
   name: 'RolesEdit',
   props: {
-    currentRole: {
+    currentRow: {
       type: Object,
-      default: () => ({ roleName: '', state: 1 })
+      default: () => ({ userName:'',userDepartment:'',userRole: ''})
     }
   },
   emits: ['success'],
 
   setup(props, { emit }) {
     // 析构获取 props 属性 basePath
-    const currentRole = toRef(props, 'currentRole')
+    const currentRow = toRef(props, 'currentRow')
     const store = useStore()
     const lang = computed(() => store.getters['settingsModule/getLangState'])
 
@@ -66,7 +66,7 @@ export default defineComponent({
       }
     })
 
-    const role = computed(() => currentRole.value.role)
+    const row = computed(() => currentRow.value)
     // 可访问
     const routes = computed(() => store.state.permissionModule.routes)
 
@@ -75,7 +75,7 @@ export default defineComponent({
      */
     const fetchData = async () => {
       const data = {
-        roleName: role.value.roleName
+        roleName: row.value.userRole
       }
       // 后端根据角色名称，查询授权菜单
       const res = await Service.postAuthPermission(data)
@@ -119,7 +119,7 @@ export default defineComponent({
     return {
       ...toRefs(state),
       lang,
-      role,
+      row,
       fetchMenuData,
       saveData
     }

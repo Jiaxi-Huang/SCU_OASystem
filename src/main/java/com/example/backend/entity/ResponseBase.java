@@ -9,12 +9,12 @@ import java.util.ArrayList;
 
 @Getter
 @Setter
-public class ReponseBase {
+public class ResponseBase {
     protected int status;
     protected String message;
     protected ArrayList<Object> data;
 
-    public ReponseBase () {
+    public ResponseBase() {
         this.status = 0;
         this.message = "No override Msg";
         this.data = new ArrayList<>();

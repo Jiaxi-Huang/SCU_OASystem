@@ -137,8 +137,7 @@ public class Auth {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
                             "/dashboard", "/guide", "/dragable", "/copy", "/userInfo",
-                            "/menu", "/projectboard", "/table", "/todoList", "/form",
-                            "/cropper", "/personal");
+                            "/menu", "/projectboard", "/table", "/form", "/cropper", "/personal");
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
                             0,
@@ -150,8 +149,8 @@ public class Auth {
                 } else if (roleName.equals("manager")) {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
-                            "/dashboard", "/guide", "/dragable", "/calendar", "/copy",
-                            "/zip", "/excel", "/table", "/todoList", "/projectboard",
+                            "/dashboard", "/guide", "/dragable", "/calendar", "/userInfo",
+                            "/copy","/zip", "/excel", "/table", "/todoList", "/projectboard",
                             "/form","/qrcode", "/editor", "/upload", "/cropper", "/personal");
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(

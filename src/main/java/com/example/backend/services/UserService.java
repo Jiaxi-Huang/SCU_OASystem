@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService extends ServiceImpl<UserMapper, User> {
 
@@ -85,6 +87,23 @@ public class UserService extends ServiceImpl<UserMapper, User> {
             e.printStackTrace();
             // 可以选择返回一个特定的错误码或抛出自定义异常
             return -1; // 表示重置密码失败
+        }
+    }
+    public List<User> adminUserInfo(int user_id){
+        try {
+            User user = userMapper.findByUserId(user_id);
+            String role = user.getRole();
+            if (role.equals("admin")){
+                return userMapper.findAllUser();
+            }
+            if(role.equals("manager")){
+                return userMapper.findDepartmentUser(user.getDepartment());
+            }
+            return null;
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return null;
         }
     }
 }
