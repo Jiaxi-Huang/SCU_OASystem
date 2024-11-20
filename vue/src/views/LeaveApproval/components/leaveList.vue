@@ -5,15 +5,8 @@
           <el-button type="primary" @click="onLeaveAdd">请假申请</el-button>
         </el-form-item>
       </el-form>
-      <el-table ref="filterTableRef" class="table-list" row-key="date" :data="tableData.filter((data) => !search || data.title.toLowerCase().includes(search.toLowerCase()))" style="width: 100%">
-        <el-table-column
-          prop="leave_submit_at"
-          label="提交日期"
-          sortable
-          width="180"
-          column-key="leave_submit_at"
-        >
-        </el-table-column>
+      <el-table ref="filterTableRef" class="table-list" row-key="date" v-loading="loading" :data="tableData" style="width: 100%">
+        <el-table-column prop="leave_submit_at" label="提交日期" sortable width="180" column-key="leave_submit_at"></el-table-column>
         <el-table-column prop="leave_start_time" label="开始时间" width="180" truncated> </el-table-column>
         <el-table-column prop="leave_end_time" label="结束时间" truncated> </el-table-column>
         <el-table-column prop="leave_reason" label="原因" truncated> </el-table-column>
@@ -22,7 +15,7 @@
             <el-input v-model="search" size="small" placeholder="搜索" />
           </template>
           <template #default="scope">
-            <el-button v-if="$isPermission(['test:permission-btn3'])" size="small" @click="modifyPop(scope.row)">修改</el-button>
+            <el-button size="small" @click="modifyPop(scope.row)">修改</el-button>
             <!---------------------------------------------------- 改成如果状态是未审核才能修改 ----------------------------------------------->
             <el-button size="small" @click="detailPop(scope.row)">查看详情</el-button>
             <el-popconfirm confirm-button-text="确定" cancel-button-text="取消" icon="el-icon-info" icon-color="red" title="确定删除该条记录吗？" @confirm="handleDelete(scope.$index, scope.row)">
@@ -141,6 +134,7 @@
       const router = useRouter()
       const filterTableRef = ref()
       const state = reactive({
+        loading: false,
         tableData: [],
         currentPage: 1,
         pageSize: 5,
@@ -169,22 +163,21 @@
           Service.postGetLeaveApproval().then((res) => {
             if (res) {
               state.tableData = []
-              console.log('postGetLeaveApproval get')
               console.log(res)
+              console.log('postGetLeaveApproval get')
               var data = res.data
               for (let i = 0; i < data.length; i++) {
                 var record = {
                   leave_id: data[i].leave_id,
-                  leave_user_id: data[i].leave_user_id,
-                  leave_start_time: data[i].leave_start_time,
-                  leave_end_time: data[i].leave_end_time,
-                  leave_reason: data[i].leave_reason,
-                  leave_status: data[i].leave_status,
-                  leave_submit_at: data[i].leave_submit_at,
+                  leave_user_id: data[i].user_id,
+                  leave_start_time: data[i].start_date,
+                  leave_end_time: data[i].end_date,
+                  leave_reason: data[i].reason,
+                  leave_status: data[i].status,
+                  leave_submit_at: data[i].submitted_at,
                 }
                 state.tableData.push(record)
               }
-  
             } else {
               console.log('postGetLeaveApproval RES MISS')
             }
@@ -334,5 +327,4 @@
   
   }
   </style>
-  
   
