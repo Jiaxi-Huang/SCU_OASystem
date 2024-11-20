@@ -1,14 +1,16 @@
 package com.example.backend.controllers;
 
-import com.example.backend.entity.ReponseBase;
 import com.example.backend.entity.LeaveApprovalRecord;
+import com.example.backend.entity.ResponseBase;
 import com.example.backend.services.LeaveApprovalService;
-import com.example.backend.mapper.LeaveApprovalMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.util.List;
 
 @RestController
@@ -19,32 +21,35 @@ public class LeaveApprovalCon {
     private LeaveApprovalService leave_service;
 
     @PostMapping("/getLeaveRecord")
-    public ReponseBase getLeaveRecord() {
-        ReponseBase res = new ReponseBase();
+    public ResponseEntity<ResponseBase> getLeaveRecord() {
+        ResponseBase response = new ResponseBase();
         List<LeaveApprovalRecord> records = leave_service.getAllRecords();
 
         for (LeaveApprovalRecord record : records) {
-            res.pushData(record);
+            response.pushData(record);
         }
-        return res;
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/modifyLeaveRecord")
-    public ReponseBase modifyLeaveRecord(@RequestBody LeaveApprovalRecord record) {
+    public ResponseEntity<ResponseBase> modifyLeaveRecord(@RequestBody LeaveApprovalRecord record) {
+        ResponseBase response = new ResponseBase();
         int res_code = leave_service.updateLeaveApprovalRecord(record);
-        return new ReponseBase();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/addLeaveRecord")
-    public ReponseBase addLeaveRecord(@RequestBody LeaveApprovalRecord record) {
+    public ResponseEntity<ResponseBase> addLeaveRecord(@RequestBody LeaveApprovalRecord record) {
+        ResponseBase response = new ResponseBase();
         int res_code = leave_service.insertLeaveApprovalRecord(record);
-        return new ReponseBase();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 
     @PostMapping("/deleteLeaveRecord")
-    public ReponseBase deleteLeaveRecord(@RequestBody LeaveApprovalRecord record) {
+    public ResponseEntity<ResponseBase> deleteLeaveRecord(@RequestBody LeaveApprovalRecord record) {
+        ResponseBase response = new ResponseBase();
         int res_code = leave_service.deleteRecord(record);
-        return new ReponseBase();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

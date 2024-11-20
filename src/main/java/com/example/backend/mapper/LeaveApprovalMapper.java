@@ -9,6 +9,7 @@ import java.util.List;
 @Mapper
 public interface LeaveApprovalMapper extends BaseMapper<LeaveApprovalRecord> {
 
+    @Select("SELECT * FROM leave_requests")
     List<LeaveApprovalRecord> getAll();
 
     @Update("UPDATE leave_requests " +
