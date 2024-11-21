@@ -137,7 +137,7 @@ public class Auth {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
                             "/dashboard", "/guide", "/dragable", "/copy", "/userInfo",
-                            "/menu", "/projectboard", "/table", "/form", "/cropper", "/personal");
+                            "/menu", "/projectboard", "/table", "/form", "/cropper", "/personal", "/leaveApproval");
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
                             0,

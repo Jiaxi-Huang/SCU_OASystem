@@ -2,7 +2,7 @@
     <div class="table-container">
       <el-form :inline="true" :model="formInline" class="form-inline">
         <el-form-item>
-          <el-button type="primary" @click="onLeaveAdd">请假申请</el-button>
+          <el-button type="primary" @click="onLeaveRequest">请假申请</el-button>
         </el-form-item>
       </el-form>
       <el-table ref="filterTableRef" class="table-list" row-key="date" v-loading="loading" :data="tableData" style="width: 100%">
@@ -287,9 +287,9 @@
         console.log('submit!')
       }
   
-      const onLeaveAdd = () => {
+      const onLeaveRequest = () => {
         // eslint-disable-next-line no-console
-        router.replace('/leaveApproval/addLeaveRecord')
+        router.replace('/leaveApproval/leaveRequest')
       }
   
       return {
@@ -299,7 +299,7 @@
         handleCurrentChange,
         handleSizeChange,
         onSubmit,
-        onLeaveAdd,
+        onLeaveRequest,
         handleEdit,
         handleDelete,
         filterTableRef,
