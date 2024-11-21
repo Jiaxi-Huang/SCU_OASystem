@@ -21,7 +21,9 @@ CREATE TABLE department_infos (
 -- 创建用户所在部门信息表
 CREATE TABLE user_department_infos (
     user_id INT PRIMARY KEY,             -- 用户ID
-    department_id INT                   -- 部门ID
+    department_id INT,                  -- 部门ID
+    FOREIGN KEY (user_id) REFERENCES user_infos(user_id),
+    FOREIGN KEY (department_id) REFERENCES department_infos(department_id)
 );
 
 
@@ -29,8 +31,8 @@ CREATE TABLE user_department_infos (
 CREATE TABLE user_permission_infos (
     user_id INT PRIMARY KEY,             -- 用户ID
     role VARCHAR(64),                    -- 职能
-    permissions VARCHAR(64)              -- 权限，使用 `VARCHAR` 类型存储列表，可以考虑使用分隔符来表示多个权限
-    -- 若权限是具体列表结构，可以考虑使用 JSON 类型存储权限列表
+    permissions VARCHAR(64),              -- 权限，使用 `VARCHAR` 类型存储列表，可以考虑使用分隔符来表示多个权限
+    FOREIGN KEY (user_id) REFERENCES user_infos(user_id)
 );
 
 
@@ -109,6 +111,5 @@ CREATE TABLE UserMeetings (
     FOREIGN KEY (mtin_id) REFERENCES Meetings(mtin_id),            -- 外键，关联会议表
     FOREIGN KEY (adder_id) REFERENCES user_infos(user_id)          -- 外键，关联用户表
 );
-
 
 
