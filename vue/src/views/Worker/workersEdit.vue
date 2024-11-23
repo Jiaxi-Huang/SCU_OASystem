@@ -1,23 +1,23 @@
 <template>
-  <div v-loading="loading" class="new">
-    <el-form ref="formRef" :model="form" :rules="rules" label-position="right" label-width="100px" title="新增员工">
-      <el-form-item label="名称">
-        <span v-if="row && row.userName">{{ row.userName }}</span>
-      </el-form-item>
-      <el-form-item label="员工部门" prop="userDepartment">
-        <el-select v-model="form.userDepartment" placeholder="请选择部门">
-          <el-option v-for="department in departments" :key="department.value" :label="department.label" :value="department.value"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="员工职位" prop="userRole">
-        <el-select v-model="form.userRole" placeholder="请选择职能">
-          <el-option v-for="role in roles" :key="role.value" :label="role.label" :value="role.value"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-row class="btn-container">
-        <el-button size="mini" type="primary" @click="saveData()"> <i class="fa fa-plus"> </i> 修改 </el-button>
-      </el-row>
-    </el-form>
+  <div v-loading="loading" class="wrapper">
+    <el-card class="transfer">
+      <template #header>
+        <span>
+          <div class="card-header">
+            <el-form label-position="left" inline class="info-table">
+              <el-form-item label="名称">
+                <span v-if="row && row.userName">{{ row.userName }}</span>
+              </el-form-item>
+            </el-form>
+          </div>
+        </span>
+      </template>
+      <el-transfer v-model="menu.form" v-loading="menu.loading" :data="menu.data" :titles="['菜单', '已授权']"> </el-transfer>
+    </el-card>
+    <br />
+    <el-row class="btns">
+      <el-button size="mini" type="primary" @click="saveData"> <i class="fa fa-check"> </i> 确认修改 </el-button>
+    </el-row>
   </div>
 </template>
 <script lang="ts">
@@ -38,7 +38,7 @@ interface stateTypes {
   }
 }
 export default defineComponent({
-  name: 'RolesEdit',
+  name: 'WorkersEdit',
   props: {
     currentRow: {
       type: Object,
@@ -54,8 +54,8 @@ export default defineComponent({
     const lang = computed(() => store.getters['settingsModule/getLangState'])
 
     const state = reactive<stateTypes>({
-      url: `/role/allow`,
-      purl: `/role/permissions`,
+      url: `/worker/allow`,
+      purl: `/worker/permissions`,
       loading: false,
       form: { key: '', label: '' },
       menu: {
@@ -65,29 +65,7 @@ export default defineComponent({
         form: []
       }
     })
-    const rules = {
-      userId: [
-        { required: true, message: '请输入员工ID', trigger: 'blur' },
-        { type:'number', message: '请输入有效数字', trigger: 'blur' }
-      ],
-      userDepartment: [
-        { required: true, message: '请选择部门', trigger: 'change' },
-      ],
-      userRole: [
-        { required: true, message: '请输入员工职能', trigger: 'change' },
-      ]
-    }
-    const departments = [
-      { value: 'IT', label: '技术部' },
-      { value: 'Market', label: '市场部' },
-      { value: 'HR', label: '人力资源部' }
-    ]
 
-    const roles = [
-      { value: 'admin', label: '管理员' },
-      { value: 'manager', label: '部门经理' },
-      { value: 'worker', label: '员工' }
-    ]
     const row = computed(() => currentRow.value)
     // 可访问
     const routes = computed(() => store.state.permissionModule.routes)
@@ -140,9 +118,6 @@ export default defineComponent({
     })
     return {
       ...toRefs(state),
-      rules,
-      departments,
-      roles,
       lang,
       row,
       fetchMenuData,

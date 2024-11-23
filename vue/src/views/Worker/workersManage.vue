@@ -1,14 +1,10 @@
 <template>
   <div>
-    <el-alert title="Tips:点击【新增】按钮进行新增员工；点击【编辑】按钮，对员工的部门以及职能信息进行操作！" type="warning"> </el-alert>
+    <el-alert title="Tips:点击【编辑】按钮，进行不同角色的菜单授权操作！" type="warning"> </el-alert>
     <el-alert title="Tips:权限控制体验：【管理员账号为：admin@outlook.com】、【超级管理员账号为：super@outlook.com】" type="info"> </el-alert>
     <el-card class="card-ctrl">
       <el-row>
         <el-col :span="8" style="text-align: left">
-          <el-button type="primary" size="small" @click="onCreate">
-            <el-icon><plus /></el-icon>
-            新增</el-button
-          >
           <el-button type="success" size="small" @click="onRefresh">
             <el-icon><refresh /></el-icon>
             刷新</el-button
@@ -24,14 +20,9 @@
 
         <el-table-column label="操作" align="center">
           <template #default="scope">
-            <el-tooltip class="item" effect="dark" content="信息修改" placement="bottom">
+            <el-tooltip class="item" effect="dark" content="菜单授权" placement="bottom">
               <el-button circle plain type="primary" size="small" @click="onEdit(scope.$index, scope.row)">
                 <el-icon><edit /></el-icon>
-              </el-button>
-            </el-tooltip>
-            <el-tooltip  class="item" effect="dark" content="删除" placement="bottom">
-              <el-button circle plain type="danger" size="small" @click="onDelete(scope.$index, scope.row)">
-                <el-icon><minus /></el-icon>
               </el-button>
             </el-tooltip>
           </template>
@@ -53,9 +44,9 @@
     </el-card>
 
     <el-dialog v-model="edit_visible" center :title="posted.userRow.userRole">
-      <role-edit :current-row="posted.userRow" @success="onEditSuccess"></role-edit>
+      <worker-edit :current-row="posted.userRow" @success="onEditSuccess"></worker-edit>
     </el-dialog>
-    <el-dialog v-model="add_visible" title="新增员工">
+    <el-dialog v-model="add_visible" title="新增角色">
       <role-new @success="onCreateSuccess"></role-new>
     </el-dialog>
   </div>
@@ -64,35 +55,13 @@
 import { defineComponent, reactive, toRefs, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Edit, Minus, Plus, Refresh } from '@element-plus/icons-vue'
-import RoleEdit from './rolesEdit.vue'
-import RoleNew from './rolesNew.vue'
+import WorkerEdit from './workersEdit.vue'
 import Service from './api/index'
-const useConfirmDelete = (index: any) => {
-  console.log(index)
-  ElMessageBox.confirm('此操作将删除该员工所有数据, 是否继续?', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  })
-    .then(() => {
-      // 此处执行接口异步删除员工
-      ElMessage({
-        type: 'success',
-        message: '删除成功'
-      })
-    })
-    .catch(() => {
-      ElMessage({
-        type: 'info',
-        message: '已取消删除'
-      })
-    })
-}
+
 export default defineComponent({
-  name: 'RoleManage',
+  name: 'WorkerManage',
   components: {
-    RoleEdit,
-    RoleNew,
+    WorkerEdit,
     Edit,
     Minus,
     Plus,
@@ -101,10 +70,10 @@ export default defineComponent({
   setup() {
     const state = reactive({
       url: {
-        c: '/role/add',
-        r: '/role/list',
-        u: '/role/update',
-        d: '/role/delete'
+        c: '/worker/add',
+        r: '/worker/list',
+        u: '/worker/update',
+        d: '/worker/delete'
       },
       param: {
         limit: 10,
@@ -173,10 +142,6 @@ export default defineComponent({
       state.posted.userRow.userDepartment = row.userDepartment
       state.edit_visible = true
     }
-    const onDelete = (index: any, row: any) => {
-      console.log(index, row)
-      useConfirmDelete(index)
-    }
     return {
       ...toRefs(state),
       total,
@@ -187,7 +152,6 @@ export default defineComponent({
       onEditSuccess,
       onRefresh,
       onEdit,
-      onDelete,
       fetchData
     }
   }

@@ -244,12 +244,12 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
     ]
   },
   {
-    path: '/userInfo',
+    path: '/role',
     component: layout,
     redirect: '/Role/roleManage',
     meta: {
       title: {
-        '/zh-CN': '角色管理',
+        '/zh-CN': '人事管理',
         '/en-US': 'Role Manage'
       },
       icon: 'ic ic-group-fill'
@@ -261,8 +261,34 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
         component: () => import(/* @/views/Menu/menuManage.vueichText" */ '@/views/Role/rolesManage.vue'),
         meta: {
           title: {
-            '/zh-CN': '角色管理',
+            '/zh-CN': '人事管理',
             '/en-US': 'Role Manage'
+          },
+          icon: 'ic ic-group-fill'
+        }
+      }
+    ]
+  },
+  {
+    path: '/worker',
+    component: layout,
+    redirect: '/Worker/workerManage',
+    meta: {
+      title: {
+        '/zh-CN': '员工管理',
+        '/en-US': 'Worker Manage'
+      },
+      icon: 'ic ic-group-fill'
+    },
+    children: [
+      {
+        path: '/Worker/workersManage',
+        name: 'workersManage',
+        component: () => import(/* @/views/Menu/menuManage.vueichText" */ '@/views/Worker/workersManage.vue'),
+        meta: {
+          title: {
+            '/zh-CN': '员工管理',
+            '/en-US': 'Worker Manage'
           },
           icon: 'ic ic-group-fill'
         }
