@@ -136,8 +136,10 @@ public class Auth {
                 if (roleName.equals("admin")) {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
-                            "/dashboard", "/guide", "/dragable", "/copy", "/role","/worker","/todoList",
-                            "/menu", "/projectboard", "/table", "/form", "/cropper", "/personal", "/leaveApproval");
+                            "/dashboard", "/guide", "/dragable","/calendar", "/copy","/zip",
+                            "/menu","/excel", "/projectboard", "/table", "/form","/qrcode","/editor","/upload", "/cropper", "/personal",
+                            "/role","/worker","/leaveApproval","/todoList"
+                    );
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
                             0,
