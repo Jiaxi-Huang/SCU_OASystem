@@ -21,7 +21,7 @@
           <el-input v-model="search" size="mini" placeholder="输入標題字段关键字搜索" />
         </template>
         <template #default="scope">
-          <el-button v-if="$isPermission(['test:permission-btn3'])" size="mini" @click="modifyPop(scope.row)">修改</el-button>
+          <el-button size="mini" @click="modifyPop(scope.row)">修改</el-button>
           <el-button size="mini" @click="detailPop(scope.row)">查看詳情</el-button>
           <el-popconfirm confirm-button-text="确定" cancel-button-text="取消" icon="el-icon-info" icon-color="red" title="确定删除该条记录吗？" @confirm="handleDelete(scope.$index, scope.row)">
             <template #reference>
