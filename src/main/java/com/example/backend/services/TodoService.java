@@ -1,7 +1,8 @@
 package com.example.backend.services;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.example.backend.entity.TodoRecord;
+import com.example.backend.entity.todoList.TodoRecord;
+import com.example.backend.entity.todoList.TodoRecordWithTk;
 import com.example.backend.mapper.TodoListMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,10 @@ public class TodoService extends ServiceImpl<TodoListMapper, TodoRecord> {
         return  todoListMapper.getAll();
     }
 
+    public List<TodoRecord> getRecordsByUserId(int user_id) {
+        return  todoListMapper.getRecordsByUserId(user_id);
+    }
+
     public int updateTodoRecord(TodoRecord record) {
 //        System.out.println(record.getTodo_fin());
         int res_code = todoListMapper.updateTodoRecord(
@@ -26,7 +31,7 @@ public class TodoService extends ServiceImpl<TodoListMapper, TodoRecord> {
         return res_code;
     }
 
-    public int insertTodoRecord(TodoRecord record) {
+    public int insertTodoRecord(TodoRecordWithTk record) {
 //        System.out.println(record.getTodo_fin());
         int res_code = todoListMapper.insertTodoRecord(
                 record.getUser_id(), record.getTodo_id(), record.getAdder_id(), record.getTodo_title(),

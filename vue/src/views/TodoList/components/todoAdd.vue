@@ -36,12 +36,12 @@
                 </el-checkbox-group>
               </el-form-item>
 
-              <el-form-item label="自己的ID" v-show="forSelf">
-                <el-input v-model="sizeForm.adder_id" placeholder="暂时这样，以后会自动填入且无法修改"></el-input>
-              </el-form-item>
+<!--              <el-form-item label="自己的ID" v-show="forSelf">-->
+<!--                <el-input v-model="sizeForm.adder_id" placeholder="暂时这样，以后会自动填入且无法修改"></el-input>-->
+<!--              </el-form-item>-->
 
               <el-form-item label="别人的ID" v-show="forOther">
-                <el-input v-model="sizeForm.user_id" placeholder="这个地方没想好怎么填起来方便"></el-input>
+                <el-input v-model="sizeForm.user_id" placeholder="这个地方先禁用了不要填东西"></el-input>
               </el-form-item>
 
               <el-form-item size="large">
@@ -83,7 +83,7 @@ export default defineComponent({
       user_id: '',
     })
 
-    const forSelf = computed(() => sizeForm.type.includes('为自己添加'));
+    // const forSelf = computed(() => sizeForm.type.includes('为自己添加'));
     const forOther = computed(() => sizeForm.type.includes('为他人添加'));
 
     const activityForm = ref()
@@ -105,7 +105,6 @@ export default defineComponent({
           }
           try {
             Service.addTodo(record).then((res) => {
-
             });
             ElMessage({
               type: 'success',
@@ -191,7 +190,7 @@ export default defineComponent({
       activityForm,
       submitForm,
       resetForm,
-      forSelf,
+      // forSelf,
       forOther,
     }
   }

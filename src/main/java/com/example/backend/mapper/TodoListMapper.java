@@ -1,7 +1,7 @@
 package com.example.backend.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.example.backend.entity.TodoRecord;
+import com.example.backend.entity.todoList.TodoRecord;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -29,4 +29,8 @@ public interface TodoListMapper extends BaseMapper<TodoRecord> {
 
     @Delete("DELETE from usertodo WHERE todo_id = #{todo_id}")
     int deleteRecord(int todo_id);
+
+
+    @Select("SELECT * FROM usertodo WHERE user_id = #{user_id}")
+    List<TodoRecord> getRecordsByUserId(int user_id);
 }
