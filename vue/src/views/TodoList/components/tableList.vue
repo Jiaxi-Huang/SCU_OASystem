@@ -2,7 +2,7 @@
   <div class="table-container">
     <el-form :inline="true" :model="formInline" class="form-inline">
       <el-form-item>
-        <el-button type="primary" @click="onAddTodo">添加待辦事項</el-button>
+        <el-button type="primary" @click="onAddTodo">添加待办事項</el-button>
       </el-form-item>
     </el-form>
     <el-table ref="filterTableRef" class="table-list" row-key="date" :data="tableData.filter((data) => !search || data.title.toLowerCase().includes(search.toLowerCase()))" style="width: 100%">
@@ -18,7 +18,7 @@
       <el-table-column prop="content" label="待办事项内容" truncated> </el-table-column>
       <el-table-column align="right">
         <template #header>
-          <el-input v-model="search" size="mini" placeholder="输入標題字段关键字搜索" />
+          <el-input v-model="search" size="mini" placeholder="输入标题字段关键字搜索" />
         </template>
         <template #default="scope">
           <el-button size="mini" @click="modifyPop(scope.row)">修改</el-button>
@@ -84,7 +84,7 @@
 
     <el-dialog v-model="detailFormVisible" title="待办事项详情">
       <el-form :model="form">
-        <el-form-item label="標題&nbsp;&nbsp;" :label-width="formLabelWidth">
+        <el-form-item label="标题&nbsp;&nbsp;" :label-width="formLabelWidth">
           {{ form.title }}
         </el-form-item>
         <el-form-item label="内容&nbsp;&nbsp;" :label-width="formLabelWidth">
@@ -93,19 +93,19 @@
         <el-form-item label="截止日期&nbsp;&nbsp;" :label-width="formLabelWidth">
           {{ form.ddl }}
         </el-form-item>
-        <el-form-item label="狀態&nbsp;&nbsp;" :label-width="formLabelWidth">
+        <el-form-item label="状态&nbsp;&nbsp;" :label-width="formLabelWidth">
           {{ form.status }}
         </el-form-item>
-        <el-form-item label="創建日期&nbsp;&nbsp;" :label-width="formLabelWidth">
+        <el-form-item label="创建日期&nbsp;&nbsp;" :label-width="formLabelWidth">
           {{ form.crt }}
         </el-form-item>
         <el-form-item label="添加者ID&nbsp;&nbsp;" :label-width="formLabelWidth">
           {{ form.adder }}
         </el-form-item>
-        <el-form-item label="待辦事項ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+        <el-form-item label="待办事項ID&nbsp;&nbsp;" :label-width="formLabelWidth">
           {{ form.todo_id }}
         </el-form-item>
-        <el-form-item label="從屬用戶ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+        <el-form-item label="从属用戶ID&nbsp;&nbsp;" :label-width="formLabelWidth">
           {{form.user_id }}
         </el-form-item>
       </el-form>
@@ -148,10 +148,10 @@ export default defineComponent({
     const state = reactive({
       tableData: [
         {
-          ddl: '2016-05-07',
-          title: '後臺沒打開',
-          status: '上海市普陀区金沙江路 1518 弄',
-          content: '家'
+          ddl: '后台沒打开',
+          title: '后台沒打开',
+          status: '后台沒打开',
+          content: 'NO'
         },
       ],
       currentPage: 1,

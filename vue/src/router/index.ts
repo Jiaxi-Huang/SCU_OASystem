@@ -425,6 +425,45 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
     ]
   },
   {
+    path: '/meetings',
+    component: layout,
+    redirect: '/meetings/meetingsList',
+    meta: {
+      title: {
+        '/zh-CN': '我的会议',
+        '/en-US': 'meetings'
+      },
+      icon: 'ic ic-barrage-fill'
+    },
+    children: [
+      {
+        path: '/meetings/meetingsList',
+        name: 'meetingsList',
+        component: () => import('@/views/Meetings/dragableComponent.vue'),
+        meta: {
+          title: {
+            '/zh-CN': '我的会议',
+            '/en-US': 'meetingsList'
+          },
+          icon: 'ic ic-barrage-fill'
+        }
+      },
+      {
+        path: '/todoList/todoAdd',
+        name: 'todoAdd',
+        component: () => import( '@/views/TodoList/components/todoAdd.vue'),
+        meta: {
+          title: {
+            '/zh-CN': '添加待办事项',
+            '/en-US': 'Add Todo'
+          },
+          icon: 'ic ic-stealth-fill',
+          hidden: true,
+        }
+      }
+    ]
+  },
+  {
     path: '/leaveApproval',
     component: layout,
     redirect: '/leaveApproval/leaveList',

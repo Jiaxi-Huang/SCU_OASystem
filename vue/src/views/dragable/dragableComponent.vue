@@ -588,11 +588,11 @@ onUnmounted(() => {
         border-radius 50%
         background-color white
         display inline-block
-        margin-right 10px
+        margin-right: 10px
     }
   }
   :deep(.bg-success){
-    background-color #0acf97!important
+    background-color: #0acf97!important
   }
   :deep(.bg-info) {
     background-color: #39afd1!important;
