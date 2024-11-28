@@ -275,7 +275,7 @@
 </template>
 <script setup lang="ts">
 import { onMounted, ref, onUnmounted, reactive } from 'vue'
-import Sortable from 'sortablejs'
+import Sortable from 'sortablejs/'
 import { Operation, Suitcase, ChatLineSquare } from '@element-plus/icons-vue'
 import pinnedCard from './components/pinnedCard.vue'
 
