@@ -117,6 +117,7 @@
         background-color #f1f3fa
         padding 1rem
         margin 0 -1rem
+        font-size 130%
       }
       .task-list-item{
         min-height 150px
@@ -298,7 +299,7 @@
                       </div>
                       <el-row></el-row>
                       <div class="flex flex-row flex-between">
-                        <div class="handle"><el-icon class="pointer" @click="buttonClickTest()"><View /></el-icon></div>
+                        <div class="handle"><el-icon class="pointer" @click="meetingDetails()"><View /></el-icon></div>
                         <div class="handle"><el-icon class="pointer" @click="buttonClickTest()"><Edit /></el-icon></div>
                         <div class="handle"><el-icon class="pointer" @click="buttonClickTest()"><Delete /></el-icon></div>
                       </div>
@@ -338,7 +339,7 @@
                       </div>
                       <el-row></el-row>
                       <div class="flex flex-row flex-between">
-                        <div class="handle"><el-icon class="pointer" @click="buttonClickTest()"><View /></el-icon></div>
+                        <div class="handle"><el-icon class="pointer" @click="showMeetingDetails(item)"><View /></el-icon></div>
                         <div class="handle"><el-icon class="pointer" @click="buttonClickTest()"><Edit /></el-icon></div>
                         <div class="handle"><el-icon class="pointer" @click="buttonClickTest()"><Delete /></el-icon></div>
                       </div>
@@ -352,6 +353,44 @@
               </div>
             </div>
           </div>
+
+          <el-dialog v-model="task.detailFormVisible" title="会议详情">
+            <el-form :model="task.detailForm">
+              <el-form-item label="会议标题&nbsp;&nbsp;" :label-width="formLabelWidth">
+                {{ task.detailForm.mtin_title }}
+              </el-form-item>
+              <el-form-item label="会议内容&nbsp;&nbsp;" :label-width="formLabelWidth">
+                {{ task.detailForm.mtin_ctnt }}
+              </el-form-item>
+              <el-form-item label="会议开始时间&nbsp;&nbsp;" :label-width="formLabelWidth">
+                {{ task.detailForm.mtin_st }}
+              </el-form-item>
+              <el-form-item label="会议长度&nbsp;&nbsp;" :label-width="formLabelWidth">
+                {{ task.detailForm.mtin_len }}
+              </el-form-item>
+              <el-form-item label="会议地点&nbsp;&nbsp;" :label-width="formLabelWidth">
+                {{ task.detailForm.mtin_loc }}
+              </el-form-item>
+              <el-form-item label="会议主持人ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+                {{ task.detailForm.mtin_host }}
+              </el-form-item>
+              <el-form-item label="会议ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+                {{ task.detailForm.mtin_id }}
+              </el-form-item>
+              <el-form-item label="会议状态&nbsp;&nbsp;" :label-width="formLabelWidth">
+                {{ task.detailForm.mtin_fin }}
+              </el-form-item>
+              <el-form-item label="会议创建时间&nbsp;&nbsp;" :label-width="formLabelWidth">
+                {{ task.detailForm.mtin_crt }}
+              </el-form-item>
+              <el-form-item label="会议添加者ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+                {{ task.detailForm.adder_id }}
+              </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+              <el-button type="primary" @click="task.detailFormVisible = false">确 定</el-button>
+            </div>
+          </el-dialog>
 
         </div>
       </el-col>
@@ -406,6 +445,8 @@ const task = reactive<taskType>({
   ],
   passed: [
   ],
+  modifyFormVisible: false,
+  detailFormVisible: false,
 })
 
 onMounted(() => {
@@ -419,6 +460,15 @@ onUnmounted(() => {
 
 const buttonClickTest = () => {
   console.log("CLicked!")
+}
+
+
+//scope.row
+const showMeetingDetails = (row:any) => {
+  console.log("Detail Shows!")
+  task.detailForm = row
+  console.log(task.detailForm)
+  task.detailFormVisible = true
 }
 
 const getPersonalMeetingList = () => {
