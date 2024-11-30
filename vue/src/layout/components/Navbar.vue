@@ -7,8 +7,15 @@
         <search></search>
         <lang-switch></lang-switch>
         <div id="Message" class="right-menu-box">
-          <el-tooltip :content="`您有 ${pendingTodos.length} 个待办事项待处理`" placement="bottom" effect="dark">
-            <el-badge :value="pendingTodos.length" :max="99" class="message-badge" type="danger">
+          <el-tooltip
+              :content="`您有 ${pendingTodos.length} 个待办事项待处理和 ${pendingLeaveApprovals.length} 条请假审批待处理`"
+              placement="bottom"
+              effect="dark">
+            <el-badge
+                :value="pendingTodos.length + pendingLeaveApprovals.length"
+                :max="99"
+                class="message-badge"
+                type="danger">
               <el-button class="message">
                 <el-icon><Message /></el-icon>
               </el-button>
@@ -64,8 +71,10 @@ import avatar from '@/assets/avatar-default.jpg'
 import { toFullScreen, exitFullScreen } from '@/utils/screen'
 import { useStore } from '@/store/index'
 import { langConfig } from '@/utils/constant/config'
-import Service from '@/views/TodoList/api/index'
+import TodoService from '@/views/TodoList/api/index'
+import LeaveService from '@/views/LeaveApproval/api/index'
 import { Todo } from '@/types/todo'
+import { LeaveApproval } from '@/types/leaveApproval'
 
 export default defineComponent({
   name: 'Navbar',
@@ -89,20 +98,32 @@ export default defineComponent({
 
     // 存储待办事项的状态
     const todos = ref<Todo[]>([])
+    // 存储请假审批的状态
+    const leaveApprovals = ref<LeaveApproval[]>([])
 
     // 获取待办事项
     const getTodos = async () => {
-      const response = await Service.postGetTodoList()
+      const response = await TodoService.postGetTodoList()
       if (response && response.data) {
         todos.value = response.data
       }
     }
 
+    // 获取请假审批
+    const getLeaveApprovals = async () => {
+      const response = await LeaveService.postGetLeaveApproval()
+      if (response && response.data) {
+        leaveApprovals.value = response.data
+      }
+    }
+
     const pendingTodos = computed(() => todos.value.filter(todo => todo.todo_fin === '未完成'))
+    const pendingLeaveApprovals = computed(() => leaveApprovals.value.filter(leave => leave.status === '待审批'))
 
     // onMounted 钩子函数，用于在组件挂载时获取数据
     onMounted(() => {
       getTodos()
+      getLeaveApprovals()
     })
 
     // methods
@@ -139,7 +160,8 @@ export default defineComponent({
       opened,
       langConfig,
       logout,
-      pendingTodos
+      pendingTodos,
+      pendingLeaveApprovals
     }
   }
 })
