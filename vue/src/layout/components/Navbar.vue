@@ -7,23 +7,26 @@
         <search></search>
         <lang-switch></lang-switch>
         <div id="Message" class="right-menu-box">
-          <el-dropdown>
-            <el-badge :value="messageNum" :max="99" class="message-badge" type="danger">
+          <el-tooltip placement="bottom" effect="dark">
+            <template #content>
+              <div>
+                <div>您有 <strong>{{ pendingTodos.length }}</strong> 个待办事项待处理</div>
+                <div>您有 <strong>{{ pendingLeaveApprovals.length }}</strong> 条请假审批待处理</div>
+              </div>
+            </template>
+            <el-badge
+                :value="pendingTodos.length + pendingLeaveApprovals.length"
+                :max="99"
+                class="message-badge"
+                type="danger">
               <el-button class="message">
                 <el-icon><Message /></el-icon>
               </el-button>
             </el-badge>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item command="a">mike 回复了你的邮件</el-dropdown-item>
-                <el-dropdown-item command="b">您有5个新任务</el-dropdown-item>
-                <el-dropdown-item command="c">您已经和Jone成为了好友</el-dropdown-item>
-                <el-dropdown-item command="d">项目验收通知</el-dropdown-item>
-                <el-dropdown-item command="e" divided>新会议通知</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+          </el-tooltip>
         </div>
+
+
         <div id="fullScreen" class="right-menu-box">
           <el-button class="full-screen">
             <el-tooltip :content="langConfig.header.fullScreen[lang]" effect="dark" placement="left">
@@ -60,8 +63,9 @@
     </el-header>
   </div>
 </template>
+
 <script lang="ts">
-import { defineComponent, computed, ref } from 'vue'
+import { defineComponent, computed, ref, onMounted } from 'vue'
 import { Message, FullScreen, BottomLeft } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 import Hamburger from '@/components/Hamburger/Hamburger.vue'
@@ -72,6 +76,10 @@ import avatar from '@/assets/avatar-default.jpg'
 import { toFullScreen, exitFullScreen } from '@/utils/screen'
 import { useStore } from '@/store/index'
 import { langConfig } from '@/utils/constant/config'
+import TodoService from '@/views/TodoList/api/index'
+import LeaveService from '@/views/LeaveApproval/api/index'
+import { Todo } from '@/types/todo'
+import { LeaveApproval } from '@/types/leaveApproval'
 
 export default defineComponent({
   name: 'Navbar',
@@ -84,12 +92,6 @@ export default defineComponent({
     FullScreen,
     BottomLeft
   },
-  props: {
-    primary: {
-      default: '#fff',
-      type: String
-    }
-  },
   setup() {
     const router = useRouter()
     const store = useStore()
@@ -98,6 +100,36 @@ export default defineComponent({
     const messageNum = computed(() => store.getters['messageModule/getMessageNum'])
     const lang = computed((): string => store.getters['settingsModule/getLangState'])
     const nickname = computed(() => JSON.parse(localStorage.getItem('userInfo') as string)?.userName ?? '极客恰恰')
+
+    // 存储待办事项的状态
+    const todos = ref<Todo[]>([])
+    // 存储请假审批的状态
+    const leaveApprovals = ref<LeaveApproval[]>([])
+
+    // 获取待办事项
+    const getTodos = async () => {
+      const response = await TodoService.postGetTodoList()
+      if (response && response.data) {
+        todos.value = response.data
+      }
+    }
+
+    // 获取请假审批
+    const getLeaveApprovals = async () => {
+      const response = await LeaveService.postGetLeaveApproval()
+      if (response && response.data) {
+        leaveApprovals.value = response.data
+      }
+    }
+
+    const pendingTodos = computed(() => todos.value.filter(todo => todo.todo_fin === '未完成'))
+    const pendingLeaveApprovals = computed(() => leaveApprovals.value.filter(leave => leave.status === '待审批'))
+
+    // onMounted 钩子函数，用于在组件挂载时获取数据
+    onMounted(() => {
+      getTodos()
+      getLeaveApprovals()
+    })
 
     // methods
     const toggleSideBar = () => {
@@ -114,10 +146,8 @@ export default defineComponent({
       fullScreen.value = false
     }
     const logout = () => {
-      // clear()
       sessionStorage.removeItem('auth')
       sessionStorage.removeItem('accessToken')
-
       router.replace('/login')
     }
 
@@ -134,11 +164,14 @@ export default defineComponent({
       toggleSideBar,
       opened,
       langConfig,
-      logout
+      logout,
+      pendingTodos,
+      pendingLeaveApprovals
     }
   }
 })
 </script>
+
 <style lang="scss" scoped>
 .navbar {
   height: 50px;
