@@ -15,4 +15,15 @@ public interface MeetingMapper extends BaseMapper<MeetingWithAdderId> {
             "mtin_fin, mtin_st, mtin_len, mtin_host, mtin_loc, mtin_crt FROM meetings natural join usermeetings WHERE user_id = #{user_id}")
     List<MeetingWithAdderId> getPersonalMeetings(int user_id);
 
+
+    @Update("UPDATE usermeetings set adder_id = #{adder_id} where user_id = #{user_id} and mtin_id = #{mtin_id}")
+    void updateMeetingAdder(int user_id, int adder_id, int mtin_id);
+
+
+    @Update("UPDATE meetings set mtin_title = #{mtin_title}, mtin_ctnt = #{mtin_ctnt}, mtin_fin = #{mtin_fin}, " +
+            "mtin_st = #{mtin_st}, mtin_len = #{mtin_len}, mtin_crt = #{mtin_crt}, mtin_host = #{mtin_host}, " +
+            "mtin_loc = #{mtin_loc} " +
+            "where mtin_id = #{mtin_id}")
+    void updateMeeting(int mtin_id, String mtin_title, String mtin_ctnt, String mtin_fin, String mtin_st,
+                       String mtin_len, String mtin_crt, String mtin_host, String mtin_loc);
 }

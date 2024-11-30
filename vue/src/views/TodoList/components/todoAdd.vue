@@ -16,18 +16,20 @@
                 <el-input v-model="sizeForm.todo_ctnt" autosize type="textarea"/>
               </el-form-item>
               <el-form-item label="截止时间">
-                <el-col :span="11">
-                  <el-date-picker v-model="sizeForm.date1"
-                                  type="date" placeholder="选择日期" style="width: 100%"
-                                  value-format="YYYY-MM-DD"
-                  ></el-date-picker>
-                </el-col>
-                <el-col class="line" :span="1">&nbsp;&nbsp;&nbsp;&nbsp;-</el-col>
-                <el-col :span="12">
-                  <el-time-picker v-model="sizeForm.date2" placeholder="选择时间" style="width: 100%"
-                                  format="HH:mm" value-format="HH:mm"
-                  ></el-time-picker>
-                </el-col>
+                <div>
+                  <el-col :span="11">
+                    <el-date-picker v-model="sizeForm.date1"
+                                    type="date" placeholder="选择日期" style="width: 100%"
+                                    value-format="YYYY-MM-DD"
+                    ></el-date-picker>
+                  </el-col>
+                  <el-col class="line" :span="1">&nbsp;&nbsp;&nbsp;&nbsp;</el-col>
+                  <el-col :span="12">
+                    <el-time-picker v-model="sizeForm.date2" placeholder="选择时间" style="width: 100%"
+                                    format="HH:mm" value-format="HH:mm"
+                    ></el-time-picker>
+                  </el-col>
+                </div>
               </el-form-item>
               <el-form-item label="从属">
                 <el-checkbox-group v-model="sizeForm.type">

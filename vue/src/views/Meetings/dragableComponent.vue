@@ -52,7 +52,9 @@
     align-items center
   }
   .text-norap{
-    white-space nowrap
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
   }
   .margin-top-1{
     margin-top 10px
@@ -74,6 +76,8 @@
   }
 
   .badge{
+    overflow: hidden;
+    text-overflow: ellipsis;
     display: inline-block;
     padding: 0.25em 0.4em;
     font-size: 130%;
@@ -218,6 +222,21 @@
     background-color: #ffbc00!important;
   }
 
+  .text_line_limit {
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ellipsis-text {
+    display: -webkit-box; /* 让元素成为弹性盒模型，支持多行截断 */
+    -webkit-box-orient: vertical; /* 设置盒子为垂直排列 */
+    overflow: hidden; /* 超出内容隐藏 */
+    text-overflow: ellipsis; /* 超出部分显示省略号 */
+    line-clamp: 2; /* 限制为 2 行 */
+    -webkit-line-clamp: 2; /* 限制为 2 行（Webkit 内核支持） */
+  }
 }
 </style>
 
@@ -246,8 +265,8 @@
                       <small class="text-muted">会议ID：  {{ item.mtin_id }} </small>
                     </div>
                     <p class="name margin-top-1 margin-bottom-1">会议时间：{{ item.mtin_st }}</p>
-                    <p class="text-muted margin-bottom-1">
-                      <span class="text-norap margin-right-1"
+                    <p class="text-muted margin-bottom-1 ellipsis-text">
+                      <span class="margin-right-1"
                         ><el-icon size="19px"><ChatLineSquare /></el-icon>&nbsp;&nbsp;会议简介： {{ item.mtin_ctnt }}</span
                       >
                     </p>
@@ -259,8 +278,8 @@
                     </div>
                     <el-row></el-row>
                     <div class="flex flex-row flex-between">
-                      <div class="handle"><el-icon class="pointer" @click="buttonClickTest()"><View /></el-icon></div>
-                      <div class="handle"><el-icon class="pointer" @click="buttonClickTest()"><Edit /></el-icon></div>
+                      <div class="handle"><el-icon class="pointer" @click="showMeetingDetails(item)"><View /></el-icon></div>
+                      <div class="handle"><el-icon class="pointer" @click="onModifyClicked(item)"><Edit /></el-icon></div>
                       <div class="handle"><el-icon class="pointer" @click="buttonClickTest()"><Delete /></el-icon></div>
                     </div>
                   </el-col>
@@ -286,8 +305,8 @@
                         <small class="text-muted">会议ID：  {{ item.mtin_id }} </small>
                       </div>
                       <p class="name margin-top-1 margin-bottom-1">会议时间：{{ item.mtin_st }}</p>
-                      <p class="text-muted margin-bottom-1">
-                      <span class="text-norap margin-right-1"
+                      <p class="text-muted margin-bottom-1 ellipsis-text">
+                      <span class="margin-right-1"
                       ><el-icon size="19px"><ChatLineSquare /></el-icon>&nbsp;&nbsp;会议简介： {{ item.mtin_ctnt }}</span
                       >
                       </p>
@@ -299,8 +318,8 @@
                       </div>
                       <el-row></el-row>
                       <div class="flex flex-row flex-between">
-                        <div class="handle"><el-icon class="pointer" @click="meetingDetails()"><View /></el-icon></div>
-                        <div class="handle"><el-icon class="pointer" @click="buttonClickTest()"><Edit /></el-icon></div>
+                        <div class="handle"><el-icon class="pointer" @click="showMeetingDetails(item)"><View /></el-icon></div>
+                        <div class="handle"><el-icon class="pointer" @click="onModifyClicked(item)"><Edit /></el-icon></div>
                         <div class="handle"><el-icon class="pointer" @click="buttonClickTest()"><Delete /></el-icon></div>
                       </div>
                     </el-col>
@@ -326,8 +345,8 @@
                         <small class="text-muted">会议ID：  {{ item.mtin_id }} </small>
                       </div>
                       <p class="name margin-top-1 margin-bottom-1">会议时间：{{ item.mtin_st }}</p>
-                      <p class="text-muted margin-bottom-1">
-                      <span class="text-norap margin-right-1"
+                      <p class="text-muted margin-bottom-1 ellipsis-text">
+                      <span class="margin-right-1"
                       ><el-icon size="19px"><ChatLineSquare /></el-icon>&nbsp;&nbsp;会议简介： {{ item.mtin_ctnt }}</span
                       >
                       </p>
@@ -340,7 +359,7 @@
                       <el-row></el-row>
                       <div class="flex flex-row flex-between">
                         <div class="handle"><el-icon class="pointer" @click="showMeetingDetails(item)"><View /></el-icon></div>
-                        <div class="handle"><el-icon class="pointer" @click="buttonClickTest()"><Edit /></el-icon></div>
+                        <div class="handle"><el-icon class="pointer" @click="onModifyClicked(item)"><Edit /></el-icon></div>
                         <div class="handle"><el-icon class="pointer" @click="buttonClickTest()"><Delete /></el-icon></div>
                       </div>
                     </el-col>
@@ -389,6 +408,71 @@
             </el-form>
             <div slot="footer" class="dialog-footer">
               <el-button type="primary" @click="task.detailFormVisible = false">确 定</el-button>
+            </div>
+          </el-dialog>
+
+          <el-dialog v-model="task.modifyFormVisible" title="修改会议详情">
+            <el-form :model="task.modifyForm">
+              <el-form-item label="会议标题&nbsp;&nbsp;" :label-width="formLabelWidth">
+                <el-input v-model="task.modifyForm. mtin_title" autocomplete="on"></el-input>
+              </el-form-item>
+              <el-form-item label="会议内容&nbsp;&nbsp;" :label-width="formLabelWidth">
+                <el-input v-model="task.modifyForm.mtin_ctnt" autosize type="textarea"/>
+              </el-form-item>
+              <el-form-item label="会议开始时间&nbsp;&nbsp;" :label-width="formLabelWidth">
+                <div>
+                  <el-col :span="11">
+                    <el-date-picker v-model="task.mtin_st_date"
+                                    type="date" placeholder="选择日期" style="width: 100%"
+                                    value-format="YYYY-MM-DD"
+                    ></el-date-picker>
+                  </el-col>
+                  <el-col class="line" :span="1">&nbsp;&nbsp;&nbsp;&nbsp;</el-col>
+                  <el-col :span="12">
+                    <el-time-picker v-model="task.mtin_st_time" placeholder="选择时间" style="width: 100%"
+                                    format="HH:mm" value-format="HH:mm"
+                    ></el-time-picker>
+                  </el-col>
+                </div>
+              </el-form-item>
+              <el-form-item label="会议长度&nbsp;&nbsp;" :label-width="formLabelWidth">
+                <el-input v-model="task.modifyForm.mtin_len" autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="会议地点&nbsp;&nbsp;" :label-width="formLabelWidth">
+                <el-input v-model="task.modifyForm.mtin_loc" autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="会议主持人ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+                <el-input v-model="task.modifyForm.mtin_host" autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="会议ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+                {{ task.modifyForm.mtin_id }}
+              </el-form-item>
+              <el-form-item label="会议状态&nbsp;&nbsp;" :label-width="formLabelWidth">
+                <el-input v-model="task.modifyForm.mtin_fin" autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="会议创建时间&nbsp;&nbsp;" :label-width="formLabelWidth">
+                <div>
+                  <el-col :span="11">
+                    <el-date-picker v-model="task.mtin_crt_date"
+                                    type="date" placeholder="选择日期" style="width: 100%"
+                                    value-format="YYYY-MM-DD"
+                    ></el-date-picker>
+                  </el-col>
+                  <el-col class="line" :span="1">&nbsp;&nbsp;&nbsp;&nbsp;</el-col>
+                  <el-col :span="12">
+                    <el-time-picker v-model="task.mtin_crt_time" placeholder="选择时间" style="width: 100%"
+                                    format="HH:mm" value-format="HH:mm"
+                    ></el-time-picker>
+                  </el-col>
+                </div>
+              </el-form-item>
+              <el-form-item label="为我添加会议者ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+                <el-input v-model="task.modifyForm.adder_id" autocomplete="off"></el-input>
+              </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+              <el-button @click="task.modifyFormVisible = false">取 消</el-button>
+              <el-button type="primary" @click="handleEdit()">确 定</el-button>
             </div>
           </el-dialog>
 
@@ -465,10 +549,45 @@ const buttonClickTest = () => {
 
 //scope.row
 const showMeetingDetails = (row:any) => {
-  console.log("Detail Shows!")
+  // console.log("Detail Shows!")
   task.detailForm = row
   console.log(task.detailForm)
   task.detailFormVisible = true
+}
+
+const onModifyClicked = (item: any) => {
+  console.log("Modify a Meeting!")
+  task.modifyForm = item
+  task.mtin_st_date = item.mtin_st.split(' ')[0]
+  task.mtin_st_time = item.mtin_st.split(' ')[1]
+  task.mtin_crt_date = item.mtin_crt.split(' ')[0]
+  task.mtin_crt_time = item.mtin_crt.split(' ')[1]
+  task.modifyFormVisible = true
+}
+
+const handleEdit = () => {
+  task.modifyFormVisible = false
+  let meeting = task.modifyForm
+  meeting.mtin_st = [task.mtin_st_date, task.mtin_st_time].join(" ")
+  meeting.mtin_crt = [task.mtin_crt_date, task.mtin_crt_time].join(" ")
+  try {
+    Service.updateMeeting(meeting).then((res) => {
+      if (res) {
+        ElMessage({
+          type: 'success',
+          message: "修改成功"
+        })
+        getPersonalMeetingList()
+      } else {
+        console.log('updateMeeting error!')
+      }
+    });
+  } catch (err) {
+    ElMessage({
+      type: 'warning',
+      message: err.message
+    })
+  }
 }
 
 const getPersonalMeetingList = () => {

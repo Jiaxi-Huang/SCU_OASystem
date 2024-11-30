@@ -1,7 +1,8 @@
 import request from '@/utils/request'
 
 const todolistApi = {
-  getTodolist: '/api/meetings/getMyMeetings',
+  getMeetingList: '/api/meetings/getMyMeetings',
+  updateMeeting: '/api/meetings/updateMeeting',
   localHost:'http://localhost:8080',
 }
 
@@ -13,7 +14,7 @@ class Service {
   static getPersonalMeetingList() {
     const data = {'accessToken':sessionStorage.getItem('accessToken')}
     return request({
-      url: todolistApi.localHost + todolistApi.getTodolist,
+      url: todolistApi.localHost + todolistApi.getMeetingList,
       method: 'POST',
       json: true,
       data: data,
@@ -26,23 +27,14 @@ class Service {
     })
   }
 
-  static postModifyTodo(record:any) {
-    let todoList = {
-      todo_ddl: record.ddl ,
-      todo_title: record.title ,
-      todo_fin: record.status ,
-      todo_ctnt: record.content ,
-      todo_crt: record.crt ,
-      adder_id: record.adder ,
-      todo_id: record.todo_id ,
-      user_id: record.user_id ,
-    }
-    console.log(todoList)
+  static updateMeeting(meeting :any) {
+    meeting.acsTkn = sessionStorage.getItem('accessToken')
+    console.log(meeting)
     return request({
-      url: todolistApi.localHost + todolistApi.modifyTodolist,
+      url: todolistApi.localHost + todolistApi.updateMeeting,
       method: 'POST',
       json: true,
-      data: todoList,
+      data: meeting,
     }).then((res) => {
       if (res.status === 0) {
         return res

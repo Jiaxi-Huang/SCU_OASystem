@@ -1,6 +1,7 @@
 package com.example.backend.controllers;
 
 import com.example.backend.entity.ResponseBase;
+import com.example.backend.entity.meeting.MeeetingWithTk;
 import com.example.backend.entity.meeting.Meeting;
 import com.example.backend.entity.meeting.MeetingWithAdderId;
 import com.example.backend.entity.userInfo.adminUserInfoRequest;
@@ -44,4 +45,19 @@ public class MeetingsCon {
         return res;
     }
 
+
+    @PostMapping("/updateMeeting")
+    public ResponseBase updateMeeting(@RequestBody MeeetingWithTk meetingWithTk) {
+        ResponseBase res = new ResponseBase();
+
+        try {
+            String accessToken = meetingWithTk.getAcsTkn();
+            int userId = accessService.getAuthenticatedId(accessToken);
+            meetingService.updateMeeting(userId, meetingWithTk);
+        } catch (Exception e) {
+            res.setStatus(-1);
+            res.setMessage(e.getMessage());
+        }
+        return res;
+    }
 }
