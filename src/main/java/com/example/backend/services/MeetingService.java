@@ -2,6 +2,7 @@ package com.example.backend.services;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.backend.entity.ResponseBase;
+import com.example.backend.entity.meeting.MeeetingWithTk;
 import com.example.backend.entity.meeting.Meeting;
 import com.example.backend.entity.meeting.MeetingWithAdderId;
 import com.example.backend.mapper.MeetingMapper;
@@ -55,4 +56,22 @@ public class MeetingService extends ServiceImpl<MeetingMapper, MeetingWithAdderI
         return response;
     }
 
+    public ResponseBase updateMeeting(int user_id, MeeetingWithTk meeting) {
+        ResponseBase response = new ResponseBase();
+//        System.out.println(meeting.getMtin_title());
+        try {
+            if (meeting.getMtin_id() >= 0 && user_id >= 0) {
+                meetingMapper.updateMeetingAdder(user_id, meeting.getAdder_id(), meeting.getMtin_id());
+            }
+
+            if (meeting.getMtin_id() >= 0) {
+                meetingMapper.updateMeeting(meeting.getMtin_id(), meeting.getMtin_title(), meeting.getMtin_ctnt(), meeting.getMtin_fin(),
+                        meeting.getMtin_st(), meeting.getMtin_len(), meeting.getMtin_crt(), meeting.getMtin_host(), meeting.getMtin_loc());
+            }
+        }catch (Exception e) {
+            response.setStatus(-1);
+            e.printStackTrace();
+        }
+        return response;
+    }
 }
