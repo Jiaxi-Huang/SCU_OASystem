@@ -7,10 +7,13 @@
         <search></search>
         <lang-switch></lang-switch>
         <div id="Message" class="right-menu-box">
-          <el-tooltip
-              :content="`您有 ${pendingTodos.length} 个待办事项待处理和 ${pendingLeaveApprovals.length} 条请假审批待处理`"
-              placement="bottom"
-              effect="dark">
+          <el-tooltip placement="bottom" effect="dark">
+            <template #content>
+              <div>
+                <div>您有 <strong>{{ pendingTodos.length }}</strong> 个待办事项待处理</div>
+                <div>您有 <strong>{{ pendingLeaveApprovals.length }}</strong> 条请假审批待处理</div>
+              </div>
+            </template>
             <el-badge
                 :value="pendingTodos.length + pendingLeaveApprovals.length"
                 :max="99"
@@ -22,6 +25,8 @@
             </el-badge>
           </el-tooltip>
         </div>
+
+
         <div id="fullScreen" class="right-menu-box">
           <el-button class="full-screen">
             <el-tooltip :content="langConfig.header.fullScreen[lang]" effect="dark" placement="left">
