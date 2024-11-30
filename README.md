@@ -1,10 +1,15 @@
+文档管理用了一个组件
+# yarn方式安装 vue-vuecmf-fileexplorer
+yarn add vue-vuecmf-fileexplorer
+# npm方式安装 vue-vuecmf-fileexplorer
+npm install vue-vuecmf-fileexplorer
 # OA办公系统
 ## 项目分工
 - 黄家曦: 项目管理 `用户管理` `登录管理`
 - 郭源: `日程管理`
 - 何海洋: `审批管理`
 - 桑郎平措: `通知管理`
-- 陈春宇: `文档管理`
+- 陈春宇: `文档管理`  
 ## 开发计划
 
 ## 项目功能点
