@@ -7,22 +7,13 @@
         <search></search>
         <lang-switch></lang-switch>
         <div id="Message" class="right-menu-box">
-          <el-dropdown>
-            <el-badge :value="messageNum" :max="99" class="message-badge" type="danger">
+          <el-tooltip :content="`您有 ${pendingTodos.length} 个待办事项待处理`" placement="bottom" effect="dark">
+            <el-badge :value="pendingTodos.length" :max="99" class="message-badge" type="danger">
               <el-button class="message">
                 <el-icon><Message /></el-icon>
               </el-button>
             </el-badge>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item command="a">mike 回复了你的邮件</el-dropdown-item>
-                <el-dropdown-item command="b">您有5个新任务</el-dropdown-item>
-                <el-dropdown-item command="c">您已经和Jone成为了好友</el-dropdown-item>
-                <el-dropdown-item command="d">项目验收通知</el-dropdown-item>
-                <el-dropdown-item command="e" divided>新会议通知</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+          </el-tooltip>
         </div>
         <div id="fullScreen" class="right-menu-box">
           <el-button class="full-screen">
@@ -60,8 +51,9 @@
     </el-header>
   </div>
 </template>
+
 <script lang="ts">
-import { defineComponent, computed, ref } from 'vue'
+import { defineComponent, computed, ref, onMounted } from 'vue'
 import { Message, FullScreen, BottomLeft } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 import Hamburger from '@/components/Hamburger/Hamburger.vue'
@@ -72,6 +64,8 @@ import avatar from '@/assets/avatar-default.jpg'
 import { toFullScreen, exitFullScreen } from '@/utils/screen'
 import { useStore } from '@/store/index'
 import { langConfig } from '@/utils/constant/config'
+import Service from '@/views/TodoList/api/index'
+import { Todo } from '@/types/todo'
 
 export default defineComponent({
   name: 'Navbar',
@@ -84,12 +78,6 @@ export default defineComponent({
     FullScreen,
     BottomLeft
   },
-  props: {
-    primary: {
-      default: '#fff',
-      type: String
-    }
-  },
   setup() {
     const router = useRouter()
     const store = useStore()
@@ -98,6 +86,24 @@ export default defineComponent({
     const messageNum = computed(() => store.getters['messageModule/getMessageNum'])
     const lang = computed((): string => store.getters['settingsModule/getLangState'])
     const nickname = computed(() => JSON.parse(localStorage.getItem('userInfo') as string)?.userName ?? '极客恰恰')
+
+    // 存储待办事项的状态
+    const todos = ref<Todo[]>([])
+
+    // 获取待办事项
+    const getTodos = async () => {
+      const response = await Service.postGetTodoList()
+      if (response && response.data) {
+        todos.value = response.data
+      }
+    }
+
+    const pendingTodos = computed(() => todos.value.filter(todo => todo.todo_fin === '未完成'))
+
+    // onMounted 钩子函数，用于在组件挂载时获取数据
+    onMounted(() => {
+      getTodos()
+    })
 
     // methods
     const toggleSideBar = () => {
@@ -114,10 +120,8 @@ export default defineComponent({
       fullScreen.value = false
     }
     const logout = () => {
-      // clear()
       sessionStorage.removeItem('auth')
       sessionStorage.removeItem('accessToken')
-
       router.replace('/login')
     }
 
@@ -134,11 +138,13 @@ export default defineComponent({
       toggleSideBar,
       opened,
       langConfig,
-      logout
+      logout,
+      pendingTodos
     }
   }
 })
 </script>
+
 <style lang="scss" scoped>
 .navbar {
   height: 50px;
