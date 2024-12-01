@@ -374,7 +374,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
       {
         path: '/table/tableList',
         name: 'tableList',
-        component: () => import(/* webpackChunkName: "personalCenter" */ '@/views/File/fileList.vue'),
+        component: () => import(/* webpackChunkName: "personalCenter" */ '@/views/Table/tableList.vue'),
         meta: {
           title: {
             '/zh-CN': '表格',
