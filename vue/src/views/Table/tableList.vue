@@ -1,23 +1,23 @@
 <template>
   <div class="table-container">
     <el-form :inline="true" :model="formInline" class="form-inline">
-      <el-form-item label="…Û≈˙»À">
-        <el-input v-model="formInline.user" placeholder="…Û≈˙»À"></el-input>
+      <el-form-item label="ÂÆ°Êâπ‰∫∫">
+        <el-input v-model="formInline.user" placeholder="ÂÆ°Êâπ‰∫∫"></el-input>
       </el-form-item>
-      <el-form-item label="ªÓ∂Ø«¯”Ú">
-        <el-select v-model="formInline.region" placeholder="ªÓ∂Ø«¯”Ú">
-          <el-option label="«¯”Ú“ª" value="shanghai"></el-option>
-          <el-option label="«¯”Ú∂˛" value="beijing"></el-option>
+      <el-form-item label="Ê¥ªÂä®Âå∫Âüü">
+        <el-select v-model="formInline.region" placeholder="Ê¥ªÂä®Âå∫Âüü">
+          <el-option label="Âå∫Âüü‰∏Ä" value="shanghai"></el-option>
+          <el-option label="Âå∫Âüü‰∫å" value="beijing"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">≤È—Ø</el-button>
+        <el-button type="primary" @click="onSubmit">Êü•ËØ¢</el-button>
       </el-form-item>
     </el-form>
     <el-table ref="filterTableRef" class="table-list" row-key="date" :data="tableData.filter((data) => !search || data.name.toLowerCase().includes(search.toLowerCase()))" style="width: 100%">
       <el-table-column
           prop="date"
-          label="»’∆⁄"
+          label="Êó•Êúü"
           sortable
           width="180"
           column-key="date"
@@ -30,11 +30,11 @@
           :filter-method="filterHandler"
       >
       </el-table-column>
-      <el-table-column prop="name" label="–’√˚" width="180"> </el-table-column>
-      <el-table-column prop="address" label="µÿ÷∑" :formatter="formatter"> </el-table-column>
+      <el-table-column prop="name" label="ÂßìÂêç" width="180"> </el-table-column>
+      <el-table-column prop="address" label="Âú∞ÂùÄ" :formatter="formatter"> </el-table-column>
       <el-table-column align="right">
         <template #header>
-          <el-input v-model="search" size="mini" placeholder=" ‰»Î–’√˚◊÷∂Œπÿº¸◊÷À—À˜" />
+          <el-input v-model="search" size="mini" placeholder="ËæìÂÖ•ÂßìÂêçÂ≠óÊÆµÂÖ≥ÈîÆÂ≠óÊêúÁ¥¢" />
         </template>
         <template #default="scope">
           <el-button v-permission="['test:permission-btn3']" size="mini" @click="handleEdit(scope.$index, scope.row)">v-permission </el-button>
@@ -42,26 +42,26 @@
           <el-button v-if="$isPermission(['test:permission-btn3'])" size="mini" @click="handleEdit(scope.$index, scope.row)">$isPermission </el-button>
 
           <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
-          <el-popconfirm confirm-button-text="»∑∂®" cancel-button-text="»°œ˚" icon="el-icon-info" icon-color="red" title="»∑∂®…æ≥˝∏√Ãıº«¬º¬£ø" @confirm="handleDelete(scope.$index, scope.row)">
+          <el-popconfirm confirm-button-text="Á°ÆÂÆö" cancel-button-text="ÂèñÊ∂à" icon="el-icon-info" icon-color="red" title="Á°ÆÂÆöÂà†Èô§ËØ•Êù°ËÆ∞ÂΩïÂêóÔºü" @confirm="handleDelete(scope.$index, scope.row)">
             <template #reference>
-              <el-button size="mini" type="danger">…æ≥˝</el-button>
+              <el-button size="mini" type="danger">Âà†Èô§</el-button>
             </template>
           </el-popconfirm>
         </template>
       </el-table-column>
       <el-table-column
           prop="tag"
-          label="±Í«©"
+          label="Ê†áÁ≠æ"
           width="100"
           :filters="[
-          { text: 'º“', value: 'º“' },
-          { text: 'π´Àæ', value: 'π´Àæ' }
+          { text: 'ÂÆ∂', value: 'ÂÆ∂' },
+          { text: 'ÂÖ¨Âè∏', value: 'ÂÖ¨Âè∏' }
         ]"
           :filter-method="filterTag"
           filter-placement="bottom-end"
       >
         <template #default="scope">
-          <el-tag :type="scope.row.tag === 'º“' ? 'primary' : 'success'" disable-transitions>{{ scope.row.tag }}</el-tag>
+          <el-tag :type="scope.row.tag === 'ÂÆ∂' ? 'primary' : 'success'" disable-transitions>{{ scope.row.tag }}</el-tag>
         </template>
       </el-table-column>
     </el-table>
@@ -89,7 +89,7 @@ export default defineComponent({
     permission
   },
   setup() {
-    // Àºøº ref œÏ”¶ Ω∫Õ reactive œÏ”¶ Ωµƒ«¯±£ª –ﬁ∏ƒ∂‘œÛ Ù–‘÷µ£¨ «∑Òª·À¢–¬ ˝æ›
+    // ÊÄùËÄÉ ref ÂìçÂ∫îÂºèÂíå reactive ÂìçÂ∫îÂºèÁöÑÂå∫Âà´Ôºõ ‰øÆÊîπÂØπË±°Â±ûÊÄßÂÄºÔºåÊòØÂê¶‰ºöÂà∑Êñ∞Êï∞ÊçÆ
 
     const router = useRouter()
     const filterTableRef = ref()
@@ -97,57 +97,57 @@ export default defineComponent({
       tableData: [
         {
           date: '2016-05-07',
-          name: '∞◊–°∞◊',
-          address: '…œ∫£ –∆’Õ”«¯Ω…≥Ω≠¬∑ 1518 ≈™',
-          tag: 'º“'
+          name: 'ÁôΩÂ∞èÁôΩ',
+          address: '‰∏äÊµ∑Â∏ÇÊôÆÈôÄÂå∫ÈáëÊ≤ôÊ±üË∑Ø 1518 ÂºÑ',
+          tag: 'ÂÆ∂'
         },
         {
           date: '2016-05-02',
-          name: 'Õı–°ª¢',
-          address: '…œ∫£ –∆’Õ”«¯Ω…≥Ω≠¬∑ 1518 ≈™',
-          tag: 'º“'
+          name: 'ÁéãÂ∞èËôé',
+          address: '‰∏äÊµ∑Â∏ÇÊôÆÈôÄÂå∫ÈáëÊ≤ôÊ±üË∑Ø 1518 ÂºÑ',
+          tag: 'ÂÆ∂'
         },
         {
           date: '2016-05-04',
-          name: '¿Ó–°≈÷',
-          address: '…œ∫£ –∆’Õ”«¯Ω…≥Ω≠¬∑ 1517 ≈™',
-          tag: 'π´Àæ'
+          name: 'ÊùéÂ∞èËÉñ',
+          address: '‰∏äÊµ∑Â∏ÇÊôÆÈôÄÂå∫ÈáëÊ≤ôÊ±üË∑Ø 1517 ÂºÑ',
+          tag: 'ÂÖ¨Âè∏'
         },
         {
           date: '2016-05-01',
-          name: 'Õı¿œŒÂ',
-          address: '…œ∫£ –∆’Õ”«¯Ω…≥Ω≠¬∑ 1519 ≈™',
-          tag: 'º“'
+          name: 'ÁéãËÄÅ‰∫î',
+          address: '‰∏äÊµ∑Â∏ÇÊôÆÈôÄÂå∫ÈáëÊ≤ôÊ±üË∑Ø 1519 ÂºÑ',
+          tag: 'ÂÆ∂'
         },
         {
           date: '2016-07-03',
-          name: 'Õı¬È◊”',
-          address: '…œ∫£ –∆’Õ”«¯Ω…≥Ω≠¬∑ 1516 ≈™',
-          tag: 'π´Àæ'
+          name: 'ÁéãÈ∫ªÂ≠ê',
+          address: '‰∏äÊµ∑Â∏ÇÊôÆÈôÄÂå∫ÈáëÊ≤ôÊ±üË∑Ø 1516 ÂºÑ',
+          tag: 'ÂÖ¨Âè∏'
         },
         {
           date: '2016-07-07',
-          name: '∞◊–°∞◊',
-          address: '…œ∫£ –∆’Õ”«¯Ω…≥Ω≠¬∑ 1518 ≈™',
-          tag: 'º“'
+          name: 'ÁôΩÂ∞èÁôΩ',
+          address: '‰∏äÊµ∑Â∏ÇÊôÆÈôÄÂå∫ÈáëÊ≤ôÊ±üË∑Ø 1518 ÂºÑ',
+          tag: 'ÂÆ∂'
         },
         {
           date: '2016-07-02',
-          name: 'Õı–°ª¢',
-          address: '…œ∫£ –∆’Õ”«¯Ω…≥Ω≠¬∑ 1518 ≈™',
-          tag: 'º“'
+          name: 'ÁéãÂ∞èËôé',
+          address: '‰∏äÊµ∑Â∏ÇÊôÆÈôÄÂå∫ÈáëÊ≤ôÊ±üË∑Ø 1518 ÂºÑ',
+          tag: 'ÂÆ∂'
         },
         {
           date: '2016-07-04',
-          name: '¿Ó–°≈÷',
-          address: '…œ∫£ –∆’Õ”«¯Ω…≥Ω≠¬∑ 1517 ≈™',
-          tag: 'π´Àæ'
+          name: 'ÊùéÂ∞èËÉñ',
+          address: '‰∏äÊµ∑Â∏ÇÊôÆÈôÄÂå∫ÈáëÊ≤ôÊ±üË∑Ø 1517 ÂºÑ',
+          tag: 'ÂÖ¨Âè∏'
         },
         {
           date: '2016-07-01',
-          name: 'Õı¿œŒÂ',
-          address: '…œ∫£ –∆’Õ”«¯Ω…≥Ω≠¬∑ 1519 ≈™',
-          tag: 'º“'
+          name: 'ÁéãËÄÅ‰∫î',
+          address: '‰∏äÊµ∑Â∏ÇÊôÆÈôÄÂå∫ÈáëÊ≤ôÊ±üË∑Ø 1519 ÂºÑ',
+          tag: 'ÂÆ∂'
         }
       ],
       currentPage: 1,
@@ -191,13 +191,13 @@ export default defineComponent({
     }
     const handleSizeChange = (val: any) => {
       // eslint-disable-next-line no-console
-      console.log(`√ø“≥ ${val} Ãı`)
+      console.log(`ÊØèÈ°µ ${val} Êù°`)
       state.pageSize = val
       // request api to change tableData
     }
     const handleCurrentChange = (val: any) => {
       // eslint-disable-next-line no-console
-      console.log(`µ±«∞“≥: ${val}`)
+      console.log(`ÂΩìÂâçÈ°µ: ${val}`)
       state.currentPage = val
       // request api to change tableData
     }
