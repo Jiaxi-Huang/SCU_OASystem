@@ -1,371 +1,238 @@
 <template>
-  <h3>个人文件管理</h3>
+  <div class="table-container">
+    <el-form :inline="true" :model="formInline" class="form-inline">
+      <el-form-item label="审批人">
+        <el-input v-model="formInline.user" placeholder="审批人"></el-input>
+      </el-form-item>
+      <el-form-item label="活动区域">
+        <el-select v-model="formInline.region" placeholder="活动区域">
+          <el-option label="区域一" value="shanghai"></el-option>
+          <el-option label="区域二" value="beijing"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="onSubmit">查询</el-button>
+      </el-form-item>
+    </el-form>
+    <el-table ref="filterTableRef" class="table-list" row-key="date" :data="tableData.filter((data) => !search || data.name.toLowerCase().includes(search.toLowerCase()))" style="width: 100%">
+      <el-table-column
+          prop="date"
+          label="日期"
+          sortable
+          width="180"
+          column-key="date"
+          :filters="[
+          { text: '2016-05-01', value: '2016-05-01' },
+          { text: '2016-05-02', value: '2016-05-02' },
+          { text: '2016-05-03', value: '2016-05-03' },
+          { text: '2016-05-04', value: '2016-05-04' }
+        ]"
+          :filter-method="filterHandler"
+      >
+      </el-table-column>
+      <el-table-column prop="name" label="姓名" width="180"> </el-table-column>
+      <el-table-column prop="address" label="地址" :formatter="formatter"> </el-table-column>
+      <el-table-column align="right">
+        <template #header>
+          <el-input v-model="search" size="mini" placeholder="输入姓名字段关键字搜索" />
+        </template>
+        <template #default="scope">
+          <el-button v-permission="['test:permission-btn3']" size="mini" @click="handleEdit(scope.$index, scope.row)">v-permission </el-button>
 
-  <vuecmf-fileexplorer
-      root_path="uploads"
-      :page_size="30"
-      list_show="list"
-      :tool_config="['new_folder','update_folder','move_folder','del_folder','upload','move_file','del_file','remark_file']"
-      upload_api="http://localhost:8080/api/file/upload"
-      :data="{user:'1'}"
-      @loadFolder="loadFolder"
-      @moveFolder="moveFolder"
-      @saveFolder="saveFolder"
-      @delFolder="delFolder"
-      @loadFile="loadFile"
-      @selectFile="selectFile"
-      @moveFile="moveFile"
-      @delFile="delFile"
-      @saveFile="saveFile"
-      @remarkFile="remarkFile"
-      @upload="upload"
+          <el-button v-if="$isPermission(['test:permission-btn3'])" size="mini" @click="handleEdit(scope.$index, scope.row)">$isPermission </el-button>
 
-      @beforeUpload="beforeUpload"
-      @onUploadSuccess="onUploadSuccess"
-      @onUploadError="onUploadError"
-
-  >
-  </vuecmf-fileexplorer>
-
+          <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
+          <el-popconfirm confirm-button-text="确定" cancel-button-text="取消" icon="el-icon-info" icon-color="red" title="确定删除该条记录吗？" @confirm="handleDelete(scope.$index, scope.row)">
+            <template #reference>
+              <el-button size="mini" type="danger">删除</el-button>
+            </template>
+          </el-popconfirm>
+        </template>
+      </el-table-column>
+      <el-table-column
+          prop="tag"
+          label="标签"
+          width="100"
+          :filters="[
+          { text: '家', value: '家' },
+          { text: '公司', value: '公司' }
+        ]"
+          :filter-method="filterTag"
+          filter-placement="bottom-end"
+      >
+        <template #default="scope">
+          <el-tag :type="scope.row.tag === '家' ? 'primary' : 'success'" disable-transitions>{{ scope.row.tag }}</el-tag>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination
+        :hide-on-single-page="false"
+        :current-page="currentPage"
+        :page-sizes="[5, 10, 15, 20, 25]"
+        :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+    >
+    </el-pagination>
+  </div>
 </template>
-
 <script lang="ts">
-import {defineComponent, getCurrentInstance, ref} from 'vue';
-import {AnyObject} from "./packages/vue-vuecmf-fileexplorer/src/typings/vuecmf";
-import {ElMessage} from "element-plus";
-import Service from "@/views/Table/api/index";
-
+import { computed, defineComponent, onMounted, reactive, ref, toRefs } from 'vue'
+import { useRouter } from 'vue-router'
+import permission from '@/directive/permission'
 
 export default defineComponent({
-  name: 'App',
-  current_select_key:'0',
-  setup(){
-    //加载文件夹列表
-    const loadFolder = (folderObj: AnyObject): void => {
-      console.log(folderObj);
-      console.log("getPersonalFolders exc");
-      console.log(folderObj.keywords)
-      Service.loadFolder().then((res) => {
-        if (res) {
-          const data = res.data;
-          if (data && Array.isArray(data)) {
-            folderObj.total = data.length; // 更新文件夹的总数
+  name: 'TableList',
+  directives: {
+    permission
+  },
+  setup() {
+    // 思考 ref 响应式和 reactive 响应式的区别； 修改对象属性值，是否会刷新数据
 
-            folderObj.data[0].id=0;
-            folderObj.data[0].title="uploads";
-            folderObj.data[0].children=[];
-            let map = {};
-            // 遍历所有数据，创建一个 map，将每个对象按 id 存储
-            data.forEach(item => {
-              map[item.id] = {...item, children: []};
-            });
-            data.forEach(item => {
-              if (item.pid === 0) {
-                // 如果是根节点（pid为0），加入结果数组
-                folderObj.data[0].children.push(map[item.id]);
-              } else {
-                if(map[item.pid]){
-                  map[item.pid].children.push(map[item.id]);
-                }
-                // 否则将其添加到对应父节点的 children 数组中
-              }
-            });
-            var is_exist=0;
-          if(folderObj.keywords){
-            folderObj.data[0].children=[];
-            data.forEach(item => {
-              if(item.title === folderObj.keywords){
-                folderObj.data[0].id=-1;
-                folderObj.data[0].title="找到了";
-                folderObj.data[0].children.push(map[item.id]);
-                is_exist=1;
-
-              }
-            if(!is_exist){
-              folderObj.data[0].id=-1;
-              folderObj.data[0].title="没找到";
-              folderObj.data[0].children=[];
-            }
-            });
-            console.log(JSON.stringify(folderObj, null, 2));
-            console.log(folderObj.is_new);
-          }
-          }
-        } else {
-          console.log("getPersonalFolders RES MISS");
-
+    const router = useRouter()
+    const filterTableRef = ref()
+    const state = reactive({
+      tableData: [
+        {
+          date: '2016-05-07',
+          name: '白小白',
+          address: '上海市普陀区金沙江路 1518 弄',
+          tag: '家'
+        },
+        {
+          date: '2016-05-02',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1518 弄',
+          tag: '家'
+        },
+        {
+          date: '2016-05-04',
+          name: '李小胖',
+          address: '上海市普陀区金沙江路 1517 弄',
+          tag: '公司'
+        },
+        {
+          date: '2016-05-01',
+          name: '王老五',
+          address: '上海市普陀区金沙江路 1519 弄',
+          tag: '家'
+        },
+        {
+          date: '2016-07-03',
+          name: '王麻子',
+          address: '上海市普陀区金沙江路 1516 弄',
+          tag: '公司'
+        },
+        {
+          date: '2016-07-07',
+          name: '白小白',
+          address: '上海市普陀区金沙江路 1518 弄',
+          tag: '家'
+        },
+        {
+          date: '2016-07-02',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1518 弄',
+          tag: '家'
+        },
+        {
+          date: '2016-07-04',
+          name: '李小胖',
+          address: '上海市普陀区金沙江路 1517 弄',
+          tag: '公司'
+        },
+        {
+          date: '2016-07-01',
+          name: '王老五',
+          address: '上海市普陀区金沙江路 1519 弄',
+          tag: '家'
         }
-      }).catch(err => {
-        ElMessage({
-          type: 'warning',
-          message: err.message || '加载文件失败',
-        });
-      });
-    };
+      ],
+      currentPage: 1,
+      pageSize: 5,
+      search: ''
+    })
+    const formInline = reactive({
+      user: '',
+      region: ''
+    })
+    const total = computed(() => state.tableData.length)
 
-
-
-    //加载文件列表
-    const loadFile = (folderObj: AnyObject): void => {
-      console.log("getPersonalFiles exc")
-      Service.loadFile().then((res) => {
-        if (res) {
-          // 处理返回的结果
-
-          const data = res.data;
-          if (data && Array.isArray(data)) {
-            folderObj.data=[];
-            folderObj.total = data.length;
-            console.log(folderObj.keywords)
-            if(folderObj.keywords){
-              for (let i = 0; i < data.length; i++) {
-                if(folderObj.keywords === data[i].fileName)
-                folderObj.data.push({
-                  "id": data[i].id,
-                  "file_name": data[i].fileName,
-                  "ext": data[i].ext,
-                  "size": data[i].size,
-                  "dir_id": data[i].dirId,
-                  "url": data[i].url,
-                  "remark": data[i].remark,
-                  "create_time": data[i].createTime,
-                  "update_time": data[i].updateTime,
-                })
-              }
-            }else{
-              console.log(folderObj.filter.dir_id)
-              for (let i = 0; i < data.length; i++) {
-                if(data[i].dirId === folderObj.filter.dir_id){
-                  folderObj.data.push({
-                    "id": data[i].id,
-                    "file_name": data[i].fileName,
-                    "ext": data[i].ext,
-                    "size": data[i].size,
-                    "dir_id": data[i].dirId,
-                    "url": data[i].url,
-                    "remark": data[i].remark,
-                    "create_time": data[i].createTime,
-                    "update_time": data[i].updateTime,
-                  })
-                }
-              }
-            }
-
-          }
-        } else {
-          console.log("getPersonalTodoList RES MISS");
-        }
-      }).catch(err => {
-        ElMessage({
-          type: 'warning',
-          message: err.message || '加载文件失败',
-        });
-      });
+    onMounted(() => {
+      // eslint-disable-next-line no-console
+      console.dir(filterTableRef.value)
+    })
+    // methods
+    const resetDateFilter = () => {
+      filterTableRef.value.clearFilter('date')
     }
 
-    //保存文件夹
-    const saveFolder = (folderData: AnyObject):void => {
-      //创建
-      console.log(folderData.is_new)
-      if(folderData.is_new === true){
-        // eslint-disable-next-line no-console
-        try {
-          Service.createFolder(folderData).then((res) => {
-            if (res) {
-              // console.log(res)
-            } else {
-            }
-          });
-        } catch (err) {
-          ElMessage({
-            type: 'warning',
-            message: err.message
-          })
-        }
-      }else{
-        try {
-          Service.modifyFolder(folderData).then((res) => {
-            if (res) {
-              // console.log(res)
-            } else {
-            }
-          });
-        } catch (err) {
-          ElMessage({
-            type: 'warning',
-            message: err.message
-          })
-        }
-      }
-      console.log(folderData)
+    const clearFilter = () => {
+      filterTableRef.value.clearFilter()
     }
 
-    //移动文件夹
-    const moveFolder = (data:AnyObject):void => {
-      console.log(data)
-      //重新加载文件夹列表及文件列表
-      try {
-        Service.moveFolder(data).then((res) => {
-          if (res) {
-            // console.log(res)
-          } else {
-          }
-        });
-      } catch (err) {
-        ElMessage({
-          type: 'warning',
-          message: err.message
-        })
-      }
-      data.loadFolder()
-
+    const formatter = (row: { address: any }) => row.address
+    const filterTag = (value: any, row: { tag: any }) => row.tag === value
+    const filterHandler = (value: any, row: { [x: string]: any }, column: { property: any }) => {
+      const { property } = column
+      return row[property] === value
     }
-
-    //删除文件夹
-    const delFolder = (folderData: AnyObject):void => {
-      console.log(folderData)
-      try {
-        Service.delFolder(folderData).then((res) => {
-          if (res) {
-            // console.log(res)
-          } else {
-          }
-        });
-      } catch (err) {
-        ElMessage({
-          type: 'warning',
-          message: err.message
-        })
-      }
-
+    const handleEdit = (index: any, row: any) => {
+      // eslint-disable-next-line no-console
+      console.log(index, row)
+      router.replace('/form/advanceForm')
     }
-
-
-
-    //选择文件事件
-    const selectFile = (files:AnyObject):void => {
-      console.log('当前选择的文件信息：', files)
+    const handleDelete = (index: any, row: any) => {
+      // eslint-disable-next-line no-console
+      console.log(index, row)
+      state.tableData.splice(index, 1)
     }
-
-    //移动文件
-    const moveFile = (data:AnyObject):void => {
-      console.log(data)
-      //重新加载文件列表
-      try {
-        Service.moveFile(data).then((res) => {
-          if (res) {
-            // console.log(res)
-          } else {
-          }
-        });
-      } catch (err) {
-        ElMessage({
-          type: 'warning',
-          message: err.message
-        })
-      }
-
-      data.loadFile()
+    const handleSizeChange = (val: any) => {
+      // eslint-disable-next-line no-console
+      console.log(`每页 ${val} 条`)
+      state.pageSize = val
+      // request api to change tableData
     }
-
-    //删除文件
-    const delFile = (data:AnyObject):void => {
-      console.log(data)
-      //重新加载文件列表
-
-      try {
-        Service.delFile(data).then((res) => {
-          if (res) {
-            // console.log(res)
-          } else {
-          }
-        });
-      } catch (err) {
-        ElMessage({
-          type: 'warning',
-          message: err.message
-        })
-      }
-      data.loadFile()
+    const handleCurrentChange = (val: any) => {
+      // eslint-disable-next-line no-console
+      console.log(`当前页: ${val}`)
+      state.currentPage = val
+      // request api to change tableData
     }
-
-    //保存文件
-    const saveFile = (data:AnyObject):void => {
-      console.log(data)
-    }
-
-    //备注文件
-    const remarkFile = (data:AnyObject):void => {
-      console.log(data)
-      //重新加载文件列表
-      try {
-        Service.remarkFile(data).then((res) => {
-          if (res) {
-            // console.log(res)
-          } else {
-          }
-        });
-      } catch (err) {
-        ElMessage({
-          type: 'warning',
-          message: err.message
-        })
-      }
-    }
-
-
-
-
-    //上传文件前
-    const beforeUpload = (data:AnyObject):void => {
-      console.log("before upload: ",data)
-      console.log(data.folder_id)
-    }
-
-    //上传文件成功返回数据时
-    const onUploadSuccess = (data:AnyObject):void => {
-      console.log('success = ',data)
-    }
-
-    //上传文件失败
-    const onUploadError = (data:AnyObject):void => {
-      console.log('error = ', data)
-    }
-
-    const upload =(data:AnyObject):void=>{
-      try {
-        Service.uploadFile(data).then((res) => {
-          if (res) {
-            // console.log(res)
-          } else {
-          }
-        });
-      } catch (err) {
-        ElMessage({
-          type: 'warning',
-          message: err.message
-        })
-      }
-      console.log(data)
+    const onSubmit = () => {
+      // eslint-disable-next-line no-console
+      console.log('submit!')
     }
     return {
-      loadFolder,
-      saveFolder,
-      moveFolder,
-      delFolder,
-      loadFile,
-      selectFile,
-      moveFile,
-      delFile,
-      saveFile,
-      remarkFile,
-      upload,
-
-      beforeUpload,
-      onUploadSuccess,
-      onUploadError
-
+      formInline,
+      total,
+      ...toRefs(state),
+      handleCurrentChange,
+      handleSizeChange,
+      onSubmit,
+      handleEdit,
+      handleDelete,
+      filterTableRef,
+      resetDateFilter,
+      clearFilter,
+      formatter,
+      filterTag,
+      filterHandler
     }
   }
-});
+})
 </script>
+<style lang="stylus" scoped>
+.table-container{
+  .form-inline{
+    margin:15px;
+    text-align:left;
+  }
+  .table-list{
+    margin:15px;
+  }
+
+}
+</style>

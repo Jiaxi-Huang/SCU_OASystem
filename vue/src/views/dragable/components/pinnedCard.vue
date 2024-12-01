@@ -28,7 +28,7 @@
 import { defineComponent, reactive, toRefs, ref, onMounted, onUnmounted } from 'vue'
 import { Operation } from '@element-plus/icons-vue'
 
-import Sortable from 'sortablejs'
+import Sortable from 'sortablejs/'
 
 interface cardInfoType {
   cardInfo: { id: number; imgSrc: string; cardTitle: string; link: string; cardContent: string }[]

@@ -37,4 +37,5 @@ vue/node_modules/
 vue/.husky/
 vue/.vs/
 vue/.vscode/
+vue/.git/
 src/main/resources/application.properties

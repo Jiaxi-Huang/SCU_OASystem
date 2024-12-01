@@ -427,6 +427,45 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
     ]
   },
   {
+    path: '/reimbursement',
+    component: layout,
+    redirect: '/reimbursement/reimbursementList',
+    meta: {
+      title: {
+        '/zh-CN': '报销管理',
+        '/en-US': 'Reimbursement'
+      },
+      icon: 'ic ic-barrage-fill'
+    },
+    children: [
+      {
+        path: '/reimbursement/reimbursementList',
+        name: 'Reimbursement',
+        component: () => import('@/views/Reimbursement/components/reimbursementList.vue'),
+        meta: {
+          title: {
+            '/zh-CN': '报销管理',
+            '/en-US': 'Reimbursement'
+          },
+          icon: 'ic ic-barrage-fill'
+        }
+      },
+      {
+        path: '/reimbursement/reimbursementAdd',
+        name: 'reimbursementAdd',
+        component: () => import( '@/views/Reimbursement/components/reimbursementAdd.vue'),
+        meta: {
+          title: {
+            '/zh-CN': '报销申请',
+            '/en-US': 'Reimbursement Apply'
+          },
+          icon: 'ic ic-stealth-fill',
+          hidden: true,
+        }
+      }
+    ]
+  },
+  {
     path: '/meetings',
     component: layout,
     redirect: '/meetings/meetingsList',
@@ -690,6 +729,32 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
             '/en-US': 'PersonalSetting'
           },
           icon: 'ic ic-setup-fill'
+        }
+      }
+    ]
+  },
+  {
+    path: '/file',
+    component: layout,
+    redirect: '/file/fileList',
+    meta: {
+      title: {
+        '/zh-CN': '文件管理',
+        '/en-US': 'File Manage'
+      },
+      icon: 'ic ic-barrage-fill'
+    },
+    children: [
+      {
+        path: '/file/fileList',
+        name: 'fileList',
+        component: () => import(/* webpackChunkName: "personalCenter" */ '@/views/File/fileList.vue'),
+        meta: {
+          title: {
+            '/zh-CN': '文件管理',
+            '/en-US': 'FileManage'
+          },
+          icon: 'ic ic-barrage-fill'
         }
       }
     ]
