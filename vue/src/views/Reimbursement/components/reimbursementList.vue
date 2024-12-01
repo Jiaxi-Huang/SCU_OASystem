@@ -25,27 +25,12 @@
         </template>
         <template #default="scope">
           <el-button size="mini" @click="modifyPop(scope.row)">修改</el-button>
-          <el-button size="mini" @click="detailPop(scope.row)">查看詳情</el-button>
+          <el-button size="mini" @click="detailPop(scope.row)">查看详情</el-button>
           <el-popconfirm confirm-button-text="确定" cancel-button-text="取消" icon="el-icon-info" icon-color="red" title="确定删除该条记录吗？" @confirm="handleDelete(scope.$index, scope.row)">
             <template #reference>
               <el-button size="mini" type="danger">删除</el-button>
             </template>
           </el-popconfirm>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="status"
-        label="状态"
-        width="100"
-        :filters="[
-          { text: '已完成', value: '已完成' },
-          { text: '未完成', value: '未完成' }
-        ]"
-        :filter-method="filterStatus"
-        filter-placement="bottom-end"
-      >
-        <template #default="scope">
-          <el-tag :type="scope.row.status === '已完成' ? 'primary' : 'success'" disable-transitions>{{ scope.row.status }}</el-tag>
         </template>
       </el-table-column>
     </el-table>
@@ -138,10 +123,12 @@ export default defineComponent({
     const state = reactive({
       tableData: [
         {
-          ddl: '后台沒打开',
-          title: '后台沒打开',
-          status: '后台沒打开',
-          content: 'NO'
+          reimbursement_id: '0231554651',
+          user_id: '1',
+          amount: '1000',
+          description: '差旅',
+          status: '未完成',
+          submitted_at: new Date(),
         },
       ],
       currentPage: 1,

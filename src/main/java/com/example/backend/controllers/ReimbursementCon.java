@@ -23,7 +23,7 @@ public class ReimbursementCon {
     @Autowired
     private AccessService accessService;
 
-    @PostMapping("/getReimbursementRecord")
+    @PostMapping("/getReimbursementList")
     public ResponseBase getReimbursementRecord(@RequestBody adminUserInfoRequest request) {
         ResponseBase res = new ResponseBase();
 

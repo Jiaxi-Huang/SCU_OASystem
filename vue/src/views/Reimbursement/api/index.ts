@@ -2,9 +2,9 @@ import request from '@/utils/request'
 
 const reimbursementApi = {
   getReimbursementList: '/api/reimbursement/getReimbursementList',
-  updateReimbursement: '/api/reimbursement/updateReimbursement',
-  deleteReimbursement: '/api/reimbursement/deleteReimbursement',
-  addReimbursement: '/api/reimbursement/addReimbursement',
+  updateReimbursement: '/api/reimbursement/modifyReimbursementRecord',
+  deleteReimbursement: '/api/reimbursement/deleteReimbursementRecord',
+  addReimbursement: '/api/reimbursement/addReimbursementRecord',
   localHost:'http://localhost:8080',
 }
 

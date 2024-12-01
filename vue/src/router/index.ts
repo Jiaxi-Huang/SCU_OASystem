@@ -425,6 +425,45 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
     ]
   },
   {
+    path: '/reimbursement',
+    component: layout,
+    redirect: '/reimbursement/reimbursementList',
+    meta: {
+      title: {
+        '/zh-CN': '报销管理',
+        '/en-US': 'Reimbursement'
+      },
+      icon: 'ic ic-barrage-fill'
+    },
+    children: [
+      {
+        path: '/reimbursement/reimbursementList',
+        name: 'Reimbursement',
+        component: () => import('@/views/Reimbursement/components/reimbursementList.vue'),
+        meta: {
+          title: {
+            '/zh-CN': '报销管理',
+            '/en-US': 'Reimbursement'
+          },
+          icon: 'ic ic-barrage-fill'
+        }
+      },
+      {
+        path: '/reimbursement/reimbursementAdd',
+        name: 'reimbursementAdd',
+        component: () => import( '@/views/Reimbursement/components/reimbursementAdd.vue'),
+        meta: {
+          title: {
+            '/zh-CN': '报销申请',
+            '/en-US': 'Reimbursement Apply'
+          },
+          icon: 'ic ic-stealth-fill',
+          hidden: true,
+        }
+      }
+    ]
+  },
+  {
     path: '/meetings',
     component: layout,
     redirect: '/meetings/meetingsList',
