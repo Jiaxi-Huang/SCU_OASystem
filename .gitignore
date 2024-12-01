@@ -38,4 +38,4 @@ vue/.husky/
 vue/.vs/
 vue/.vscode/
 vue/.git/
-#src/main/resources/application.properties
+src/main/resources/application.properties
