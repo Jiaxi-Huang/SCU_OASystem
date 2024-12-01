@@ -1,371 +1,238 @@
 <template>
-  <h3>ä¸ªäººæ–‡ä»¶ç®¡ç†</h3>
+  <div class="table-container">
+    <el-form :inline="true" :model="formInline" class="form-inline">
+      <el-form-item label="ÉóÅúÈË">
+        <el-input v-model="formInline.user" placeholder="ÉóÅúÈË"></el-input>
+      </el-form-item>
+      <el-form-item label="»î¶¯ÇøÓò">
+        <el-select v-model="formInline.region" placeholder="»î¶¯ÇøÓò">
+          <el-option label="ÇøÓòÒ»" value="shanghai"></el-option>
+          <el-option label="ÇøÓò¶ş" value="beijing"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="onSubmit">²éÑ¯</el-button>
+      </el-form-item>
+    </el-form>
+    <el-table ref="filterTableRef" class="table-list" row-key="date" :data="tableData.filter((data) => !search || data.name.toLowerCase().includes(search.toLowerCase()))" style="width: 100%">
+      <el-table-column
+          prop="date"
+          label="ÈÕÆÚ"
+          sortable
+          width="180"
+          column-key="date"
+          :filters="[
+          { text: '2016-05-01', value: '2016-05-01' },
+          { text: '2016-05-02', value: '2016-05-02' },
+          { text: '2016-05-03', value: '2016-05-03' },
+          { text: '2016-05-04', value: '2016-05-04' }
+        ]"
+          :filter-method="filterHandler"
+      >
+      </el-table-column>
+      <el-table-column prop="name" label="ĞÕÃû" width="180"> </el-table-column>
+      <el-table-column prop="address" label="µØÖ·" :formatter="formatter"> </el-table-column>
+      <el-table-column align="right">
+        <template #header>
+          <el-input v-model="search" size="mini" placeholder="ÊäÈëĞÕÃû×Ö¶Î¹Ø¼ü×ÖËÑË÷" />
+        </template>
+        <template #default="scope">
+          <el-button v-permission="['test:permission-btn3']" size="mini" @click="handleEdit(scope.$index, scope.row)">v-permission </el-button>
 
-  <vuecmf-fileexplorer
-      root_path="uploads"
-      :page_size="30"
-      list_show="list"
-      :tool_config="['new_folder','update_folder','move_folder','del_folder','upload','move_file','del_file','remark_file']"
-      upload_api="http://localhost:8080/api/file/upload"
-      :data="{user:'1'}"
-      @loadFolder="loadFolder"
-      @moveFolder="moveFolder"
-      @saveFolder="saveFolder"
-      @delFolder="delFolder"
-      @loadFile="loadFile"
-      @selectFile="selectFile"
-      @moveFile="moveFile"
-      @delFile="delFile"
-      @saveFile="saveFile"
-      @remarkFile="remarkFile"
-      @upload="upload"
+          <el-button v-if="$isPermission(['test:permission-btn3'])" size="mini" @click="handleEdit(scope.$index, scope.row)">$isPermission </el-button>
 
-      @beforeUpload="beforeUpload"
-      @onUploadSuccess="onUploadSuccess"
-      @onUploadError="onUploadError"
-
-  >
-  </vuecmf-fileexplorer>
-
+          <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
+          <el-popconfirm confirm-button-text="È·¶¨" cancel-button-text="È¡Ïû" icon="el-icon-info" icon-color="red" title="È·¶¨É¾³ı¸ÃÌõ¼ÇÂ¼Âğ£¿" @confirm="handleDelete(scope.$index, scope.row)">
+            <template #reference>
+              <el-button size="mini" type="danger">É¾³ı</el-button>
+            </template>
+          </el-popconfirm>
+        </template>
+      </el-table-column>
+      <el-table-column
+          prop="tag"
+          label="±êÇ©"
+          width="100"
+          :filters="[
+          { text: '¼Ò', value: '¼Ò' },
+          { text: '¹«Ë¾', value: '¹«Ë¾' }
+        ]"
+          :filter-method="filterTag"
+          filter-placement="bottom-end"
+      >
+        <template #default="scope">
+          <el-tag :type="scope.row.tag === '¼Ò' ? 'primary' : 'success'" disable-transitions>{{ scope.row.tag }}</el-tag>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination
+        :hide-on-single-page="false"
+        :current-page="currentPage"
+        :page-sizes="[5, 10, 15, 20, 25]"
+        :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+    >
+    </el-pagination>
+  </div>
 </template>
-
 <script lang="ts">
-import {defineComponent, getCurrentInstance, ref} from 'vue';
-import {AnyObject} from "./packages/vue-vuecmf-fileexplorer/src/typings/vuecmf";
-import {ElMessage} from "element-plus";
-import Service from "@/views/Table/api/index";
-
+import { computed, defineComponent, onMounted, reactive, ref, toRefs } from 'vue'
+import { useRouter } from 'vue-router'
+import permission from '@/directive/permission'
 
 export default defineComponent({
-  name: 'App',
-  current_select_key:'0',
-  setup(){
-    //åŠ è½½æ–‡ä»¶å¤¹åˆ—è¡¨
-    const loadFolder = (folderObj: AnyObject): void => {
-      console.log(folderObj);
-      console.log("getPersonalFolders exc");
-      console.log(folderObj.keywords)
-      Service.loadFolder().then((res) => {
-        if (res) {
-          const data = res.data;
-          if (data && Array.isArray(data)) {
-            folderObj.total = data.length; // æ›´æ–°æ–‡ä»¶å¤¹çš„æ€»æ•°
+  name: 'TableList',
+  directives: {
+    permission
+  },
+  setup() {
+    // Ë¼¿¼ ref ÏìÓ¦Ê½ºÍ reactive ÏìÓ¦Ê½µÄÇø±ğ£» ĞŞ¸Ä¶ÔÏóÊôĞÔÖµ£¬ÊÇ·ñ»áË¢ĞÂÊı¾İ
 
-            folderObj.data[0].id=0;
-            folderObj.data[0].title="uploads";
-            folderObj.data[0].children=[];
-            let map = {};
-            // éå†æ‰€æœ‰æ•°æ®ï¼Œåˆ›å»ºä¸€ä¸ª mapï¼Œå°†æ¯ä¸ªå¯¹è±¡æŒ‰ id å­˜å‚¨
-            data.forEach(item => {
-              map[item.id] = {...item, children: []};
-            });
-            data.forEach(item => {
-              if (item.pid === 0) {
-                // å¦‚æœæ˜¯æ ¹èŠ‚ç‚¹ï¼ˆpidä¸º0ï¼‰ï¼ŒåŠ å…¥ç»“æœæ•°ç»„
-                folderObj.data[0].children.push(map[item.id]);
-              } else {
-                if(map[item.pid]){
-                  map[item.pid].children.push(map[item.id]);
-                }
-                // å¦åˆ™å°†å…¶æ·»åŠ åˆ°å¯¹åº”çˆ¶èŠ‚ç‚¹çš„ children æ•°ç»„ä¸­
-              }
-            });
-            var is_exist=0;
-          if(folderObj.keywords){
-            folderObj.data[0].children=[];
-            data.forEach(item => {
-              if(item.title === folderObj.keywords){
-                folderObj.data[0].id=-1;
-                folderObj.data[0].title="æ‰¾åˆ°äº†";
-                folderObj.data[0].children.push(map[item.id]);
-                is_exist=1;
-
-              }
-            if(!is_exist){
-              folderObj.data[0].id=-1;
-              folderObj.data[0].title="æ²¡æ‰¾åˆ°";
-              folderObj.data[0].children=[];
-            }
-            });
-            console.log(JSON.stringify(folderObj, null, 2));
-            console.log(folderObj.is_new);
-          }
-          }
-        } else {
-          console.log("getPersonalFolders RES MISS");
-
+    const router = useRouter()
+    const filterTableRef = ref()
+    const state = reactive({
+      tableData: [
+        {
+          date: '2016-05-07',
+          name: '°×Ğ¡°×',
+          address: 'ÉÏº£ÊĞÆÕÍÓÇø½ğÉ³½­Â· 1518 Åª',
+          tag: '¼Ò'
+        },
+        {
+          date: '2016-05-02',
+          name: 'ÍõĞ¡»¢',
+          address: 'ÉÏº£ÊĞÆÕÍÓÇø½ğÉ³½­Â· 1518 Åª',
+          tag: '¼Ò'
+        },
+        {
+          date: '2016-05-04',
+          name: 'ÀîĞ¡ÅÖ',
+          address: 'ÉÏº£ÊĞÆÕÍÓÇø½ğÉ³½­Â· 1517 Åª',
+          tag: '¹«Ë¾'
+        },
+        {
+          date: '2016-05-01',
+          name: 'ÍõÀÏÎå',
+          address: 'ÉÏº£ÊĞÆÕÍÓÇø½ğÉ³½­Â· 1519 Åª',
+          tag: '¼Ò'
+        },
+        {
+          date: '2016-07-03',
+          name: 'ÍõÂé×Ó',
+          address: 'ÉÏº£ÊĞÆÕÍÓÇø½ğÉ³½­Â· 1516 Åª',
+          tag: '¹«Ë¾'
+        },
+        {
+          date: '2016-07-07',
+          name: '°×Ğ¡°×',
+          address: 'ÉÏº£ÊĞÆÕÍÓÇø½ğÉ³½­Â· 1518 Åª',
+          tag: '¼Ò'
+        },
+        {
+          date: '2016-07-02',
+          name: 'ÍõĞ¡»¢',
+          address: 'ÉÏº£ÊĞÆÕÍÓÇø½ğÉ³½­Â· 1518 Åª',
+          tag: '¼Ò'
+        },
+        {
+          date: '2016-07-04',
+          name: 'ÀîĞ¡ÅÖ',
+          address: 'ÉÏº£ÊĞÆÕÍÓÇø½ğÉ³½­Â· 1517 Åª',
+          tag: '¹«Ë¾'
+        },
+        {
+          date: '2016-07-01',
+          name: 'ÍõÀÏÎå',
+          address: 'ÉÏº£ÊĞÆÕÍÓÇø½ğÉ³½­Â· 1519 Åª',
+          tag: '¼Ò'
         }
-      }).catch(err => {
-        ElMessage({
-          type: 'warning',
-          message: err.message || 'åŠ è½½æ–‡ä»¶å¤±è´¥',
-        });
-      });
-    };
+      ],
+      currentPage: 1,
+      pageSize: 5,
+      search: ''
+    })
+    const formInline = reactive({
+      user: '',
+      region: ''
+    })
+    const total = computed(() => state.tableData.length)
 
-
-
-    //åŠ è½½æ–‡ä»¶åˆ—è¡¨
-    const loadFile = (folderObj: AnyObject): void => {
-      console.log("getPersonalFiles exc")
-      Service.loadFile().then((res) => {
-        if (res) {
-          // å¤„ç†è¿”å›çš„ç»“æœ
-
-          const data = res.data;
-          if (data && Array.isArray(data)) {
-            folderObj.data=[];
-            folderObj.total = data.length;
-            console.log(folderObj.keywords)
-            if(folderObj.keywords){
-              for (let i = 0; i < data.length; i++) {
-                if(folderObj.keywords === data[i].fileName)
-                folderObj.data.push({
-                  "id": data[i].id,
-                  "file_name": data[i].fileName,
-                  "ext": data[i].ext,
-                  "size": data[i].size,
-                  "dir_id": data[i].dirId,
-                  "url": data[i].url,
-                  "remark": data[i].remark,
-                  "create_time": data[i].createTime,
-                  "update_time": data[i].updateTime,
-                })
-              }
-            }else{
-              console.log(folderObj.filter.dir_id)
-              for (let i = 0; i < data.length; i++) {
-                if(data[i].dirId === folderObj.filter.dir_id){
-                  folderObj.data.push({
-                    "id": data[i].id,
-                    "file_name": data[i].fileName,
-                    "ext": data[i].ext,
-                    "size": data[i].size,
-                    "dir_id": data[i].dirId,
-                    "url": data[i].url,
-                    "remark": data[i].remark,
-                    "create_time": data[i].createTime,
-                    "update_time": data[i].updateTime,
-                  })
-                }
-              }
-            }
-
-          }
-        } else {
-          console.log("getPersonalTodoList RES MISS");
-        }
-      }).catch(err => {
-        ElMessage({
-          type: 'warning',
-          message: err.message || 'åŠ è½½æ–‡ä»¶å¤±è´¥',
-        });
-      });
+    onMounted(() => {
+      // eslint-disable-next-line no-console
+      console.dir(filterTableRef.value)
+    })
+    // methods
+    const resetDateFilter = () => {
+      filterTableRef.value.clearFilter('date')
     }
 
-    //ä¿å­˜æ–‡ä»¶å¤¹
-    const saveFolder = (folderData: AnyObject):void => {
-      //åˆ›å»º
-      console.log(folderData.is_new)
-      if(folderData.is_new === true){
-        // eslint-disable-next-line no-console
-        try {
-          Service.createFolder(folderData).then((res) => {
-            if (res) {
-              // console.log(res)
-            } else {
-            }
-          });
-        } catch (err) {
-          ElMessage({
-            type: 'warning',
-            message: err.message
-          })
-        }
-      }else{
-        try {
-          Service.modifyFolder(folderData).then((res) => {
-            if (res) {
-              // console.log(res)
-            } else {
-            }
-          });
-        } catch (err) {
-          ElMessage({
-            type: 'warning',
-            message: err.message
-          })
-        }
-      }
-      console.log(folderData)
+    const clearFilter = () => {
+      filterTableRef.value.clearFilter()
     }
 
-    //ç§»åŠ¨æ–‡ä»¶å¤¹
-    const moveFolder = (data:AnyObject):void => {
-      console.log(data)
-      //é‡æ–°åŠ è½½æ–‡ä»¶å¤¹åˆ—è¡¨åŠæ–‡ä»¶åˆ—è¡¨
-      try {
-        Service.moveFolder(data).then((res) => {
-          if (res) {
-            // console.log(res)
-          } else {
-          }
-        });
-      } catch (err) {
-        ElMessage({
-          type: 'warning',
-          message: err.message
-        })
-      }
-      data.loadFolder()
-
+    const formatter = (row: { address: any }) => row.address
+    const filterTag = (value: any, row: { tag: any }) => row.tag === value
+    const filterHandler = (value: any, row: { [x: string]: any }, column: { property: any }) => {
+      const { property } = column
+      return row[property] === value
     }
-
-    //åˆ é™¤æ–‡ä»¶å¤¹
-    const delFolder = (folderData: AnyObject):void => {
-      console.log(folderData)
-      try {
-        Service.delFolder(folderData).then((res) => {
-          if (res) {
-            // console.log(res)
-          } else {
-          }
-        });
-      } catch (err) {
-        ElMessage({
-          type: 'warning',
-          message: err.message
-        })
-      }
-
+    const handleEdit = (index: any, row: any) => {
+      // eslint-disable-next-line no-console
+      console.log(index, row)
+      router.replace('/form/advanceForm')
     }
-
-
-
-    //é€‰æ‹©æ–‡ä»¶äº‹ä»¶
-    const selectFile = (files:AnyObject):void => {
-      console.log('å½“å‰é€‰æ‹©çš„æ–‡ä»¶ä¿¡æ¯ï¼š', files)
+    const handleDelete = (index: any, row: any) => {
+      // eslint-disable-next-line no-console
+      console.log(index, row)
+      state.tableData.splice(index, 1)
     }
-
-    //ç§»åŠ¨æ–‡ä»¶
-    const moveFile = (data:AnyObject):void => {
-      console.log(data)
-      //é‡æ–°åŠ è½½æ–‡ä»¶åˆ—è¡¨
-      try {
-        Service.moveFile(data).then((res) => {
-          if (res) {
-            // console.log(res)
-          } else {
-          }
-        });
-      } catch (err) {
-        ElMessage({
-          type: 'warning',
-          message: err.message
-        })
-      }
-
-      data.loadFile()
+    const handleSizeChange = (val: any) => {
+      // eslint-disable-next-line no-console
+      console.log(`Ã¿Ò³ ${val} Ìõ`)
+      state.pageSize = val
+      // request api to change tableData
     }
-
-    //åˆ é™¤æ–‡ä»¶
-    const delFile = (data:AnyObject):void => {
-      console.log(data)
-      //é‡æ–°åŠ è½½æ–‡ä»¶åˆ—è¡¨
-
-      try {
-        Service.delFile(data).then((res) => {
-          if (res) {
-            // console.log(res)
-          } else {
-          }
-        });
-      } catch (err) {
-        ElMessage({
-          type: 'warning',
-          message: err.message
-        })
-      }
-      data.loadFile()
+    const handleCurrentChange = (val: any) => {
+      // eslint-disable-next-line no-console
+      console.log(`µ±Ç°Ò³: ${val}`)
+      state.currentPage = val
+      // request api to change tableData
     }
-
-    //ä¿å­˜æ–‡ä»¶
-    const saveFile = (data:AnyObject):void => {
-      console.log(data)
-    }
-
-    //å¤‡æ³¨æ–‡ä»¶
-    const remarkFile = (data:AnyObject):void => {
-      console.log(data)
-      //é‡æ–°åŠ è½½æ–‡ä»¶åˆ—è¡¨
-      try {
-        Service.remarkFile(data).then((res) => {
-          if (res) {
-            // console.log(res)
-          } else {
-          }
-        });
-      } catch (err) {
-        ElMessage({
-          type: 'warning',
-          message: err.message
-        })
-      }
-    }
-
-
-
-
-    //ä¸Šä¼ æ–‡ä»¶å‰
-    const beforeUpload = (data:AnyObject):void => {
-      console.log("before upload: ",data)
-      console.log(data.folder_id)
-    }
-
-    //ä¸Šä¼ æ–‡ä»¶æˆåŠŸè¿”å›æ•°æ®æ—¶
-    const onUploadSuccess = (data:AnyObject):void => {
-      console.log('success = ',data)
-    }
-
-    //ä¸Šä¼ æ–‡ä»¶å¤±è´¥
-    const onUploadError = (data:AnyObject):void => {
-      console.log('error = ', data)
-    }
-
-    const upload =(data:AnyObject):void=>{
-      try {
-        Service.uploadFile(data).then((res) => {
-          if (res) {
-            // console.log(res)
-          } else {
-          }
-        });
-      } catch (err) {
-        ElMessage({
-          type: 'warning',
-          message: err.message
-        })
-      }
-      console.log(data)
+    const onSubmit = () => {
+      // eslint-disable-next-line no-console
+      console.log('submit!')
     }
     return {
-      loadFolder,
-      saveFolder,
-      moveFolder,
-      delFolder,
-      loadFile,
-      selectFile,
-      moveFile,
-      delFile,
-      saveFile,
-      remarkFile,
-      upload,
-
-      beforeUpload,
-      onUploadSuccess,
-      onUploadError
-
+      formInline,
+      total,
+      ...toRefs(state),
+      handleCurrentChange,
+      handleSizeChange,
+      onSubmit,
+      handleEdit,
+      handleDelete,
+      filterTableRef,
+      resetDateFilter,
+      clearFilter,
+      formatter,
+      filterTag,
+      filterHandler
     }
   }
-});
+})
 </script>
+<style lang="stylus" scoped>
+.table-container{
+  .form-inline{
+    margin:15px;
+    text-align:left;
+  }
+  .table-list{
+    margin:15px;
+  }
+
+}
+</style>

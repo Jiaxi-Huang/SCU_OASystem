@@ -17,7 +17,7 @@ import 'element-plus/dist/index.css'
 import 'element-plus/theme-chalk/index.css'
 import 'dayjs/locale/zh-cn'
 import '@/styles/index.scss'
-import VuecmfFileexplorer from "./views/Table/packages/vue-vuecmf-fileexplorer"
+import VuecmfFileexplorer from "@/views/File/packages/vue-vuecmf-fileexplorer"
 import '@/mock'
 
 const roles = localStorage.getItem('role')

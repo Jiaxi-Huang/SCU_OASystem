@@ -374,7 +374,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
       {
         path: '/table/tableList',
         name: 'tableList',
-        component: () => import(/* webpackChunkName: "personalCenter" */ '@/views/Table/tableList.vue'),
+        component: () => import(/* webpackChunkName: "personalCenter" */ '@/views/File/fileList.vue'),
         meta: {
           title: {
             '/zh-CN': '表格',
@@ -688,6 +688,32 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
             '/en-US': 'PersonalSetting'
           },
           icon: 'ic ic-setup-fill'
+        }
+      }
+    ]
+  },
+  {
+    path: '/file',
+    component: layout,
+    redirect: '/file/fileList',
+    meta: {
+      title: {
+        '/zh-CN': '文件管理',
+        '/en-US': 'File Manage'
+      },
+      icon: 'ic ic-barrage-fill'
+    },
+    children: [
+      {
+        path: '/file/fileList',
+        name: 'fileList',
+        component: () => import(/* webpackChunkName: "personalCenter" */ '@/views/File/fileList.vue'),
+        meta: {
+          title: {
+            '/zh-CN': '文件管理',
+            '/en-US': 'FileManage'
+          },
+          icon: 'ic ic-barrage-fill'
         }
       }
     ]
