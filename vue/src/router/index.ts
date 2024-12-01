@@ -1,6 +1,8 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 import { store } from '../store'
 import layout from '../layout/index.vue'
+import Todo from '@/views/Todo.vue'
+import LeaveApproval from "@/views/leaveApproval.vue";
 // 静态路由
 export const constantRoutes: Array<RouteRecordRaw> = [
   {
