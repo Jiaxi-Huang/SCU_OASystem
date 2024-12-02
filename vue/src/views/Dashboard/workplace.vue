@@ -4,7 +4,7 @@
       <div class="board-left">
         <div class="board-title"><span>工作台</span></div>
         <div class="board-info">
-          <img class="logo" :src="avatar" />
+          <img class="logo" :src="getAvatarUrl(avatar)" />
           <div class="content">
             <span class="content-name">极客恰恰</span>
             <span class="content-title">高级前端开发工程师</span>
@@ -102,14 +102,16 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, onMounted, reactive, ref } from 'vue'
+import {computed, defineComponent, onMounted, reactive, ref} from 'vue'
 import * as Echarts from 'echarts'
-import avatar from '@/assets/avatar-default.jpg'
+import { useStore } from '@/store/index'
 
 export default defineComponent({
   name: 'Workplace',
   setup() {
+    const store = useStore()
     const radarEchart = ref()
+    const avatar = computed(() => store.state.permissionModule.avatar)
     const radarOptions = {
       title: {
         text: ''
@@ -142,6 +144,18 @@ export default defineComponent({
           ]
         }
       ]
+    }
+    const getAvatarUrl = (avatar: string) => {
+      if (typeof avatar === 'string' && avatar.trim().length > 0) {
+        // 简单的 URL 验证
+        try {
+          new URL(avatar);
+          return avatar;
+        } catch (e) {
+          console.error('Invalid avatar URL:', e);
+        }
+      }
+      return '../../assets/avatar-default.jpg';
     }
     onMounted(() => {
       const radarChart = Echarts.init(radarEchart.value)
@@ -230,6 +244,7 @@ export default defineComponent({
     }
 
     return {
+      getAvatarUrl,
       handleLinkClick,
       radarEchart,
       avatar,

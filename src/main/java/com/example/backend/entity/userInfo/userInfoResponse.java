@@ -53,41 +53,32 @@ public class userInfoResponse {
         private String userDepartment;
         private String userIntro;
         private String userPhone;
-        public String getUserPhone() {
-            return userPhone;
-        }
-
-        public void setUserPhone(String userPhone) {
-            this.userPhone = userPhone;
-        }
-
-        public String getUserName() {
-            return userName;
-        }
-
-        public void setUserName(String userName) {
-            this.userName = userName;
-        }
-
-        public String getUserDepartment() {
-            return userDepartment;
-        }
-
-        public void setUserDepartment(String userDepartment) {
-            this.userDepartment = userDepartment;
-        }
-
-        public String getUserIntro() {
-            return userIntro;
-        }
-
-        public void setUserIntro(String userIntro) {
-            this.userIntro = userIntro;
-        }
-
+        private String userAvatar;
         public Data() {
         }
 
+        public String getUserPhone() {return userPhone;}
+        public void setUserPhone(String userPhone) {
+            this.userPhone = userPhone;
+        }
+        public String getUserName() {
+            return userName;
+        }
+        public void setUserName(String userName) {
+            this.userName = userName;
+        }
+        public String getUserDepartment() {
+            return userDepartment;
+        }
+        public void setUserDepartment(String userDepartment) {
+            this.userDepartment = userDepartment;
+        }
+        public String getUserIntro() {
+            return userIntro;
+        }
+        public void setUserIntro(String userIntro) {
+            this.userIntro = userIntro;
+        }
         public String getRoleName() {
             return roleName;
         }
@@ -95,5 +86,7 @@ public class userInfoResponse {
         public void setRoleName(String roleName) {
             this.roleName = roleName;
         }
+        public String getUserAvatar() {return userAvatar;}
+        public void setUserAvatar(String userAvatar) {this.userAvatar = userAvatar;}
     }
 }

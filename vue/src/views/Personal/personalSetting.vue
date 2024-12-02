@@ -38,16 +38,14 @@
                   <div class="avatar">
                     <div class="preview">
                       <span>头像</span>
-                      <img src="../../assets/avatar-default.jpg" />
+                      <img :src="getAvatarUrl(avatar)" />
                     </div>
                     <el-upload
-                      class="avatar-uploader"
-                      action="https://jsonplaceholder.typicode.com/posts/"
-                      :show-file-list="false"
-                      :on-success="handleAvatarSuccess"
-                      :before-upload="beforeAvatarUpload"
+                        action="http://localhost:8080/api/upload/uploadAvatar/"
+                        :on-success="handleAvatarSuccess"
+                        :before-upload="beforeAvatarUpload"
                     >
-                      <el-button style="margin-left: 10px" size="small" type="success"><i class="el-icon-upload"></i>更换头像</el-button>
+                      <el-button type="primary">点击上传</el-button>
                     </el-upload>
                   </div>
                 </div>
@@ -59,23 +57,15 @@
                 <div class="secure-item">
                   <div class="secure-info">
                     <span class="secure-key">账户密码</span>
-                    <span class="secure-value">当前密码强度：强</span>
                   </div>
-                  <div class="opera-btn"><span>修改</span></div>
-                </div>
-                <div class="secure-item">
-                  <div class="secure-info">
-                    <span class="secure-key">密保手机</span>
-                    <span class="secure-value">已绑定手机：138****2234</span>
-                  </div>
-                  <div class="opera-btn"><span>修改</span></div>
+                  <div class="opera-btn" @click="showPasswordDialog = true"><span>修改</span></div>
                 </div>
                 <div class="secure-item">
                   <div class="secure-info">
                     <span class="secure-key">绑定邮箱</span>
-                    <span class="secure-value">已绑定邮箱：geek****@outlook.com</span>
+                    <span class="secure-value">已绑定邮箱：{{email}}</span>
                   </div>
-                  <div class="opera-btn"><span>修改</span></div>
+                  <div class="opera-btn" @click="showEmailDialog = true"><span>修改</span></div>
                 </div>
               </el-tab-pane>
               <el-tab-pane label="新消息通知">
@@ -111,42 +101,65 @@
                 </div>
               </el-tab-pane>
             </el-tabs>
-          </el-card></div
-      ></el-col>
+          </el-card>
+        </div>
+      </el-col>
     </el-row>
+    <el-dialog title="修改绑定邮箱" :visible.sync="showEmailDialog" :model-value="showEmailDialog" width="50%" :before-close="handleClose">
+      <personal-email-edit @success="handleSaveEmail"></personal-email-edit>
+    </el-dialog>
+    <el-dialog title="修改密码" :visible.sync="showPasswordDialog" :model-value="showPasswordDialog" width="50%" :before-close="handleClose">
+      <personal-password-edit @success="handleSavePassword"></personal-password-edit>
+    </el-dialog>
   </div>
 </template>
 <script lang="ts">
 import { ElMessage } from 'element-plus'
-import { defineComponent, onMounted, reactive, ref, toRefs } from 'vue'
+import {computed, defineComponent, onMounted, reactive, ref, toRefs} from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from '@/store'
 import Service from './api/index'
+import PersonalEmailEdit  from "@/views/Personal/personalEmailEdit.vue";
+import PersonalPasswordEdit from "@/views/Personal/personalPasswordEdit.vue";
 import LoginService from '../Login/api/index'
 // eslint-disable-next-line no-unused-vars
 type VoidNoop = (arg0?: Error) => void
 export default defineComponent({
   name: 'PersonalSetting',
+  components: {PersonalEmailEdit,PersonalPasswordEdit},
   setup() {
+    const email = localStorage.getItem('email')
     const router = useRouter()
     const tabPosition = ref('left')
     const settingFormRef = ref()
     const store = useStore()
+    const showEmailDialog = ref(false)
+    const showPasswordDialog = ref(false)
+    const avatar = computed(() => store.state.permissionModule.avatar)
     const noticeSwitch = reactive({
       userSwitch: false,
       sysSwitch: true,
       taskSwitch: true
     })
     const settingForm = reactive({
-      //email:'',
       username: '',
       intro: '',
       phone: '',
       accessToken: sessionStorage.getItem('accessToken')
     })
-    const imageUrl = ref()
     const updateLoading = ref(false)
-
+    const getAvatarUrl = (avatar: string) => {
+      if (typeof avatar === 'string' && avatar.trim().length > 0) {
+        // 简单的 URL 验证
+        try {
+          new URL(avatar);
+          return avatar;
+        } catch (e) {
+          console.error('Invalid avatar URL:', e);
+        }
+      }
+      return '../../assets/avatar-default.jpg';
+    }
     // eslint-disable-next-line no-unused-vars
     const validateMobile = (rule: any, value: string, callback: VoidNoop) => {
       if (value === '') {
@@ -207,8 +220,14 @@ export default defineComponent({
     const resetForm = () => {
       settingFormRef.value.resetFields()
     }
-    const handleAvatarSuccess = (res: any, file: { raw: any }) => {
-      imageUrl.value = URL.createObjectURL(file.raw)
+    const handleAvatarSuccess = (res: any) => {
+      if (res.status === 0) {
+        console.log('Avatar uploaded successfully:', res.data.download_url)
+        // 更新头像URL到store或其他地方
+        store.commit('permissionModule/setAvatar', res.data.download_url)
+      } else {
+        ElMessage.error('上传头像失败: ' + res.message)
+      }
     }
     const beforeAvatarUpload = (file: { raw: any; type: string; size: number }) => {
       // const isJPG = file.type === 'image/jpeg'
@@ -226,7 +245,30 @@ export default defineComponent({
       }
       return isLt2M
     }
+    const handleClose = (done: () => void) => {
+      showEmailDialog.value = false
+      showPasswordDialog.value = false
+      done()
+    }
+
+    const handleSaveEmail = (data: any) => {
+      // 处理保存邮箱逻辑
+      ElMessage({
+        type: 'success',
+        message: '邮箱修改成功'
+      })
+      showEmailDialog.value = false
+    }
+    const handleSavePassword = (data: any) => {
+      ElMessage({
+        type: 'success',
+        message: '密码修改成功'
+      })
+      showPasswordDialog.value = false
+    }
     return {
+      avatar,
+      getAvatarUrl,
       handleBack,
       tabPosition,
       settingFormRef,
@@ -235,8 +277,12 @@ export default defineComponent({
       resetForm,
       handleAvatarSuccess,
       beforeAvatarUpload,
+      showEmailDialog,
+      showPasswordDialog,
+      handleClose,
+      handleSaveEmail,
+      handleSavePassword,
       rules,
-      imageUrl,
       ...toRefs(noticeSwitch),
       updateLoading
     }

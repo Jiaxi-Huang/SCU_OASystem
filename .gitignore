@@ -38,4 +38,5 @@ vue/.husky/
 vue/.vs/
 vue/.vscode/
 vue/.git/
+vue/yarn.lock
 src/main/resources/application.properties

@@ -7,16 +7,13 @@
         <el-col :span="8" style="text-align: left">
           <el-button type="primary" size="small" @click="onCreate">
             <el-icon><plus /></el-icon>
-            新增</el-button
-          >
-          <el-button type="success" size="small" @click="onRefresh">
-            <el-icon><refresh /></el-icon>
-            刷新</el-button
+            新增用户</el-button
           >
         </el-col>
       </el-row>
       <br />
       <el-table v-loading="loading" :data="data" stripe class="table">
+        <el-table-column prop="userId" label="用户ID" align="center"></el-table-column>
         <el-table-column prop="userName" label="用户名" align="center"></el-table-column>
         <el-table-column prop="userDepartment" label="部门" align="center"></el-table-column>
         <el-table-column prop="userRole" label="职位" align="center"></el-table-column>
@@ -67,27 +64,7 @@ import { Edit, Minus, Plus, Refresh } from '@element-plus/icons-vue'
 import RoleEdit from './rolesEdit.vue'
 import RoleNew from './rolesNew.vue'
 import Service from './api/index'
-const useConfirmDelete = (index: any) => {
-  console.log(index)
-  ElMessageBox.confirm('此操作将删除该员工所有数据, 是否继续?', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  })
-    .then(() => {
-      // 此处执行接口异步删除员工
-      ElMessage({
-        type: 'success',
-        message: '删除成功'
-      })
-    })
-    .catch(() => {
-      ElMessage({
-        type: 'info',
-        message: '已取消删除'
-      })
-    })
-}
+
 export default defineComponent({
   name: 'RoleManage',
   components: {
@@ -120,6 +97,7 @@ export default defineComponent({
       detail_visible: false,
       posted: {
         userRow: {
+          userId: null,
           userName:'',
           userRole: '',
           userDepartment:''
@@ -132,6 +110,7 @@ export default defineComponent({
      * @description 请求接口获取当前设置角色，默认始终有超级管理员角色
      */
     const fetchData = async() => {
+      state.is_search = false
       const data = {'accessToken':sessionStorage.getItem('accessToken')}
       const adminUserInfo = await Service.postAdminQueryUserList(data)
       if (adminUserInfo.status === 0) {
@@ -149,9 +128,6 @@ export default defineComponent({
       state.add_visible = true
     }
     const onCreateSuccess = (val: any) => {
-      console.log(val)
-      const newRow = { userRole: val.userRole}
-      state.data.push(newRow)
       state.add_visible = false
       fetchData()
     }
@@ -159,24 +135,58 @@ export default defineComponent({
       state.edit_visible = false
       fetchData()
     }
-    const onRefresh = () => {
-      state.is_search = false
-      fetchData()
-    }
+
     /**
      * @description 选择点击编辑授权角色；roleName
      */
     const onEdit = (index: any, row: any) => {
       console.log('row', row)
+      state.posted.userRow.userId = row.userId
       state.posted.userRow.userName = row.userName
       state.posted.userRow.userRole = row.userRole
       state.posted.userRow.userDepartment = row.userDepartment
       state.edit_visible = true
     }
+    const useConfirmDelete = async(row: any) => {
+      ElMessageBox.confirm('此操作将删除该员工所有数据, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+          .then(async() => {
+            // 此处执行接口异步删除员工
+            const data = {
+              userId : row.userId,
+              accessToken: sessionStorage.getItem('accessToken')
+            }
+            const res = await Service.postAdminDeleteUser(data);
+            if(res.status === 0) {
+              ElMessage({
+                type: 'success',
+                message: '删除成功'
+              })
+              fetchData()
+            }
+            else{
+              ElMessage({
+                type: 'error',
+                message: '删除失败'
+              })
+            }
+          })
+          .catch(() => {
+            ElMessage({
+              type: 'info',
+              message: '已取消删除'
+            })
+          })
+    }
     const onDelete = (index: any, row: any) => {
       console.log(index, row)
-      useConfirmDelete(index)
+      useConfirmDelete(row)
     }
+    //初始调用
+    fetchData()
     return {
       ...toRefs(state),
       total,
@@ -185,7 +195,6 @@ export default defineComponent({
       onCreate,
       onCreateSuccess,
       onEditSuccess,
-      onRefresh,
       onEdit,
       onDelete,
       fetchData

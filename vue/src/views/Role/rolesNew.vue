@@ -1,8 +1,8 @@
 <template>
   <div v-loading="loading" class="new">
     <el-form ref="formRef" :model="form" :rules="rules" label-position="right" label-width="100px" title="新增员工">
-      <el-form-item label="员工ID" prop="userId">
-        <el-input v-model="form.userId" placeholder="请输入员工ID"></el-input>
+      <el-form-item label="员工名" prop="userName">
+        <el-input v-model="form.userName" placeholder="请输入员工名"></el-input>
       </el-form-item>
       <el-form-item label="员工部门" prop="userDepartment">
         <el-select v-model="form.userDepartment" placeholder="请选择部门">
@@ -22,15 +22,14 @@
 </template>
 <script lang="ts">
 import { defineComponent, reactive, toRefs, ref } from 'vue'
-
+import Service from './api/index'
 export default defineComponent({
   name: 'RoleNew',
   emits: ['success'],
   setup(props, { emit }) {
     const rules = {
-      userId: [
-        { required: true, message: '请输入员工ID', trigger: 'blur' },
-        { type:'number', message: '请输入有效数字', trigger: 'blur' }
+      userName: [
+        { required: true, message: '请输入员工名', trigger: 'blur' },
       ],
       userDepartment: [
         { required: true, message: '请选择部门', trigger: 'change' },
@@ -55,23 +54,29 @@ export default defineComponent({
     // 只将响应式数据进行响应式处理
     const state = reactive({
       form: {
-        roleName: '',
-        remark: ''
+        userName: '',
+        userDepartment: '',
+        userRole: ''
       },
       loading: false
     })
     /**
      * @description 提交新建角色处理函数
      */
-    const submitForm = () => {
-      formRef.value.validate((valid: any): boolean => {
+    const submitForm = async() => {
+      formRef.value.validate(async(valid: any) => {
         if (valid) {
-          emit('success', { ...state.form })
-          return true
+          const data ={
+            accessToken : sessionStorage.getItem('accessToken'),
+            userName: state.form.userName,
+            userDepartment: state.form.userDepartment,
+            userRole: state.form.userRole
+          }
+          const res = await Service.postAdminAddUser(data)
+          if(res.status ===0) {
+            emit('success')
+          }
         }
-        // eslint-disable-next-line no-console
-        console.log('error submit!!')
-        return false
       })
     }
     return {

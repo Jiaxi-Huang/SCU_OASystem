@@ -100,6 +100,7 @@ public class Auth {
                 userInfoResponseData.setUserIntro(userInfo.getIntro());
                 userInfoResponseData.setUserPhone(userInfo.getPhone());
                 userInfoResponseData.setUserDepartment(userInfo.getDepartment());
+                userInfoResponseData.setUserAvatar(userInfo.getAvatar());
                 userInfoResponse response = new userInfoResponse(
                         0,
                         "获取职位信息成功",

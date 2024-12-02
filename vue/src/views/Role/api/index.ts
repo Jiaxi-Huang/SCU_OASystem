@@ -39,5 +39,47 @@ class Service {
       return Promise.reject(res)
     })
   }
+  static postAdminAddUser(data: any) {
+    return request({
+      url: 'http://localhost:8080/api/admin/user/add',
+      method: 'POST',
+      json: true,
+      data
+    }).then((res) => {
+      console.log(res)
+      if (res.status === 0) {
+        return Promise.resolve(res)
+      }
+      return Promise.reject(res)
+    })
+  }
+  static postAdminUpdateUser(data: any) {
+    return request({
+      url: 'http://localhost:8080/api/admin/user/update',
+      method: 'POST',
+      json: true,
+      data
+    }).then((res) => {
+      console.log(res)
+      if (res.status === 0) {
+        return Promise.resolve(res)
+      }
+      return Promise.reject(res)
+    })
+  }
+  static postAdminDeleteUser(data:any) {
+    return request({
+      url: 'http://localhost:8080/api/admin/user/delete',
+      method: 'POST',
+      json: true,
+      data
+    }).then((res) => {
+      console.log(res)
+      if (res.status === 0) {
+        return Promise.resolve(res)
+      }
+      return Promise.reject(res)
+    })
+  }
 }
 export default Service

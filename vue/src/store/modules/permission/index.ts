@@ -11,6 +11,7 @@ const role = localStorage.getItem('role') || ''
 const department = localStorage.getItem('department') || ''
 const intro = localStorage.getItem('intro') || ''
 const phone = localStorage.getItem('phone') || ''
+const avatar = localStorage.getItem('avatar') || ''
 // create a new Store Modules.
 const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
   namespaced: true,
@@ -20,6 +21,7 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
     department,//用户部门
     intro,//用户介绍
     phone,// 用户手机号
+    avatar: '',//头像url
     //暂时不用permissions: [],
     accessRoutes: constantRoutes, // 可访问路由集合
     routes: constantRoutes, // 所有路由集合
@@ -46,6 +48,10 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
       state.phone = userPhone
       console.log(state.phone)
     },
+    setAvatar: (state: permissionStateTypes, { userAvatar }) => {
+      state.avatar = userAvatar
+      console.log(state.avatar)
+    },
     setAccessRoutes: (state: permissionStateTypes, routes) => {
       state.accessRoutes = constantRoutes.concat(routes)
     },
@@ -71,7 +77,8 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
         roleName: payload.roleName,
         userDepartment: payload.userDepartment,
         userIntro: payload.userIntro,
-        userPhone:payload.userPhone
+        userPhone:payload.userPhone,
+        userAvatar: payload.userAvatar
       }
       // 后端根据角色名称，查询授权菜单
       Service.postAuthPermission(data).then((res) => {
@@ -157,6 +164,10 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
         localStorage.setItem('intro', payload.userIntro);
         commit('setIntro', payload);
       }
+      if ('userAvatar' in payload) {
+        localStorage.setItem('avatar', payload.userAvatar);
+        commit('setAvatar', payload);
+      }
     }
 
   },
@@ -181,6 +192,9 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
     },
     getPhone(state: permissionStateTypes) {
       return state.phone
+    },
+    getAvatar(state: permissionStateTypes) {
+      return state.avatar
     },
     /**
     getPermission(state: permissionStateTypes) {

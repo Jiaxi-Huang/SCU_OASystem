@@ -12,9 +12,7 @@
       <el-col :span="7" :offset="1">
         <el-card class="box-card">
           <div class="account-avatar">
-            <img src="../../assets/avatar-default.jpg" />
-            <div class="account-name">极客恰恰</div>
-            <div class="account-sign">极客签名,持续学习</div>
+            <img :src="getAvatarUrl(avatar)" />
           </div>
           <div class="account-detail">
             <el-descriptions class="detail" :column="1" :size="size">
@@ -111,7 +109,23 @@ export default defineComponent({
     const department = computed(() => store.state.permissionModule.department)
     const phone = computed(() => store.state.permissionModule.phone)
     const intro = computed(() => store.state.permissionModule.intro)
+    const avatar = computed(() => store.state.permissionModule.avatar)
     // mothods
+    /**
+     * @description 获取头像
+     */
+    const getAvatarUrl = (avatar: string) => {
+      if (typeof avatar === 'string' && avatar.trim().length > 0) {
+        // 简单的 URL 验证
+        try {
+          new URL(avatar);
+          return avatar;
+        } catch (e) {
+          console.error('Invalid avatar URL:', e);
+        }
+      }
+      return '../../assets/avatar-default.jpg';
+    }
     /**
      * @description 关闭tag标签
      */
@@ -150,6 +164,7 @@ export default defineComponent({
     })
     return {
       formLabelWidth,
+      getAvatarUrl,
       showInput,
       handleInputConfirm,
       ...toRefs(state),
@@ -159,6 +174,7 @@ export default defineComponent({
       department,
       phone,
       intro,
+      avatar,
       showDesc,
       handleClose
     }

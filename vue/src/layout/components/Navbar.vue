@@ -39,7 +39,7 @@
         </div>
         <el-dropdown class="avatar-container" trigger="hover">
           <div class="avatar-wrapper">
-            <el-avatar :src="avatar"></el-avatar>
+            <el-avatar :src="getAvatarUrl(avatar)"></el-avatar>
             <div class="nickname">{{ nickname }}</div>
           </div>
           <template #dropdown>
@@ -72,7 +72,6 @@ import Hamburger from '@/components/Hamburger/Hamburger.vue'
 import Breadcrumb from '@/components/Breadcrumb/index.vue'
 import Search from '@/components/Search/index.vue'
 import LangSwitch from '@/components/LangSwitch/index.vue'
-import avatar from '@/assets/avatar-default.jpg'
 import { toFullScreen, exitFullScreen } from '@/utils/screen'
 import { useStore } from '@/store/index'
 import { langConfig } from '@/utils/constant/config'
@@ -99,13 +98,24 @@ export default defineComponent({
     const fullScreen = ref(false)
     const messageNum = computed(() => store.getters['messageModule/getMessageNum'])
     const lang = computed((): string => store.getters['settingsModule/getLangState'])
-    const nickname = computed(() => JSON.parse(localStorage.getItem('userInfo') as string)?.userName ?? '极客恰恰')
-
+    const nickname = computed(() => store.state.permissionModule.username)
+    const avatar = computed(() => store.state.permissionModule.avatar)
     // 存储待办事项的状态
     const todos = ref<Todo[]>([])
     // 存储请假审批的状态
     const leaveApprovals = ref<LeaveApproval[]>([])
-
+    const getAvatarUrl = (avatar: string) => {
+      if (typeof avatar === 'string' && avatar.trim().length > 0) {
+        // 简单的 URL 验证
+        try {
+          new URL(avatar);
+          return avatar;
+        } catch (e) {
+          console.error('Invalid avatar URL:', e);
+        }
+      }
+      return '../../assets/avatar-default.jpg';
+    }
     // 获取待办事项
     const getTodos = async () => {
       const response = await TodoService.postGetTodoList()
@@ -152,6 +162,7 @@ export default defineComponent({
     }
 
     return {
+      getAvatarUrl,
       messageNum,
       toShowFullScreen,
       toExitFullScreen,
