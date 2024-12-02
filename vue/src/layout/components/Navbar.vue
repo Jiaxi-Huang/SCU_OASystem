@@ -10,8 +10,12 @@
           <el-tooltip placement="bottom" effect="dark">
             <template #content>
               <div>
-                <div>您有 <strong>{{ pendingTodos.length }}</strong> 个待办事项待处理</div>
-                <div>您有 <strong>{{ pendingLeaveApprovals.length }}</strong> 条请假审批待处理</div>
+                <div @click="navigateTo('/todoList/todoTableList')" style="cursor: pointer;">
+                  您有 <strong>{{ pendingTodos.length }}</strong> 个待办事项待处理
+                </div>
+                <div @click="navigateTo('/leaveApproval/leaveList')" style="cursor: pointer;">
+                  您有 <strong>{{ pendingLeaveApprovals.length }}</strong> 条请假审批待处理
+                </div>
               </div>
             </template>
             <el-badge
@@ -25,8 +29,6 @@
             </el-badge>
           </el-tooltip>
         </div>
-
-
         <div id="fullScreen" class="right-menu-box">
           <el-button class="full-screen">
             <el-tooltip :content="langConfig.header.fullScreen[lang]" effect="dark" placement="left">
@@ -120,6 +122,7 @@ export default defineComponent({
     const getTodos = async () => {
       const response = await TodoService.postGetTodoList()
       if (response && response.data) {
+        console.log('待办事项数据：',response.data)
         todos.value = response.data
       }
     }
@@ -128,6 +131,7 @@ export default defineComponent({
     const getLeaveApprovals = async () => {
       const response = await LeaveService.postGetLeaveApproval()
       if (response && response.data) {
+        console.log('请假审批数据：',response.data)
         leaveApprovals.value = response.data
       }
     }
@@ -155,6 +159,12 @@ export default defineComponent({
       exitFullScreen()
       fullScreen.value = false
     }
+
+    // 导航到不同页面的方法
+    const navigateTo = (page: string) => {
+      router.push(page)
+    }
+
     const logout = () => {
       sessionStorage.removeItem('auth')
       sessionStorage.removeItem('accessToken')
@@ -177,7 +187,8 @@ export default defineComponent({
       langConfig,
       logout,
       pendingTodos,
-      pendingLeaveApprovals
+      pendingLeaveApprovals,
+      navigateTo // 添加到返回对象中
     }
   }
 })
