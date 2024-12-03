@@ -10,8 +10,12 @@
           <el-tooltip placement="bottom" effect="dark">
             <template #content>
               <div>
-                <div>您有 <strong>{{ pendingTodos.length }}</strong> 个待办事项待处理</div>
-                <div>您有 <strong>{{ pendingLeaveApprovals.length }}</strong> 条请假审批待处理</div>
+                <div @click="navigateTo('/todoList/todoTableList')" style="cursor: pointer;">
+                  您有 <strong>{{ pendingTodos.length }}</strong> 个待办事项待处理
+                </div>
+                <div @click="navigateTo('/leaveApproval/leaveList')" style="cursor: pointer;">
+                  您有 <strong>{{ pendingLeaveApprovals.length }}</strong> 条请假审批待处理
+                </div>
               </div>
             </template>
             <el-badge
@@ -25,8 +29,6 @@
             </el-badge>
           </el-tooltip>
         </div>
-
-
         <div id="fullScreen" class="right-menu-box">
           <el-button class="full-screen">
             <el-tooltip :content="langConfig.header.fullScreen[lang]" effect="dark" placement="left">
@@ -39,7 +41,7 @@
         </div>
         <el-dropdown class="avatar-container" trigger="hover">
           <div class="avatar-wrapper">
-            <el-avatar :src="avatar"></el-avatar>
+            <el-avatar :src="getAvatarUrl(avatar)"></el-avatar>
             <div class="nickname">{{ nickname }}</div>
           </div>
           <template #dropdown>
@@ -72,7 +74,6 @@ import Hamburger from '@/components/Hamburger/Hamburger.vue'
 import Breadcrumb from '@/components/Breadcrumb/index.vue'
 import Search from '@/components/Search/index.vue'
 import LangSwitch from '@/components/LangSwitch/index.vue'
-import avatar from '@/assets/avatar-default.jpg'
 import { toFullScreen, exitFullScreen } from '@/utils/screen'
 import { useStore } from '@/store/index'
 import { langConfig } from '@/utils/constant/config'
@@ -99,17 +100,29 @@ export default defineComponent({
     const fullScreen = ref(false)
     const messageNum = computed(() => store.getters['messageModule/getMessageNum'])
     const lang = computed((): string => store.getters['settingsModule/getLangState'])
-    const nickname = computed(() => JSON.parse(localStorage.getItem('userInfo') as string)?.userName ?? '极客恰恰')
-
+    const nickname = computed(() => store.state.permissionModule.username)
+    const avatar = computed(() => store.state.permissionModule.avatar)
     // 存储待办事项的状态
     const todos = ref<Todo[]>([])
     // 存储请假审批的状态
     const leaveApprovals = ref<LeaveApproval[]>([])
-
+    const getAvatarUrl = (avatar: string) => {
+      if (typeof avatar === 'string' && avatar.trim().length > 0) {
+        // 简单的 URL 验证
+        try {
+          new URL(avatar);
+          return avatar;
+        } catch (e) {
+          console.error('Invalid avatar URL:', e);
+        }
+      }
+      return '../../assets/avatar-default.jpg';
+    }
     // 获取待办事项
     const getTodos = async () => {
       const response = await TodoService.postGetTodoList()
       if (response && response.data) {
+        console.log('待办事项数据：',response.data)
         todos.value = response.data
       }
     }
@@ -118,6 +131,7 @@ export default defineComponent({
     const getLeaveApprovals = async () => {
       const response = await LeaveService.postGetLeaveApproval()
       if (response && response.data) {
+        console.log('请假审批数据：',response.data)
         leaveApprovals.value = response.data
       }
     }
@@ -145,6 +159,12 @@ export default defineComponent({
       exitFullScreen()
       fullScreen.value = false
     }
+
+    // 导航到不同页面的方法
+    const navigateTo = (page: string) => {
+      router.push(page)
+    }
+
     const logout = () => {
       sessionStorage.removeItem('auth')
       sessionStorage.removeItem('accessToken')
@@ -152,6 +172,7 @@ export default defineComponent({
     }
 
     return {
+      getAvatarUrl,
       messageNum,
       toShowFullScreen,
       toExitFullScreen,
@@ -166,7 +187,8 @@ export default defineComponent({
       langConfig,
       logout,
       pendingTodos,
-      pendingLeaveApprovals
+      pendingLeaveApprovals,
+      navigateTo // 添加到返回对象中
     }
   }
 })

@@ -32,6 +32,7 @@ public class Admin {
             List<adminUserInfoResponse.Data> data = new ArrayList<>();
             for(User user:userInfo){
                 adminUserInfoResponse.Data temp = new adminUserInfoResponse.Data();
+                temp.setUserId(user.getUserId());
                 temp.setUserName(user.getUsername());
                 temp.setUserDepartment(user.getDepartment());
                 temp.setUserRole(user.getRole());
@@ -49,6 +50,119 @@ public class Admin {
         catch (Exception e) {
             adminUserInfoResponse response = new adminUserInfoResponse(
                     1,
+                    "服务器内部错误",
+                    false,
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    @PostMapping("/user/add")
+    public ResponseEntity<adminUserInfoResponse> userAdd(@RequestBody adminUserInfoRequest request) {
+        try {
+            String accessToken = request.getAccessToken();
+            int adminId = accessService.getAuthenticatedId(accessToken);
+            String username = request.getUserName();
+            String userdepartment = request.getUserDepartment();
+            String userrole = request.getUserRole();
+            int isSuccess = userService.adminUserAdd(username, userdepartment, userrole, adminId);
+            if (isSuccess > 0) {
+                adminUserInfoResponse response = new adminUserInfoResponse(
+                        0,
+                        "获取用户列表成功",
+                        true,
+                        null
+                );
+                return ResponseEntity.status(HttpStatus.OK).body(response);
+            }
+            else{
+                adminUserInfoResponse response = new adminUserInfoResponse(
+                        1,
+                        "添加用户失败",
+                        false,
+                        null
+                );
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+        }
+        catch (Exception e) {
+            adminUserInfoResponse response = new adminUserInfoResponse(
+                    1,
+                    "服务器内部错误",
+                    false,
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    @PostMapping("/user/update")
+    public ResponseEntity<adminUserInfoResponse> userUpdate(@RequestBody adminUserInfoRequest request) {
+        try {
+            String accessToken = request.getAccessToken();
+            String username = request.getUserName();
+            String userdepartment = request.getUserDepartment();
+            String userrole = request.getUserRole();
+            int userId = request.getUserId();
+            int adminId = accessService.getAuthenticatedId(accessToken);
+            int isSuccess = userService.adminUserUpdate(username, userdepartment, userrole, adminId, userId);
+            if (isSuccess > 0) {
+                adminUserInfoResponse response = new adminUserInfoResponse(
+                        0,
+                        "更新用户信息成功",
+                        true,
+                        null
+                );
+                return ResponseEntity.status(HttpStatus.OK).body(response);
+            }
+            else{
+                adminUserInfoResponse response = new adminUserInfoResponse(
+                        1,
+                        "更新用户信息失败",
+                        false,
+                        null
+                );
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+        }
+        catch (Exception e) {
+            adminUserInfoResponse response = new adminUserInfoResponse(
+                    2,
+                    "服务器内部错误",
+                    false,
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    @PostMapping("/user/delete")
+    public ResponseEntity<adminUserInfoResponse> userDelete(@RequestBody adminUserInfoRequest request) {
+        try {
+            String accessToken = request.getAccessToken();
+            int userId = request.getUserId();
+            int adminId = accessService.getAuthenticatedId(accessToken);
+            int isSuccess = userService.adminUserDelete(adminId, userId);
+            if (isSuccess > 0) {
+                adminUserInfoResponse response = new adminUserInfoResponse(
+                        0,
+                        "获取用户列表成功",
+                        true,
+                        null
+                );
+                return ResponseEntity.status(HttpStatus.OK).body(response);
+            }
+            else{
+                adminUserInfoResponse response = new adminUserInfoResponse(
+                        1,
+                        "删除用户失败",
+                        false,
+                        null
+                );
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+        }
+        catch (Exception e) {
+            adminUserInfoResponse response = new adminUserInfoResponse(
+                    2,
                     "服务器内部错误",
                     false,
                     null

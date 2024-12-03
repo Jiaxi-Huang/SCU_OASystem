@@ -29,7 +29,11 @@ interface stateTypes {
   url: String
   purl: String
   loading: Boolean
-  form: { key: String; label: String }
+  form: {
+    userName:string
+    userDepartment:string
+    userRole:string
+  }
   menu: {
     loading: Boolean
     url: String
@@ -57,7 +61,11 @@ export default defineComponent({
       url: `/role/allow`,
       purl: `/role/permissions`,
       loading: false,
-      form: { key: '', label: '' },
+      form: {
+        userName: '',
+        userRole: '',
+        userDepartment: ''
+      },
       menu: {
         loading: false,
         url: `/menu/list`,
@@ -89,54 +97,32 @@ export default defineComponent({
       { value: 'worker', label: '员工' }
     ]
     const row = computed(() => currentRow.value)
-    // 可访问
-    const routes = computed(() => store.state.permissionModule.routes)
-
     /**
-     * @description 异步获取已经授权的菜单
+     * @description 保存当前角色信息
      */
-    const fetchData = async () => {
-      const data = {
-        roleName: row.value.userRole
-      }
-      // 后端根据角色名称，查询授权菜单
-      const res = await Service.postAuthPermission(data)
-      if (res?.data) {
-        const { authedRoutes } = res.data
-        state.menu.form = authedRoutes
-      }
-    }
-    /**
-     * @description 异步获取所有的菜单
-     */
-    const fetchMenuData = () => {
-      // 模拟获取所有菜单数据；
-      // eslint-disable-next-line no-restricted-syntax
-      for (const i of routes.value) {
-        if (!i?.meta?.hidden) {
-          state.menu.data.push({
-            key: i?.path,
-            label: i?.meta?.title[lang.value] as String
-          })
-        }
-      }
-    }
-
-    /**
-     * @description 保存当前角色授权菜单
-     */
-    const saveData = () => {
+    const saveData = async() => {
       console.log('form is ', state.menu.form)
       //  省略接口：向后端接口传递已经授权菜单名称；  state.menu.form
-      emit('success')
+      const data = {
+        accessToken: sessionStorage.getItem('accessToken'),
+        userName: state.form.userName,
+        userDepartment: state.form.userDepartment,
+        userRole: state.form.userRole,
+        userId: row.value.userId
+      }
+      const res = await Service.postAdminUpdateUser(data)
+      if(res.status === 0) {
+        emit('success')
+      }
     }
-    onMounted(() => {
-      // 获取 auth Menu Info
-      fetchMenuData()
-    })
+
     // 使用watchEffect 监听所用到的变化时做出的副作用反应；
     watchEffect(() => {
-      fetchData()
+      if (row.value) {
+        state.form.userName = row.value.userName
+        state.form.userRole = row.value.userRole
+        state.form.userDepartment = row.value.userDepartment
+      }
     })
     return {
       ...toRefs(state),
@@ -145,7 +131,6 @@ export default defineComponent({
       roles,
       lang,
       row,
-      fetchMenuData,
       saveData
     }
   }

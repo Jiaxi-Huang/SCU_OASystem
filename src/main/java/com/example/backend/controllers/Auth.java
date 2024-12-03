@@ -100,6 +100,7 @@ public class Auth {
                 userInfoResponseData.setUserIntro(userInfo.getIntro());
                 userInfoResponseData.setUserPhone(userInfo.getPhone());
                 userInfoResponseData.setUserDepartment(userInfo.getDepartment());
+                userInfoResponseData.setUserAvatar(userInfo.getAvatar());
                 userInfoResponse response = new userInfoResponse(
                         0,
                         "获取职位信息成功",
@@ -138,7 +139,7 @@ public class Auth {
                     List<String> authedRoutes = Arrays.asList(
                             "/dashboard", "/guide", "/dragable","/calendar", "/copy","/zip",
                             "/menu","/excel", "/projectboard", "/table", "/form","/qrcode","/editor","/upload", "/cropper", "/personal",
-                            "/role","/worker","/leaveApproval","/todoList", "/meetings","/file"
+                            "/role","/worker","/leaveApproval","/reimbursement","/todoList", "/meetings","/file"
                     );
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(

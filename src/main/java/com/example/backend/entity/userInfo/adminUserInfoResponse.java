@@ -17,11 +17,15 @@ public class adminUserInfoResponse {
     }
     // 内部类 Data
     public static class Data {
+        private int userId;
         private String userName;
         private String userDepartment;
         private String userRole;
         private String userPhone;
-                public String getUserName() {
+
+        public int getUserId() {return userId;}
+        public void setUserId(int userId) {this.userId = userId;}
+        public String getUserName() {
             return userName;
         }
 

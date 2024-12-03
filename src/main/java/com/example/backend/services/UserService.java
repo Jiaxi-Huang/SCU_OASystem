@@ -89,6 +89,37 @@ public class UserService extends ServiceImpl<UserMapper, User> {
             return -1; // 表示重置密码失败
         }
     }
+    public int resetPersonalPassword(int user_id,String old_password, String new_password) {
+        try {
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            String newPasswordBCrypt = encoder.encode(new_password);
+            User user = userMapper.findByUserId(user_id);
+            if(user!=null){
+                if (encoder.matches(old_password, user.getPassword())) {
+                    return userMapper.updatePersonalPassword(user_id, newPasswordBCrypt);
+                }
+            }
+        } catch (Exception e) {
+            // 记录异常信息
+            e.printStackTrace();
+            // 可以选择返回一个特定的错误码或抛出自定义异常
+            return -1; // 表示重置密码失败
+        }
+        return 0; // 输入原来密码错误
+    }
+    public int resetPersonalEmail(int user_id,String oldEmail, String newEmail) {
+        try {
+            if (userMapper.findByUserId(user_id) == null) {
+                return 0;
+            }
+            return userMapper.updatePersonalEmail(user_id,oldEmail, newEmail);
+        } catch (Exception e) {
+            // 记录异常信息
+            e.printStackTrace();
+            // 可以选择返回一个特定的错误码或抛出自定义异常
+            return -1; // 表示重置密码失败
+        }
+    }
     public List<User> adminUserInfo(int user_id){
         try {
             User user = userMapper.findByUserId(user_id);
@@ -105,5 +136,50 @@ public class UserService extends ServiceImpl<UserMapper, User> {
             e.printStackTrace();
             return null;
         }
+    }
+    public int adminUserAdd(String username,String department,String role,int adminId){
+        try {
+            User user = userMapper.findByUserId(adminId);
+            String adminRole = user.getRole();
+            String password = "123456";
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            String passwordBCrypt = encoder.encode(password);
+            if (adminRole.equals("admin")){
+                return userMapper.adminInsertUser(username,passwordBCrypt,department,role);
+            }
+            return -1;
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return -1;
+    }
+    public int adminUserUpdate(String username,String department,String role,int adminId,int user_id){
+        try {
+            User user = userMapper.findByUserId(adminId);
+            String adminRole = user.getRole();
+            if (adminRole.equals("admin")){
+                return userMapper.adminUpdateUserInfo(username,department,role,user_id);
+            }
+            return -1;
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return -1;
+    }
+    public int adminUserDelete(int adminId,int user_id){
+        try {
+            User user = userMapper.findByUserId(adminId);
+            String adminRole = user.getRole();
+            if (adminRole.equals("admin")){
+                return userMapper.adminDeleteUser(user_id);
+            }
+            return -1;
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return -1;
     }
 }

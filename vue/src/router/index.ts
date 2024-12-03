@@ -1,6 +1,8 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 import { store } from '../store'
 import layout from '../layout/index.vue'
+import Todo from '@/views/Todo.vue'
+import LeaveApproval from "@/views/leaveApproval.vue";
 // 静态路由
 export const constantRoutes: Array<RouteRecordRaw> = [
   {
@@ -374,7 +376,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
       {
         path: '/table/tableList',
         name: 'tableList',
-        component: () => import(/* webpackChunkName: "personalCenter" */ '@/views/File/fileList.vue'),
+        component: () => import(/* webpackChunkName: "personalCenter" */ '@/views/Table/tableList.vue'),
         meta: {
           title: {
             '/zh-CN': '表格',
@@ -417,6 +419,45 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
           title: {
             '/zh-CN': '添加待办事项',
             '/en-US': 'Add Todo'
+          },
+          icon: 'ic ic-stealth-fill',
+          hidden: true,
+        }
+      }
+    ]
+  },
+  {
+    path: '/reimbursement',
+    component: layout,
+    redirect: '/reimbursement/reimbursementList',
+    meta: {
+      title: {
+        '/zh-CN': '报销管理',
+        '/en-US': 'Reimbursement'
+      },
+      icon: 'ic ic-barrage-fill'
+    },
+    children: [
+      {
+        path: '/reimbursement/reimbursementList',
+        name: 'Reimbursement',
+        component: () => import('@/views/Reimbursement/components/reimbursementList.vue'),
+        meta: {
+          title: {
+            '/zh-CN': '报销管理',
+            '/en-US': 'Reimbursement'
+          },
+          icon: 'ic ic-barrage-fill'
+        }
+      },
+      {
+        path: '/reimbursement/reimbursementAdd',
+        name: 'reimbursementAdd',
+        component: () => import( '@/views/Reimbursement/components/reimbursementAdd.vue'),
+        meta: {
+          title: {
+            '/zh-CN': '报销申请',
+            '/en-US': 'Reimbursement Apply'
           },
           icon: 'ic ic-stealth-fill',
           hidden: true,
