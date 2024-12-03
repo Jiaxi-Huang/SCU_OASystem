@@ -64,6 +64,7 @@ public class TodoListCon {
             request.setUser_id(userId);
             res_code = my_service.insertTodoRecord(request);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             res.setStatus(-1);
             res.setMessage(e.getMessage());
         }

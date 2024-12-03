@@ -101,7 +101,7 @@ export default defineComponent({
           let record = {
             todo_title: sizeForm.todo_title,
             todo_ctnt: sizeForm.todo_ctnt,
-            todo_ddl: sizeForm.date1 + "-" + sizeForm.date2,
+            todo_ddl: sizeForm.date1 + " " + sizeForm.date2,
             adder_id: sizeForm.adder_id,
             user_id: sizeForm.user_id,
           }

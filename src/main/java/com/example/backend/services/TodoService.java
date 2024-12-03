@@ -7,6 +7,8 @@ import com.example.backend.mapper.TodoListMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -33,9 +35,13 @@ public class TodoService extends ServiceImpl<TodoListMapper, TodoRecord> {
 
     public int insertTodoRecord(TodoRecordWithTk record) {
 //        System.out.println(record.getTodo_fin());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        // 获取当前时间
+        LocalDateTime now = LocalDateTime.now();
+        String formattedNow = now.format(formatter);
         int res_code = todoListMapper.insertTodoRecord(
                 record.getUser_id(), record.getTodo_id(), record.getAdder_id(), record.getTodo_title(),
-                record.getTodo_ctnt(), record.getTodo_fin(), record.getTodo_crt(), record.getTodo_ddl());
+                record.getTodo_ctnt(), record.getTodo_fin(), formattedNow, record.getTodo_ddl());
         return res_code;
     }
 
