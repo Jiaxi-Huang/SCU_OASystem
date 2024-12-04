@@ -1,4 +1,5 @@
 <template>
+  <meta name="referrer" content="no-referrer">
   <div class="navbar">
     <el-header height="50px">
       <hamburger id="Hamburger" :is-active="opened" class="hamburger-container" @toggleClick="toggleSideBar" />

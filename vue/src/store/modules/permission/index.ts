@@ -21,7 +21,7 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
     department,//用户部门
     intro,//用户介绍
     phone,// 用户手机号
-    avatar: '',//头像url
+    avatar,//头像url
     //暂时不用permissions: [],
     accessRoutes: constantRoutes, // 可访问路由集合
     routes: constantRoutes, // 所有路由集合

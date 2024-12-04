@@ -1,4 +1,5 @@
 <template>
+  <meta name="referrer" content="no-referrer">
   <div class="PersonalSetting">
     <el-row>
       <el-col :offset="1" :span="22">
@@ -41,7 +42,8 @@
                       <img :src="getAvatarUrl(avatar)" />
                     </div>
                     <el-upload
-                        action="http://localhost:8080/api/upload/uploadAvatar/"
+                        action="http://localhost:8080/api/upload/uploadAvatar"
+                        :data="additionalParams"
                         :on-success="handleAvatarSuccess"
                         :before-upload="beforeAvatarUpload"
                     >
@@ -135,7 +137,7 @@ export default defineComponent({
     const store = useStore()
     const showEmailDialog = ref(false)
     const showPasswordDialog = ref(false)
-    const avatar = computed(() => store.state.permissionModule.avatar)
+    var avatar = computed(() => store.state.permissionModule.avatar)
     const noticeSwitch = reactive({
       userSwitch: false,
       sysSwitch: true,
@@ -148,17 +150,17 @@ export default defineComponent({
       accessToken: sessionStorage.getItem('accessToken')
     })
     const updateLoading = ref(false)
+    const additionalParams = reactive({
+      'accessToken': `${settingForm.accessToken}` // 假设 accessToken 存储在 sessionStorage 中
+    });
     const getAvatarUrl = (avatar: string) => {
-      if (typeof avatar === 'string' && avatar.trim().length > 0) {
-        // 简单的 URL 验证
-        try {
+      if(avatar) {
           new URL(avatar);
           return avatar;
-        } catch (e) {
-          console.error('Invalid avatar URL:', e);
-        }
       }
-      return '../../assets/avatar-default.jpg';
+      else {
+        return '../../assets/avatar-default.jpg';
+      }
     }
     // eslint-disable-next-line no-unused-vars
     const validateMobile = (rule: any, value: string, callback: VoidNoop) => {
@@ -220,11 +222,12 @@ export default defineComponent({
     const resetForm = () => {
       settingFormRef.value.resetFields()
     }
-    const handleAvatarSuccess = (res: any) => {
+    const handleAvatarSuccess = async(res: any) => {
       if (res.status === 0) {
-        console.log('Avatar uploaded successfully:', res.data.download_url)
+        ElMessage('上传头像成功')
         // 更新头像URL到store或其他地方
-        store.commit('permissionModule/setAvatar', res.data.download_url)
+        console.log(res.data[0])
+        store.dispatch('permissionModule/getUserInfos', res.data[0])
       } else {
         ElMessage.error('上传头像失败: ' + res.message)
       }
@@ -267,7 +270,9 @@ export default defineComponent({
       showPasswordDialog.value = false
     }
     return {
+      email,
       avatar,
+      additionalParams,
       getAvatarUrl,
       handleBack,
       tabPosition,

@@ -3,6 +3,7 @@
  */
 import Mock from 'mockjs'
 // 设置拦截请求的响应时间 ajax 请求；
+/**
 Mock.setup({
   timeout: '200-600'
 })
@@ -13,7 +14,7 @@ const genRoles = () => ({
   data: ['admin','manager','worker'],
   message: '成功'
 })
-
+/*
 const getSwiperInfo = () => ({
   status: 0,
   data: [
@@ -40,6 +41,7 @@ const getSwiperInfo = () => ({
   ],
   message: '成功'
 })
+*/
 /**
 Mock.mock('/api/auth/user/login', 'post', (option) => {
   const { email, password } = JSON.parse(option.body)
@@ -198,8 +200,9 @@ Mock.mock('/api/setting/basicInfo', 'post', (option) => {
     message: '更新成功'
   }
 })
-*/
 
+ */
+/**
 Mock.mock('/api/personal/tags', 'get', () => ({
   status: 0,
   data: {
@@ -384,3 +387,4 @@ const getProjectInfo = {
 // 获取项目详情
 // eslint-disable-next-line no-useless-concat
 Mock.mock(RegExp('/api/project/list' + '.*'), 'get', getProjectInfo)
+*/

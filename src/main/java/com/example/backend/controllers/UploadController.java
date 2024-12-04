@@ -1,10 +1,14 @@
 package com.example.backend.controllers;
+
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.example.backend.entity.ResponseBase;
+import com.example.backend.services.AccessService;
+import com.example.backend.services.UploadService;
 import com.example.backend.services.utils.UploadGiteeImgBed;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +23,12 @@ import java.util.Map;
 @RestController
 @Slf4j
 @RequestMapping("/api/upload")
+
 public class UploadController {
+    @Autowired
+    private UploadService uploadService;
+    @Autowired
+    private AccessService accessService;
     /**
      *  上传图片
      * @param multipartFile 文件对象
@@ -27,10 +36,12 @@ public class UploadController {
      * @throws IOException
      */
     @PostMapping("/uploadAvatar")
-    public ResponseEntity<ResponseBase> uploadImg(@RequestParam("file") MultipartFile multipartFile) throws IOException {
+    public ResponseEntity<ResponseBase> uploadImg(@RequestParam("file") MultipartFile multipartFile,
+                                                  @RequestParam("accessToken") String accessToken) throws IOException {
         try {
             log.info("uploadImg()请求已来临...");
             //根据文件名生成指定的请求url
+            int user_id = accessService.getAuthenticatedId(accessToken);
             String originalFilename = multipartFile.getOriginalFilename();
             String targetURL = UploadGiteeImgBed.createUploadFileUrl(originalFilename);
             log.info("目标url：" + targetURL);
@@ -49,8 +60,12 @@ public class UploadController {
             }
             //请求成功：返回下载地址
             JSONObject content = JSONUtil.parseObj(jsonObj.getObj("content"));
+            String downloadUrl = content.getStr("download_url");
+            JSONObject data = new JSONObject();
+            data.put("userAvatar", downloadUrl);
+            int isSuccess = uploadService.uploadPersonalAvatar(user_id,downloadUrl);
             ResponseBase responseBase = new ResponseBase();
-            responseBase.pushData(content);
+            responseBase.pushData(data);
             responseBase.setMessage("上传成功");
             return ResponseEntity.status(HttpStatus.OK).body(responseBase);
         }
