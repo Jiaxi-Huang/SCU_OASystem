@@ -130,14 +130,14 @@ export default defineComponent({
   name: 'PersonalSetting',
   components: {PersonalEmailEdit,PersonalPasswordEdit},
   setup() {
-    const email = localStorage.getItem('email')
+    let email = localStorage.getItem('email')
     const router = useRouter()
     const tabPosition = ref('left')
     const settingFormRef = ref()
     const store = useStore()
     const showEmailDialog = ref(false)
     const showPasswordDialog = ref(false)
-    var avatar = computed(() => store.state.permissionModule.avatar)
+    let avatar = computed(() => store.state.permissionModule.avatar)
     const noticeSwitch = reactive({
       userSwitch: false,
       sysSwitch: true,

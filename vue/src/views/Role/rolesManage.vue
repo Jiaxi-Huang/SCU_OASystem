@@ -13,6 +13,7 @@
       </el-row>
       <br />
       <el-table v-loading="loading" :data="data" stripe class="table">
+        <el-table-column type="selection" width="55" align="center"></el-table-column>
         <el-table-column prop="userId" label="用户ID" align="center"></el-table-column>
         <el-table-column prop="userName" label="用户名" align="center"></el-table-column>
         <el-table-column prop="userDepartment" label="部门" align="center"></el-table-column>
@@ -39,7 +40,7 @@
           :current-page="param.page"
           :page-size="param.limit"
           layout="sizes,prev,pager,next,total"
-          :page-sizes="[5, 10, 20]"
+          :page-sizes="[10, 20, 50]"
           :total="total"
           background
           @current-change="onCurrentChange"
@@ -102,10 +103,19 @@ export default defineComponent({
           userRole: '',
           userDepartment:''
         }
-      }
+      },
+      selectionRows:[]
     })
     // 动态计算total;
     const total = computed(() => state.data.length)
+    /**
+     * @description 获取选择行的userId列表
+     */
+    const getSelectionRows = () => {
+      const selectionRows = state.data.filter((item: any) => item.isSelect)
+      console.log(selectionRows)
+      return selectionRows
+    }
     /**
      * @description 请求接口获取当前设置角色，默认始终有超级管理员角色
      */
@@ -187,9 +197,11 @@ export default defineComponent({
     }
     //初始调用
     fetchData()
+    getSelectionRows()
     return {
       ...toRefs(state),
       total,
+      getSelectionRows,
       onCurrentChange,
       onSizeChange,
       onCreate,

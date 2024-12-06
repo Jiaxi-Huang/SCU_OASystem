@@ -32,7 +32,6 @@ class Service {
       json: true,
       data
     }).then((res) => {
-      console.log(res)
       if (res.status === 0) {
         return Promise.resolve(res)
       }
@@ -46,7 +45,6 @@ class Service {
       json: true,
       data
     }).then((res) => {
-      console.log(res)
       if (res.status === 0) {
         return Promise.resolve(res)
       }
@@ -60,7 +58,6 @@ class Service {
       json: true,
       data
     }).then((res) => {
-      console.log(res)
       if (res.status === 0) {
         return Promise.resolve(res)
       }
@@ -74,7 +71,6 @@ class Service {
       json: true,
       data
     }).then((res) => {
-      console.log(res)
       if (res.status === 0) {
         return Promise.resolve(res)
       }

@@ -23,11 +23,45 @@ class Service {
     })
   }
   /**
-   * @description POST 管理员查询用户信息列表
+   * @description POST 经理查询本部门用户信息列表
    */
   static postAdminQueryUserList(data: any) {
     return request({
       url: 'http://localhost:8080/api/admin/user/list',
+      method: 'POST',
+      json: true,
+      data
+    }).then((res) => {
+      console.log(res)
+      if (res.status === 0) {
+        return Promise.resolve(res)
+      }
+      return Promise.reject(res)
+    })
+  }
+  /**
+   * @description POST 经理分发指定用户列表待办事项
+   */
+  static postManagerDistributeTodo(data: any){
+    return request({
+      url: 'http://localhost:8080/api/admin/distribute/todo',
+      method: 'POST',
+      json: true,
+      data
+    }).then((res) => {
+      console.log(res)
+      if (res.status === 0) {
+        return Promise.resolve(res)
+      }
+      return Promise.reject(res)
+    })
+  }
+  /**
+   * @description POST 经理分发指定用户会议
+   */
+  static postManagerDistributeMeeting(data: any){
+    return request({
+      url: 'http://localhost:8080/api/admin/distribute/meeting',
       method: 'POST',
       json: true,
       data
