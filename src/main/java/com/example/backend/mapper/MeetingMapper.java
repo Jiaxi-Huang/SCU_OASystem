@@ -24,6 +24,17 @@ public interface MeetingMapper extends BaseMapper<MeetingWithAdderId> {
             "mtin_st = #{mtin_st}, mtin_len = #{mtin_len}, mtin_crt = #{mtin_crt}, mtin_host = #{mtin_host}, " +
             "mtin_loc = #{mtin_loc} " +
             "where mtin_id = #{mtin_id}")
-    void updateMeeting(int mtin_id, String mtin_title, String mtin_ctnt, String mtin_fin, String mtin_st,
+    void updateMeeting(int mtin_id, String mtin_title, String mtin_ctnt, int mtin_fin, String mtin_st,
                        String mtin_len, String mtin_crt, String mtin_host, String mtin_loc);
+
+    @Insert("INSERT INTO meetings(mtin_title, mtin_ctnt, " +
+            "mtin_fin, mtin_st, mtin_len, mtin_host, mtin_loc, mtin_crt) VALUES " +
+            "(#{mtin_title}, #{mtin_ctnt}, #{mtin_fin}, #{mtin_st}, #{mtin_len}, #{mtin_host}, " +
+            "#{mtin_loc}, #{mtin_crt})")
+    @Options(useGeneratedKeys = true, keyProperty = "mtin_id")
+    void createMeeting(Meeting meeting);
+
+    @Insert("INSERT INTO usermeetings(user_id, mtin_id, adder_id) VALUES (#{user_id}, #{meeting_id}, #{adder_id})")
+    void addMeetingForSomeone(int user_id, int meeting_id, int adder_id);
+
 }

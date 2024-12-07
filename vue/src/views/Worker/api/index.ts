@@ -60,8 +60,9 @@ class Service {
    * @description POST 经理分发指定用户会议
    */
   static postManagerDistributeMeeting(data: any){
+      console.log(data)
     return request({
-      url: 'http://localhost:8080/api/admin/distribute/meeting',
+      url: 'http://localhost:8080/api/meetings/distributed_create',
       method: 'POST',
       json: true,
       data
