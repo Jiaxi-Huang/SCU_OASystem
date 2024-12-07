@@ -43,8 +43,9 @@ class Service {
    * @description POST 经理分发指定用户列表待办事项
    */
   static postManagerDistributeTodo(data: any){
+    console.log(data)
     return request({
-      url: 'http://localhost:8080/api/admin/distribute/todo',
+      url: 'http://localhost:8080/api/todolist/distributed_create',
       method: 'POST',
       json: true,
       data

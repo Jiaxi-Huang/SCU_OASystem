@@ -244,7 +244,7 @@ export default defineComponent({
             const data = res.data
             state.record_cnt = data.length
             state.tableData = data
-            updatePaginatedData();  // 更新分页数据
+            updatePaginatedData()  // 更新分页数据
           } else {
             console.log('getPersonalTodoList RES MISS')
           }
