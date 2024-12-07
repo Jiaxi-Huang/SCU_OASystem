@@ -1,10 +1,4 @@
-// +----------------------------------------------------------------------
-// | Copyright (c) 2024 http://www.vuecmf.com All rights reserved.
-// +----------------------------------------------------------------------
-// | Licensed ( https://github.com/emei8/vuecmf/blob/master/LICENSE )
-// +----------------------------------------------------------------------
-// | Author: emei8 <2278667823@qq.com>
-// +----------------------------------------------------------------------
+
 
 import VuecmfFileexplorer from './vue-vuecmf-fileexplorer'
 import { App } from 'vue'

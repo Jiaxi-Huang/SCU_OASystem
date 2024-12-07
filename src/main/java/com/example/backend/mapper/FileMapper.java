@@ -23,4 +23,7 @@ public interface FileMapper extends BaseMapper<Files> {
     @Insert("INSERT INTO files ( file_name, ext, size, dir_id, user_id, url )" +
             " VALUES( #{fileName}, #{ext}, #{size}, #{dirId}, #{userId}, #{url} )")
     int uploadFile(String fileName, String ext, String size, Integer dirId, String userId,String url);
+
+    @Select(" SELECT * FROM files")
+    List<Files> getFile();
 }

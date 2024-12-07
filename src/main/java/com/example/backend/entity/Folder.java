@@ -12,6 +12,9 @@ public class Folder {
     private Integer id;
     private String title;
     private Integer pid; // 父文件夹ID
+    private Integer userId;
     private List<Folder> children; // 子文件夹
     private String acsTkn;
+    private String department;
+    private Integer isShared;
 }

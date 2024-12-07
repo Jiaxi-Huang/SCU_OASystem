@@ -1,10 +1,15 @@
 package com.example.backend.controllers;
 
 import com.example.backend.entity.Files;
+import com.example.backend.entity.Folder;
 import com.example.backend.entity.ResponseBase;
+import com.example.backend.entity.User;
 import com.example.backend.entity.userInfo.adminUserInfoRequest;
+import com.example.backend.entity.userInfo.adminUserInfoResponse;
+import com.example.backend.mapper.UserMapper;
 import com.example.backend.services.AccessService;
 import com.example.backend.services.FileService;
+import com.example.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/file")
 public class FileController {
-
-
+    int userId1;
 
     @Autowired
     private FileService fileService;
@@ -27,17 +31,31 @@ public class FileController {
     @Autowired
     private AccessService accessService;
 
+    @Autowired
+    UserService userService;
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private FolderController folderController;
+
+
     @PostMapping("/loadFile")
-    public ResponseBase loadFile(@RequestBody adminUserInfoRequest request) {
-        System.out.println("[loadFile] receive");
+    public ResponseBase loadFile(@RequestBody adminUserInfoRequest request,@RequestParam String dir_id) {
         ResponseBase res = new ResponseBase();
         try {
             String accessToken = request.getAccessToken();
             int userId = accessService.getAuthenticatedId(accessToken);
-            List<Files> records = fileService.getFileByUserId(userId);
+            userId1=userId;
+            List<Files> records = fileService.getFile();
+            User userInfo = userMapper.findByUserId(userId);
+            int FolderType =folderController.judgeFolder(Integer.parseInt(dir_id));
             for (Files record : records) {
                 res.pushData(record);
             }
+            res.pushData(FolderType);
+            res.pushData(userInfo);
+
         }
         catch (Exception e) {
             res.setStatus(-1);
@@ -49,6 +67,7 @@ public class FileController {
     @PostMapping("/moveFile")
     public ResponseEntity<ResponseBase> moveFile(@RequestBody Files record) {
         ResponseBase response = new ResponseBase();
+        record.getDirId();
         int res_code = fileService.moveFile(record);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -82,11 +101,12 @@ public class FileController {
     public ResponseEntity<ResponseBase> uploadFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam("folder_id") String folderId,  // 接收 folder_id
-            @RequestParam("user") String user) {        // 接收 user
+            @RequestParam("user") int user
+            ) {  // 获取 accessToken) {        // 接收 user
         ResponseBase response = new ResponseBase();
         // 定义文件保存路径
-        System.out.println(folderId);
-        System.out.println(user);
+       // System.out.println("upload folder"+accessToken);
+        user=userId1;
         String uploadDir = "F:/upload/";  // 可以修改为你存储文件的目录
         String allFileName = file.getOriginalFilename();
         String filePath = uploadDir + allFileName;
@@ -101,7 +121,7 @@ public class FileController {
             System.out.println(fileUrl);
             response.pushData(fileUrl);
             Files record = new Files();
-            record.setFileName(allFileName);
+
             record.setFilePath(filePath);
             int dotIndex = allFileName.lastIndexOf('.');
 
@@ -114,11 +134,20 @@ public class FileController {
             record.setUserId(user);
             record.setDirId(Integer.valueOf(folderId));
             record.setExt(ext);
+            record.setFileName(fileName);
             record.setSize(String.valueOf(file.getSize()));
             System.out.println(file.getSize());
             System.out.println(record);
+            int fileType = folderController.judgeFolder(record.getDirId());
+            int res_code;
+            if(fileType==0||fileType==-2){
+                 res_code = fileService.uploadFile(record);
+            }
+            if (fileType==-1){
+               // record.setDepartment();
+                res_code = fileService.uploadFile(record);
+            }
 
-            int res_code = fileService.uploadFile(record);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (IOException e) {
             response.setMessage("上传失败");
