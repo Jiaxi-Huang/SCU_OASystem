@@ -8,19 +8,22 @@
         <search></search>
         <lang-switch></lang-switch>
         <div id="Message" class="right-menu-box">
-          <el-tooltip placement="bottom" effect="dark">
+          <el-tooltip placement="bottom" effect="light">
             <template #content>
               <div>
-                <div @click="navigateTo('/todoList/todoTableList')" style="cursor: pointer;">
+                <div @click="navigateTo('/todoList/todoTableList', { status: '未完成' })" style="cursor: pointer;">
                   您有 <strong>{{ pendingTodos.length }}</strong> 个待办事项待处理
                 </div>
-                <div @click="navigateTo('/leaveApproval/leaveList')" style="cursor: pointer;">
+                <div @click="navigateTo('/leaveApproval/leaveList', { status: '未处理' })" style="cursor: pointer;">
                   您有 <strong>{{ pendingLeaveApprovals.length }}</strong> 条请假审批待处理
+                </div>
+                <div @click="navigateTo('/Reimbursement/reimbursementList', { status: '未处理' })" style="cursor: pointer;">
+                  您有 <strong>{{ pendingReimbursement.length }}</strong> 笔报销待处理
                 </div>
               </div>
             </template>
             <el-badge
-                :value="pendingTodos.length + pendingLeaveApprovals.length"
+                :value="pendingTodos.length + pendingLeaveApprovals.length + pendingReimbursement.length"
                 :max="99"
                 class="message-badge"
                 type="danger">
@@ -30,6 +33,8 @@
             </el-badge>
           </el-tooltip>
         </div>
+
+
         <div id="fullScreen" class="right-menu-box">
           <el-button class="full-screen">
             <el-tooltip :content="langConfig.header.fullScreen[lang]" effect="dark" placement="left">
@@ -80,8 +85,10 @@ import { useStore } from '@/store/index'
 import { langConfig } from '@/utils/constant/config'
 import TodoService from '@/views/TodoList/api/index'
 import LeaveService from '@/views/LeaveApproval/api/index'
+import ReimbursementService from '@/views/Reimbursement/api/index'
 import { Todo } from '@/types/todo'
 import { LeaveApproval } from '@/types/leaveApproval'
+import { Reimbursement } from '@/types/reimbursement'  // 确保正确导入
 
 export default defineComponent({
   name: 'Navbar',
@@ -103,10 +110,14 @@ export default defineComponent({
     const lang = computed((): string => store.getters['settingsModule/getLangState'])
     const nickname = computed(() => store.state.permissionModule.username)
     const avatar = computed(() => store.state.permissionModule.avatar)
+
     // 存储待办事项的状态
     const todos = ref<Todo[]>([])
     // 存储请假审批的状态
     const leaveApprovals = ref<LeaveApproval[]>([])
+    // 存储报销的状态
+    const reimbursements = ref<Reimbursement[]>([])  // 定义 reimbursements 变量
+
     const getAvatarUrl = (avatar: string) => {
       if (typeof avatar === 'string' && avatar.trim().length > 0) {
         // 简单的 URL 验证
@@ -119,11 +130,12 @@ export default defineComponent({
       }
       return '../../assets/avatar-default.jpg';
     }
+
     // 获取待办事项
     const getTodos = async () => {
       const response = await TodoService.postGetTodoList()
       if (response && response.data) {
-        console.log('待办事项数据：',response.data)
+        console.log('待办事项数据：', response.data)
         todos.value = response.data
       }
     }
@@ -132,18 +144,32 @@ export default defineComponent({
     const getLeaveApprovals = async () => {
       const response = await LeaveService.postGetLeaveApproval()
       if (response && response.data) {
-        console.log('请假审批数据：',response.data)
+        console.log('请假审批数据：', response.data)
         leaveApprovals.value = response.data
       }
     }
 
+
+
+// 获取报销数据的方法
+    const getReimbursements = async () => {
+      const response = await ReimbursementService.getReimbursementList()  // 使用正确的方法名
+      if (response && response.data) {
+        console.log('报销数据：', response.data)
+        reimbursements.value = response.data
+      }
+    }
+
+
     const pendingTodos = computed(() => todos.value.filter(todo => todo.todo_fin === '未完成'))
     const pendingLeaveApprovals = computed(() => leaveApprovals.value.filter(leave => leave.status === '待审批'))
+    const pendingReimbursement = computed(() => reimbursements.value.filter(reimbursement => reimbursement.status === '待处理'))  // 定义 pendingReimbursement
 
     // onMounted 钩子函数，用于在组件挂载时获取数据
     onMounted(() => {
       getTodos()
       getLeaveApprovals()
+      getReimbursements()  // 调用获取报销数据的方法
     })
 
     // methods
@@ -162,8 +188,8 @@ export default defineComponent({
     }
 
     // 导航到不同页面的方法
-    const navigateTo = (page: string) => {
-      router.push(page)
+    const navigateTo = (path: string, query?: Record<string, string>) => {
+      router.push({ path, query })
     }
 
     const logout = () => {
@@ -189,11 +215,14 @@ export default defineComponent({
       logout,
       pendingTodos,
       pendingLeaveApprovals,
-      navigateTo // 添加到返回对象中
+      reimbursements,  // 返回 reimbursements
+      pendingReimbursement,  // 返回 pendingReimbursement
+      navigateTo
     }
   }
 })
 </script>
+
 
 <style lang="scss" scoped>
 .navbar {
