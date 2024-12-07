@@ -490,13 +490,13 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
         }
       },
       {
-        path: '/todoList/todoAdd',
+        path: '/meetings/addMeeting',
         name: 'todoAdd',
-        component: () => import( '@/views/TodoList/components/todoAdd.vue'),
+        component: () => import( '@/views/Meetings/meetingAdd.vue'),
         meta: {
           title: {
-            '/zh-CN': '添加待办事项',
-            '/en-US': 'Add Todo'
+            '/zh-CN': '添加会议',
+            '/en-US': 'Add a Meeting'
           },
           icon: 'ic ic-stealth-fill',
           hidden: true,
