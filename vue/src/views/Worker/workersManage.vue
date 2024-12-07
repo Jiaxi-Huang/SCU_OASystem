@@ -5,14 +5,19 @@
     <el-card class="card-ctrl">
       <el-row>
         <el-col :span="8" style="text-align: left">
-          <el-button type="success" size="small" @click="onRefresh">
-            <el-icon><refresh /></el-icon>
-            刷新</el-button
+          <el-button type="primary" size="small" @click="onDistributeTodo">
+            <el-icon><plus /></el-icon>
+            分派任务</el-button
+          >
+          <el-button type="success" size="small" @click="onDistributeMeeting">
+            <el-icon><plus /></el-icon>
+            新建会议</el-button
           >
         </el-col>
       </el-row>
       <br />
-      <el-table v-loading="loading" :data="data" stripe class="table">
+      <el-table v-loading="loading" :data="data" stripe class="table" @selection-change="handleSelectionChange">
+        <el-table-column type="selection" width="55" align="center"></el-table-column>
         <el-table-column prop="userName" label="用户名" align="center"></el-table-column>
         <el-table-column prop="userDepartment" label="部门" align="center"></el-table-column>
         <el-table-column prop="userRole" label="职位" align="center"></el-table-column>
@@ -42,12 +47,14 @@
         </el-pagination>
       </div>
     </el-card>
-
     <el-dialog v-model="edit_visible" center :title="posted.userRow.userRole">
       <worker-edit :current-row="posted.userRow" @success="onEditSuccess"></worker-edit>
     </el-dialog>
-    <el-dialog v-model="add_visible" title="新增角色">
-      <role-new @success="onCreateSuccess"></role-new>
+    <el-dialog v-model="todo_visible" center :title="posted.userRow.userRole">
+      <distribute-todo :userIds="selectionRows" @success="onDistributeTodoSuccess"></distribute-todo>
+    </el-dialog>
+    <el-dialog v-model="meeting_visible" center :title="posted.userRow.userRole">
+      <distribute-meeting :userIds="selectionRows" @success="onDistributeMeetingSuccess"></distribute-meeting>
     </el-dialog>
   </div>
 </template>
@@ -56,12 +63,19 @@ import { defineComponent, reactive, toRefs, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Edit, Minus, Plus, Refresh } from '@element-plus/icons-vue'
 import WorkerEdit from './workersEdit.vue'
+import DistributeTodo from "@/views/Worker/distributeTodo.vue";
+import DistributeMeeting from "@/views/Worker/distributeMeeting.vue";
 import Service from './api/index'
+import RoleEdit from "@/views/Role/rolesEdit.vue";
+import RoleNew from "@/views/Role/rolesNew.vue";
 
 export default defineComponent({
   name: 'WorkerManage',
   components: {
     WorkerEdit,
+    DistributeTodo,DistributeMeeting,
+    RoleNew,
+    RoleEdit,
     Edit,
     Minus,
     Plus,
@@ -84,16 +98,19 @@ export default defineComponent({
       ],
       loading: false,
       is_search: false,
-      add_visible: false,
       edit_visible: false,
       detail_visible: false,
+      todo_visible: false,
+      meeting_visible: false,
       posted: {
         userRow: {
+          userId: null,
           userName:'',
           userRole: '',
           userDepartment:''
         }
-      }
+      },
+      selectionRows: [] as { userId: number }[], // 假设 userId 是字符串或数字
     })
     // 动态计算total;
     const total = computed(() => state.data.length)
@@ -101,35 +118,45 @@ export default defineComponent({
      * @description 请求接口获取当前设置角色，默认始终有超级管理员角色
      */
     const fetchData = async() => {
+      state.is_search = false
       const data = {'accessToken':sessionStorage.getItem('accessToken')}
       const adminUserInfo = await Service.postAdminQueryUserList(data)
       if (adminUserInfo.status === 0) {
-        state.data = adminUserInfo.data
+        state.data = adminUserInfo.data.map((item: any) => ({
+          ...item,
+          isSelect: false
+        }));
       }
+    }
+    /**
+     * @description 实时更新选择行的userId列表
+     */
+    const handleSelectionChange = (selection:any[]) => {
+      state.selectionRows = selection.map(item => item.userId)
+      console.log("SelectionRows",state.selectionRows)
     }
     const onCurrentChange = () => {
       fetchData()
     }
+
     const onSizeChange = (val: number) => {
       state.param.limit = val
       fetchData()
     }
-    const onCreate = () => {
-      state.add_visible = true
+    const onDistributeTodo = () => {
+      state.todo_visible = true
     }
-    const onCreateSuccess = (val: any) => {
-      console.log(val)
-      const newRow = { userRole: val.userRole}
-      state.data.push(newRow)
-      state.add_visible = false
-      fetchData()
+    const onDistributeMeeting = () => {
+      state.meeting_visible = true
+    }
+    const onDistributeTodoSuccess = () => {
+      state.todo_visible = false
+    }
+    const onDistributeMeetingSuccess = () => {
+      state.meeting_visible = false
     }
     const onEditSuccess = () => {
       state.edit_visible = false
-      fetchData()
-    }
-    const onRefresh = () => {
-      state.is_search = false
       fetchData()
     }
     /**
@@ -142,16 +169,20 @@ export default defineComponent({
       state.posted.userRow.userDepartment = row.userDepartment
       state.edit_visible = true
     }
+
+    fetchData()
     return {
       ...toRefs(state),
       total,
+      handleSelectionChange,
       onCurrentChange,
       onSizeChange,
-      onCreate,
-      onCreateSuccess,
-      onEditSuccess,
-      onRefresh,
+      onDistributeTodo,
+      onDistributeTodoSuccess,
+      onDistributeMeeting,
+      onDistributeMeetingSuccess,
       onEdit,
+      onEditSuccess,
       fetchData
     }
   }

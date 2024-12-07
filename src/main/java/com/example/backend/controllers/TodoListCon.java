@@ -1,6 +1,9 @@
 package com.example.backend.controllers;
 
+import com.example.backend.entity.meeting.Meeting;
+import com.example.backend.entity.meeting.MeetingWithMultiUsers;
 import com.example.backend.entity.todoList.TodoRecord;
+import com.example.backend.entity.todoList.TodoRecordWithMultiUsers;
 import com.example.backend.entity.todoList.TodoRecordWithTk;
 import com.example.backend.entity.ResponseBase;
 import com.example.backend.entity.userInfo.adminUserInfoRequest;
@@ -11,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.backend.services.TodoService;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -79,5 +85,31 @@ public class TodoListCon {
         int res_code = my_service.deleteRecord(record);
         System.out.println("deleteRecord res_code: " + res_code);
         return new ResponseBase();
+    }
+
+    @PostMapping("/distributed_create")
+    public ResponseBase distributedCreateMeeting(@RequestBody TodoRecordWithMultiUsers metaRecord) {
+        ResponseBase res = new ResponseBase();
+        try {
+            String accessToken = metaRecord.getAccessToken();
+            int adder_id = accessService.getAuthenticatedId(accessToken);
+
+            TodoRecordWithTk this_record = new TodoRecordWithTk (
+                    -1, -1, adder_id, metaRecord.getTodo_title(),
+                        metaRecord.getTodo_ctnt(), metaRecord.getTodo_fin(),
+                    metaRecord.getTodo_ddl(), null, null
+                    );
+
+            for (int user_id: metaRecord.getUser_ids()) {
+                this_record.setUser_id(user_id);
+                my_service.insertTodoRecord(this_record);
+            }
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            res.setStatus(-1);
+            res.setMessage(e.getMessage());
+        }
+        return res;
     }
 }

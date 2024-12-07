@@ -5,6 +5,7 @@ import com.example.backend.entity.ResponseBase;
 import com.example.backend.entity.meeting.MeeetingWithTk;
 import com.example.backend.entity.meeting.Meeting;
 import com.example.backend.entity.meeting.MeetingWithAdderId;
+import com.example.backend.entity.meeting.MeetingWithMultiUsers;
 import com.example.backend.mapper.MeetingMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -74,4 +75,13 @@ public class MeetingService extends ServiceImpl<MeetingMapper, MeetingWithAdderI
         }
         return response;
     }
+
+    public void createMeeting(Meeting meeting) {
+        meetingMapper.createMeeting(meeting);
+    }
+
+    public void addMeetingToUserId(int user_id, int meeting_id, int adder_id) {
+        meetingMapper.addMeetingForSomeone(user_id, meeting_id, adder_id);
+    }
+
 }
