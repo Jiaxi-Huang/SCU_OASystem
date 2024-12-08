@@ -11,17 +11,23 @@
           <el-tooltip placement="bottom" effect="light">
             <template #content>
               <div>
-                <div @click="navigateTo('/todoList/todoTableList', { status: '未完成' })" style="cursor: pointer;">
+                <div @click="navigateTo('/todoList/todoTableList')" style="cursor: pointer;">
                   您有 <strong>{{ pendingTodos.length }}</strong> 个待办事项待处理
                 </div>
-                <div @click="navigateTo('/leaveApproval/leaveList', { status: '未处理' })" style="cursor: pointer;">
+                <div @click="navigateTo('/leaveApproval/leaveList')" style="cursor: pointer;">
                   您有 <strong>{{ pendingLeaveApprovals.length }}</strong> 条请假审批待处理
                 </div>
-                <div @click="navigateTo('/Reimbursement/reimbursementList', { status: '未处理' })" style="cursor: pointer;">
+                <div @click="navigateTo('/Reimbursement/reimbursementList')" style="cursor: pointer;">
                   您有 <strong>{{ pendingReimbursement.length }}</strong> 笔报销待处理
                 </div>
               </div>
             </template>
+
+
+
+
+
+
             <el-badge
                 :value="pendingTodos.length + pendingLeaveApprovals.length + pendingReimbursement.length"
                 :max="99"
@@ -149,8 +155,6 @@ export default defineComponent({
       }
     }
 
-
-
 // 获取报销数据的方法
     const getReimbursements = async () => {
       const response = await ReimbursementService.getReimbursementList()  // 使用正确的方法名
@@ -163,7 +167,7 @@ export default defineComponent({
 
     const pendingTodos = computed(() => todos.value.filter(todo => todo.todo_fin === '未完成'))
     const pendingLeaveApprovals = computed(() => leaveApprovals.value.filter(leave => leave.status === '待审批'))
-    const pendingReimbursement = computed(() => reimbursements.value.filter(reimbursement => reimbursement.status === '待处理'))  // 定义 pendingReimbursement
+    const pendingReimbursement = computed(() => reimbursements.value.filter(reimbursement => reimbursement.status === '未完成'))  // 定义 pendingReimbursement
 
     // onMounted 钩子函数，用于在组件挂载时获取数据
     onMounted(() => {
@@ -189,8 +193,19 @@ export default defineComponent({
 
     // 导航到不同页面的方法
     const navigateTo = (path: string, query?: Record<string, string>) => {
-      router.push({ path, query })
+      if (path.includes('/todoList')) {
+        sessionStorage.setItem('showUncompleted', '1');  // 设置待办事项的标志位
+      } else if (path.includes('/leaveApproval')) {
+        sessionStorage.setItem('showPendingLeave', '1');  // 设置请假管理的标志位
+      } else if (path.includes('/Reimbursement')) {
+        sessionStorage.setItem('showPendingReimbursement', '1');  // 设置报销管理的标志位
+      }
+      router.push({ path, query });
     }
+
+
+
+
 
     const logout = () => {
       sessionStorage.removeItem('auth')
