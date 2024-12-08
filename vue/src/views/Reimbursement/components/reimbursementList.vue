@@ -5,7 +5,8 @@
         <el-button type="primary" @click="onAddReimbursement">提交报销申请</el-button>
       </el-form-item>
     </el-form>
-    <el-table ref="filterTableRef" class="table-list" row-key="date" :data="tableData.filter((data) => !search || data.title.toLowerCase().includes(search.toLowerCase()))" style="width: 100%">
+    <el-table ref="filterTableRef" class="table-list" row-key="reimbursement_id" :data="paginatedData" style="width: 100%"
+              @filter-change="handleFilterChange">
       <el-table-column
         prop="reimbursement_id"
         label="报销编号"
@@ -17,7 +18,20 @@
       <el-table-column prop="user_id" label="提交用户id" width="180" truncated> </el-table-column>
       <el-table-column prop="amount" label="金额" truncated> </el-table-column>
       <el-table-column prop="description" label="描述" truncated> </el-table-column>
-      <el-table-column prop="status" label="状态" truncated> </el-table-column>
+      <el-table-column
+          prop="status"
+          column-key="status"
+          label="状态"
+          width="100"
+          :filters="status_options"
+          :filtered-value="filters.status"
+          :filter-multiple="false"
+          filter-placement="bottom-end"
+      >
+        <template #default="scope">
+          <el-tag :type="scope.row.status === '已通过' ? 'primary' : 'success'" disable-transitions>{{ scope.row.status}}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column prop="submitted_at" label="提交时间" truncated> </el-table-column>
       <el-table-column align="right">
         <template #header>
@@ -52,7 +66,14 @@
           <el-input v-model="form.description" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="状态" :label-width="formLabelWidth">
-          <el-input v-model="form.status" autocomplete="off"></el-input>
+          <el-select v-model="form.status" placeholder="Select" style="width: 240px">
+            <el-option
+                v-for="item in status_options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="提交时间" :label-width="formLabelWidth">
           <el-input v-model="form.submitted_at" autocomplete="off"></el-input>
@@ -91,12 +112,11 @@
     </el-dialog>
 
     <el-pagination
-      :hide-on-single-page="true"
       :current-page="currentPage"
       :page-sizes="[5, 10, 15, 20, 25]"
       :page-size="pageSize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="total"
+      :total="record_cnt"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     >
@@ -105,7 +125,7 @@
   </div>
 </template>
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, ref, toRefs } from 'vue'
+import {computed, defineComponent, onMounted, reactive, ref, toRefs, watch} from 'vue'
 import { useRouter } from 'vue-router'
 import permission from '@/directive/permission'
 import Service from '../api/index'
@@ -137,7 +157,30 @@ export default defineComponent({
       modifyFormVisible: false,
       detailFormVisible: false,
       form: {},
+
+      paginatedData: [],
+      record_cnt: 0,
+
+      status_options: [
+        {
+          value:'未审核',
+          text:'未审核',
+        },
+        {
+          value:'已通过',
+          text:'已通过',
+        },
+        {
+          value:'未通过',
+          text:'未通过',
+        }
+      ],
+
+      filters: {
+        status: ''
+      },
     })
+
     const formInline = reactive({
       user: '',
       region: ''
@@ -149,40 +192,102 @@ export default defineComponent({
     onMounted(() => {
       // eslint-disable-next-line no-console
       getReimbursementList()
+      filterReimbursementStatus()
     })
     // methods
     const resetDateFilter = () => {
       filterTableRef.value.clearFilter('date')
     }
+    const filterReimbursementStatus = () => {
+      if (sessionStorage.getItem("showPendingReimbursement") === '1') {
+        state.filters.status = "未审核";
+        console.log("showPendingReimbursement", state.filters.status);
+      }
+      sessionStorage.setItem("showPendingReimbursement", 0);
+    }
 
-    const getReimbursementList = () => {
-      try {
-        Service.getReimbursementList().then((res) => {
-          if (res) {
-            state.tableData = []
-            var data = res.data
-            for (let i = 0; i < data.length; i++) {
-              var record = {
-                reimbursement_id: data[i].reimbursement_id,
-                user_id: data[i].user_id,
-                amount: data[i].amount,
-                description: data[i].description,
-                status: data[i].status,
-                submitted_at: data[i].submitted_at,
-              }
-              state.tableData.push(record)
-            }
-          } else {
-            console.log('MISS')
-          }
-        });
-      } catch (err) {
-        ElMessage({
-          type: 'warning',
-          message: err.message
-        })
+    const updatePaginatedData = () => {
+      let recordsToFilter = state.tableData;
+      console.log("recordsToFilter", recordsToFilter)
+      if (state.search) {
+        recordsToFilter = recordsToFilter.filter((record) =>
+            record.reimbursement_id.toLowerCase().includes(state.search.toLowerCase()) // 忽略大小写
+        );
       }
 
+      if (state.filters.status === '未审核') {
+        recordsToFilter = recordsToFilter.filter((record) =>
+            record.status == state.filters.status
+        );
+        console.log("执行跳转")
+      }
+
+      // 更新分页数据
+      // console.log(state.pageSize)
+      const start = (state.currentPage - 1) * state.pageSize;
+      const end = state.currentPage * state.pageSize;
+      state.paginatedData = recordsToFilter.slice(start, end);  // 根据当前页和页大小提取分页数据
+      state.record_cnt = recordsToFilter.length;  // 更新总记录数
+    };
+
+    const getReimbursementList = () => {
+      const role = localStorage.getItem('role')
+      if (role != 'admin') {
+        try {
+          Service.getReimbursementList().then((res) => {
+            if (res) {
+              state.tableData = []
+              var data = res.data
+              for (let i = 0; i < data.length; i++) {
+                var record = {
+                  reimbursement_id: data[i].reimbursement_id,
+                  user_id: data[i].user_id,
+                  amount: data[i].amount,
+                  description: data[i].description,
+                  status: data[i].status,
+                  submitted_at: data[i].submitted_at,
+                }
+                state.tableData.push(record)
+              }
+              updatePaginatedData();
+            } else {
+              console.log('MISS')
+            }
+          });
+        } catch (err) {
+          ElMessage({
+            type: 'warning',
+            message: err.message
+          })
+        }
+      }else {
+        try {
+          Service.getAdminReimbursementList().then((res) => {
+            if (res) {
+              state.tableData = []
+              var data = res.data
+              for (let i = 0; i < data.length; i++) {
+                var record = {
+                  reimbursement_id: data[i].reimbursement_id,
+                  user_id: data[i].user_id,
+                  amount: data[i].amount,
+                  description: data[i].description,
+                  status: data[i].status,
+                  submitted_at: data[i].submitted_at,
+                }
+                state.tableData.push(record)
+              }
+            } else {
+              console.log('MISS')
+            }
+          });
+        } catch (err) {
+          ElMessage({
+            type: 'warning',
+            message: err.message
+          })
+        }
+      }
     }
 
     const clearFilter = () => {
@@ -191,11 +296,17 @@ export default defineComponent({
 
     const formatter = (row: { address: any }) => row.address
     const filterTag = (value: any, row: { Tag: any }) => row.tag === value
-    const filterStatus = (value: any, row: { status: any }) => row.status === value
     const filterHandler = (value: any, row: { [x: string]: any }, column: { property: any }) => {
       const { property } = column
       return row[property] === value
     }
+
+
+
+    const watchSearch = () => {
+      updatePaginatedData();  // 过滤数据并更新分页
+    };
+    watch(() => state.search, watchSearch);
 
     const modifyPop = (row) => {
       state.modifyFormVisible = true
@@ -248,38 +359,25 @@ export default defineComponent({
       state.tableData.splice(index, 1)
     }
     const handleSizeChange = (val: any) => {
-      // eslint-disable-next-line no-console
       console.log(`每页 ${val} 条`)
       state.pageSize = val
-      // request api to change tableData
+      updatePaginatedData();  // 更新分页数据
     }
 
-     // 分页数据处理
-     // @param data [Array] 需要分页的数据
-     //  @param num [Number] 当前第几页
-     //  @param size [Number] 每页显示多少条
-    // const getList = (data, num, size) => {
-    //   let list, start, end
-    //   start = (num - 1) * size
-    //   end = start + size
-    //   list = data.filter((item, index) => {
-    //     return index >= start && index < end
-    //   })
-    //   list.forEach((item, index) => {
-    //     item.seq = index + start
-    //   })
-    //   return list
-    // }
-
     const handleCurrentChange = (val: any) => {
-      // eslint-disable-next-line no-console
       console.log(`当前页: ${val}`)
       state.currentPage = val
-      // request api to change tableData
+      updatePaginatedData();  // 更新分页数据
     }
     const onSubmit = () => {
       // eslint-disable-next-line no-console
       console.log('submit!')
+    }
+    const handleFilterChange = (filters: any) => {
+      state.filters.status = filters.status;   // 只有一个条件在 `filters` 中
+      console.log(state.filters.status);
+      console.log(filters.status);
+      updatePaginatedData(); // 更新分页数据
     }
 
     const onAddReimbursement = () => {
@@ -302,10 +400,11 @@ export default defineComponent({
       clearFilter,
       formatter,
       filterTag,
-      filterStatus,
       filterHandler,
       modifyPop,
       detailPop,
+      filterReimbursementStatus,
+      handleFilterChange
     }
   }
 })

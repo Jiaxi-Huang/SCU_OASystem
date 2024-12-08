@@ -1,7 +1,7 @@
 package com.example.backend.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.example.backend.entity.ReimbursementRecord;
+import com.example.backend.entity.reimbursement.ReimbursementRecord;
 import org.apache.ibatis.annotations.*;
 
 import java.math.BigDecimal;
@@ -18,7 +18,6 @@ public interface ReimbursementMapper extends BaseMapper<ReimbursementRecord> {
             "SET description = #{description} , amount = #{amount}," +
             "status = #{status}, submitted_at=#{submitted_at}" +
             " WHERE user_id = #{user_id} and reimbursement_id = #{reimbursement_id}")
-            //Where另起一行前面要放个空格啊，不能放在前一行后面，不知道为什么啊
     int modifyReimbursementRecord(int user_id, int reimbursement_id, BigDecimal amount, String description,
                          String status, String submitted_at);
 
@@ -30,7 +29,6 @@ public interface ReimbursementMapper extends BaseMapper<ReimbursementRecord> {
 
     @Delete("DELETE from reimbursement_requests WHERE reimbursement_id = #{reimbursement_id}")
     int deleteReimbursementRecord(int reimbursement_id);
-
 
     @Select("SELECT * FROM reimbursement_requests WHERE user_id = #{user_id}")
     List<ReimbursementRecord> getReimbursementRecordByUserId(int user_id);

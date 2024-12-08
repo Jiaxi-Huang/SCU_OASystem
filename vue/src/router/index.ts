@@ -491,7 +491,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
       },
       {
         path: '/meetings/addMeeting',
-        name: 'todoAdd',
+        name: 'meetingAdd',
         component: () => import( '@/views/Meetings/meetingAdd.vue'),
         meta: {
           title: {

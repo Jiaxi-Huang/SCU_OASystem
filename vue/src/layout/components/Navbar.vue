@@ -19,11 +19,14 @@
                 <div @click="navigateTo('/Reimbursement/reimbursementList')" style="cursor: pointer;">
                   您有 <strong>{{ pendingReimbursement.length }}</strong> 笔报销待处理
                 </div>
+                <div @click="navigateTo('/meetings/meetingsList')" style="cursor: pointer;">
+                  您有 <strong>{{ pendingMeetings.length }}</strong> 个会议待处理
+                </div>
+
               </div>
             </template>
-
             <el-badge
-                :value="pendingTodos.length + pendingLeaveApprovals.length + pendingReimbursement.length"
+                :value="pendingTodos.length + pendingLeaveApprovals.length + pendingReimbursement.length + pendingMeetings.length"
                 :max="99"
                 class="message-badge"
                 type="danger">
@@ -33,8 +36,6 @@
             </el-badge>
           </el-tooltip>
         </div>
-
-
         <div id="fullScreen" class="right-menu-box">
           <el-button class="full-screen">
             <el-tooltip :content="langConfig.header.fullScreen[lang]" effect="dark" placement="left">
@@ -72,23 +73,27 @@
   </div>
 </template>
 
+
 <script lang="ts">
-import { defineComponent, computed, ref, onMounted } from 'vue'
-import { Message, FullScreen, BottomLeft } from '@element-plus/icons-vue'
+import { defineComponent, computed, ref, onMounted, onBeforeUnmount } from 'vue'
+import { ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
+import { useStore } from '@/store/index'
+import TodoService from '@/views/TodoList/api/index'
+import LeaveService from '@/views/LeaveApproval/api/index'
+import ReimbursementService from '@/views/Reimbursement/api/index'
+import MeetingService from '@/views/Meetings/api/index'  // 导入会议管理的 Service
+import { Todo } from '@/types/todo'
+import { LeaveApproval } from '@/types/leaveApproval'
+import { Reimbursement } from '@/types/reimbursement'
+import { Meeting } from '@/types/meeting'  // 导入会议类型
 import Hamburger from '@/components/Hamburger/Hamburger.vue'
 import Breadcrumb from '@/components/Breadcrumb/index.vue'
 import Search from '@/components/Search/index.vue'
 import LangSwitch from '@/components/LangSwitch/index.vue'
 import { toFullScreen, exitFullScreen } from '@/utils/screen'
-import { useStore } from '@/store/index'
+import { Message, FullScreen, BottomLeft } from '@element-plus/icons-vue'
 import { langConfig } from '@/utils/constant/config'
-import TodoService from '@/views/TodoList/api/index'
-import LeaveService from '@/views/LeaveApproval/api/index'
-import ReimbursementService from '@/views/Reimbursement/api/index'
-import { Todo } from '@/types/todo'
-import { LeaveApproval } from '@/types/leaveApproval'
-import { Reimbursement } from '@/types/reimbursement'  // 确保正确导入
 
 export default defineComponent({
   name: 'Navbar',
@@ -111,66 +116,90 @@ export default defineComponent({
     const nickname = computed(() => store.state.permissionModule.username)
     const avatar = computed(() => store.state.permissionModule.avatar)
 
-    // 存储待办事项的状态
     const todos = ref<Todo[]>([])
-    // 存储请假审批的状态
     const leaveApprovals = ref<LeaveApproval[]>([])
-    // 存储报销的状态
-    const reimbursements = ref<Reimbursement[]>([])  // 定义 reimbursements 变量
+    const reimbursements = ref<Reimbursement[]>([])
+    const meetings = ref<Meeting[]>([])  // 定义 meetings 变量
 
     const getAvatarUrl = (avatar: string) => {
       if (typeof avatar === 'string' && avatar.trim().length > 0) {
-        // 简单的 URL 验证
         try {
-          new URL(avatar);
-          return avatar;
+          new URL(avatar)
+          return avatar
         } catch (e) {
-          console.error('Invalid avatar URL:', e);
+          console.error('Invalid avatar URL:', e)
         }
       }
-      return '../../assets/avatar-default.jpg';
+      return '../../assets/avatar-default.jpg'
     }
 
-    // 获取待办事项
     const getTodos = async () => {
       const response = await TodoService.postGetTodoList()
       if (response && response.data) {
-        console.log('待办事项数据：', response.data)
         todos.value = response.data
       }
     }
 
-    // 获取请假审批
     const getLeaveApprovals = async () => {
       const response = await LeaveService.postGetLeaveApproval()
       if (response && response.data) {
-        console.log('请假审批数据：', response.data)
         leaveApprovals.value = response.data
       }
     }
 
-// 获取报销数据的方法
     const getReimbursements = async () => {
-      const response = await ReimbursementService.getReimbursementList()  // 使用正确的方法名
-      if (response && response.data) {
-        console.log('报销数据：', response.data)
-        reimbursements.value = response.data
+      const role = localStorage.getItem("role")
+      if (role === "admin") {
+        const response = await ReimbursementService.getAdminReimbursementList()
+        if (response && response.data) {
+          reimbursements.value = response.data
+        }
+      }else{
+        const response = await ReimbursementService.getReimbursementList()
+        if (response && response.data) {
+          reimbursements.value = response.data
+        }
       }
     }
 
+    const getMeetings = async () => {
+      const response = await MeetingService.getPersonalMeetingList()
+      if (response && response.data) {
+        meetings.value = response.data
+      }
+    }
 
-    const pendingTodos = computed(() => todos.value.filter(todo => todo.todo_fin === '未完成'))
-    const pendingLeaveApprovals = computed(() => leaveApprovals.value.filter(leave => leave.status === '待审批'))
-    const pendingReimbursement = computed(() => reimbursements.value.filter(reimbursement => reimbursement.status === '未完成'))  // 定义 pendingReimbursement
+    const checkDueTodos = (todos: Todo[]) => {
+      const now = new Date().getTime()
+      todos.forEach((todo: Todo) => {
+        const dueTime = new Date(todo.todo_ddl).getTime()
+        if (dueTime - now <= 3600000 && todo.todo_fin !== '已完成') {
+          ElMessageBox.alert(`待办事项 "${todo.todo_title}" 即将临期`, '提醒', {
+            confirmButtonText: '确定',
+            type: 'warning',
+          })
+        }
+      })
+    }
 
-    // onMounted 钩子函数，用于在组件挂载时获取数据
     onMounted(() => {
       getTodos()
       getLeaveApprovals()
-      getReimbursements()  // 调用获取报销数据的方法
+      getReimbursements()
+      getMeetings()  // 获取会议数据
+
+      const intervalId = setInterval(() => {
+        console.log("Checking todos at interval...")  // 打印定时器调用信息
+        getTodos().then(() => {
+          checkDueTodos(todos.value)
+        })
+      }, 600000)
+
+      onBeforeUnmount(() => {
+        clearInterval(intervalId)
+      })
     })
 
-    // methods
     const toggleSideBar = () => {
       store.dispatch('appModule/toggleSideBar')
     }
@@ -185,20 +214,18 @@ export default defineComponent({
       fullScreen.value = false
     }
 
-    // 导航到不同页面的方法
     const navigateTo = (path: string, query?: Record<string, string>) => {
       if (path.includes('/todoList')) {
-        sessionStorage.setItem('showUncompleted', '1');  // 设置待办事项的标志位
+        sessionStorage.setItem('showUncompleted', '1')
       } else if (path.includes('/leaveApproval')) {
-        sessionStorage.setItem('showPendingLeave', '1');  // 设置请假管理的标志位
+        sessionStorage.setItem('showPendingLeave', '1')
       } else if (path.includes('/Reimbursement')) {
-        sessionStorage.setItem('showPendingReimbursement', '1');  // 设置报销管理的标志位
+        sessionStorage.setItem('showPendingReimbursement', '1')
+      } else if (path.includes('/meetings')) {
+        sessionStorage.setItem('showPendingMeetings', '1')
       }
-      router.push({ path, query });
+      router.push({ path, query })
     }
-
-
-
 
 
     const logout = () => {
@@ -222,16 +249,15 @@ export default defineComponent({
       opened,
       langConfig,
       logout,
-      pendingTodos,
-      pendingLeaveApprovals,
-      reimbursements,  // 返回 reimbursements
-      pendingReimbursement,  // 返回 pendingReimbursement
+      pendingTodos: computed(() => todos.value.filter(todo => todo.todo_fin === '未完成')),
+      pendingLeaveApprovals: computed(() => leaveApprovals.value.filter(leave => leave.status === '待审批')),
+      pendingReimbursement: computed(() => reimbursements.value.filter(reimbursement => reimbursement.status == '未审核' || reimbursement.status == '未通过')),
+      pendingMeetings: computed(() => meetings.value.filter(meeting => meeting.mtin_fin === '未完成')),
       navigateTo
     }
   }
 })
 </script>
-
 
 <style lang="scss" scoped>
 .navbar {
