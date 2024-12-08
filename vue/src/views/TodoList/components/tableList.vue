@@ -5,7 +5,8 @@
         <el-button type="primary" @click="onAddTodo">添加待办事项</el-button>
       </el-form-item>
     </el-form>
-    <el-table ref="filterTableRef" class="table-list" row-key="todo_id" :data="paginatedData" style="width: 100%">
+    <el-table ref="filterTableRef" class="table-list" row-key="todo_id" :data="paginatedData" style="width: 100%"
+              @filter-change="handleFilterChange">
       <el-table-column
         prop="todo_ddl"
         label="截止日期"
@@ -32,13 +33,12 @@
       </el-table-column>
       <el-table-column
         prop="todo_fin"
+        column-key="todo_fin"
         label="状态"
         width="100"
-        :filters="[
-          { text: '已完成', value: '已完成' },
-          { text: '未完成', value: '未完成' }
-        ]"
-        :filter-method="filterStatus"
+        :filters="fin_options"
+        :filtered-value="filters.todo_fin"
+        :filter-multiple="false"
         filter-placement="bottom-end"
       >
         <template #default="scope">
@@ -176,7 +176,7 @@ export default defineComponent({
     // 思考 ref 响应式和 reactive 响应式的区别； 修改对象属性值，是否会刷新数据
 
     const router = useRouter()
-    const filterTableRef = ref()
+    const filterTableRef = ref(null)
     const state = reactive({
       tableData: [
         {
@@ -198,14 +198,19 @@ export default defineComponent({
 
       fin_options: [
         {
-          value:"未完成",
-          label:"未完成",
+          value:'未完成',
+          text:'未完成',
         },
         {
-          value:"已完成",
-          label:"已完成",
+          value:'已完成',
+          text:'已完成',
         },
       ],
+
+      filters: { // 筛选条件
+        todo_fin: [] // 筛选的状态，可以是 '已完成' 或 '未完成'
+      },
+
 
     })
     const formInline = reactive({
@@ -218,6 +223,16 @@ export default defineComponent({
 
     onMounted(() => {
       // eslint-disable-next-line no-console
+      page_size_get_set()
+      filterPresetTest()
+      getPersonalTodoList()
+    })
+    // methods
+    const resetDateFilter = () => {
+      filterTableRef.value.clearFilter('date')
+    }
+
+    const page_size_get_set = () => {
       const pageSizeTmp = sessionStorage.getItem("TODOLIST_PAGE_SIZE");
       if (!pageSizeTmp) {
         sessionStorage.setItem("TODOLIST_PAGE_SIZE", 5);
@@ -226,21 +241,24 @@ export default defineComponent({
         // ####parseInt#### is IMPORTANT!!!!
         state.pageSize = parseInt(pageSizeTmp, 10);
       }
-      getPersonalTodoList()
-    })
-    // methods
-    const resetDateFilter = () => {
-      filterTableRef.value.clearFilter('date')
     }
 
+    const filterPresetTest = () => {
+      if (sessionStorage.getItem("showUncompleted") === '1') {
+        state.filters.todo_fin[0] = "未完成"
+        sessionStorage.setItem("showUncompleted", 0)
+      }
+    }
+
+
     const getPersonalTodoList = () => {
-      console.log("getPersonalTodoList exc")
+      // console.log("getPersonalTodoList exc")
       try {
         Service.postGetTodoList().then((res) => {
           if (res) {
             state.tableData = []
-            console.log('getPersonalTodoList get')
-            console.log(res)
+            // console.log('getPersonalTodoList get')
+            // console.log(res)
             const data = res.data
             state.record_cnt = data.length
             state.tableData = data
@@ -264,7 +282,7 @@ export default defineComponent({
 
     const formatter = (row: { address: any }) => row.address
     const filterTag = (value: any, row: { Tag: any }) => row.tag === value
-    const filterStatus = (value: any, row: { todo_fin: any }) => row.todo_fin === value
+    // const filterStatus = (value: any, row: { todo_fin: any }) => row.todo_fin === value
     const filterHandler = (value: any, row: { [x: string]: any }, column: { property: any }) => {
       const { property } = column
       return row[property] === value
@@ -272,17 +290,21 @@ export default defineComponent({
 
     // 更新分页数据
     const updatePaginatedData = () => {
-      // 过滤包含搜索关键字的书籍
       let recordsToFilter = state.tableData;
-
-      // 如果有搜索关键词，按书名进行过滤
       if (state.search) {
         recordsToFilter = recordsToFilter.filter((record) =>
             record.todo_title.toLowerCase().includes(state.search.toLowerCase()) // 忽略大小写
         );
       }
+
+      if (state.filters.todo_fin[0] && state.filters.todo_fin[0] !== '') {
+        recordsToFilter = recordsToFilter.filter((record) =>
+            record.todo_fin == state.filters.todo_fin[0]
+        );
+      }
+
       // 更新分页数据
-      console.log(state.pageSize)
+      // console.log(state.pageSize)
       const start = (state.currentPage - 1) * state.pageSize;
       const end = state.currentPage * state.pageSize;
       state.paginatedData = recordsToFilter.slice(start, end);  // 根据当前页和页大小提取分页数据
@@ -333,7 +355,7 @@ export default defineComponent({
     }
     const handleDelete = (index: any, row: any) => {
       // eslint-disable-next-line no-console
-      console.log(index, row)
+      // console.log(index, row)
       let record = {
         todo_id: row.todo_id
       }
@@ -373,6 +395,13 @@ export default defineComponent({
       router.replace('/todoList/todoAdd')
     }
 
+    const handleFilterChange = (filters: any) => {
+      state.filters.todo_fin = filters.todo_fin;   // 只有一个条件在 `filters` 中
+      console.log(state.filters.todo_fin);
+      console.log(filters.todo_fin);
+      updatePaginatedData(); // 更新分页数据
+    }
+
     return {
       formInline,
       total,
@@ -388,11 +417,14 @@ export default defineComponent({
       clearFilter,
       formatter,
       filterTag,
-      filterStatus,
+      // filterStatus,
+      handleFilterChange,
       filterHandler,
       modifyPop,
       detailPop,
-      watchSearch
+      watchSearch,
+      page_size_get_set,
+      filterPresetTest,
     }
   }
 })
