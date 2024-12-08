@@ -22,7 +22,8 @@ import { computed, defineComponent, reactive, ref } from 'vue'
 import Service from "@/views/Personal/api";
 import {ElMessage} from "element-plus/es";
 import {useRouter} from "vue-router";
-import { encrypt } from '@/utils/aes' // aes 密码加密
+import { encrypt } from '@/utils/aes'
+ // aes 密码加密
 export default defineComponent({
   name: 'PersonalPasswordEdit',
   emits: ['success'],

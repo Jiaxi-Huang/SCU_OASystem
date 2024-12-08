@@ -1,5 +1,4 @@
 <template>
-  <meta name="referrer" content="no-referrer">
   <div class="PersonalSetting">
     <el-row>
       <el-col :offset="1" :span="22">
@@ -39,7 +38,7 @@
                   <div class="avatar">
                     <div class="preview">
                       <span>头像</span>
-                      <img :src="getAvatarUrl(avatar)" />
+                      <img :src="getAvatarUrl(avatar)" referrerPolicy="no-referrer"/>
                     </div>
                     <el-upload
                         action="http://localhost:8080/api/upload/uploadAvatar"
@@ -121,9 +120,8 @@ import {computed, defineComponent, onMounted, reactive, ref, toRefs} from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from '@/store'
 import Service from './api/index'
-import PersonalEmailEdit  from "@/views/Personal/personalEmailEdit.vue";
-import PersonalPasswordEdit from "@/views/Personal/personalPasswordEdit.vue";
-import LoginService from '../Login/api/index'
+import PersonalEmailEdit  from "@/views/Personal/components/personalEmailEdit.vue";
+import PersonalPasswordEdit from "@/views/Personal/components/personalPasswordEdit.vue";
 // eslint-disable-next-line no-unused-vars
 type VoidNoop = (arg0?: Error) => void
 export default defineComponent({
@@ -137,7 +135,7 @@ export default defineComponent({
     const store = useStore()
     const showEmailDialog = ref(false)
     const showPasswordDialog = ref(false)
-    let avatar = computed(() => store.state.permissionModule.avatar)
+    const avatar = computed(() => store.state.permissionModule.avatar)
     const noticeSwitch = reactive({
       userSwitch: false,
       sysSwitch: true,
