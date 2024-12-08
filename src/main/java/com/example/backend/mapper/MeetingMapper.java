@@ -37,4 +37,14 @@ public interface MeetingMapper extends BaseMapper<MeetingWithAdderId> {
     @Insert("INSERT INTO usermeetings(user_id, mtin_id, adder_id) VALUES (#{user_id}, #{meeting_id}, #{adder_id})")
     void addMeetingForSomeone(int user_id, int meeting_id, int adder_id);
 
+    @Delete("DELETE from usermeetings where user_id = #{user_id} and mtin_id = #{mtin_id}")
+    void deleteUserMeetings(int user_id, int mtin_id);
+
+
+    @Insert("INSERT INTO usermeetings(user_id, mtin_id, adder_id) VALUES (#{user_id}, #{mtin_id}, #{user_id})")
+    void addMeetingPersonally(int user_id, int mtin_id);
+
+    @Select("SELECT mtin_id, mtin_title, mtin_ctnt, mtin_st, " +
+            "mtin_fin, mtin_len, mtin_host, mtin_loc, mtin_crt from meetings where mtin_id = #{mtin_id}")
+    Meeting searchByMtinId(int mtin_id);
 }

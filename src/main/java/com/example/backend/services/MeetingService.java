@@ -84,4 +84,16 @@ public class MeetingService extends ServiceImpl<MeetingMapper, MeetingWithAdderI
         meetingMapper.addMeetingForSomeone(user_id, meeting_id, adder_id);
     }
 
+    public void deleteMeetingPersonally(int user_id, int mtin_id) {
+        meetingMapper.deleteUserMeetings(user_id, mtin_id);
+    }
+
+
+    public void addMeetingPersonally(int user_id, int mtin_id) {
+        meetingMapper.addMeetingPersonally(user_id, mtin_id);
+    }
+
+    public Meeting searchByMtinId(int mtin_id) {
+        return meetingMapper.searchByMtinId(mtin_id);
+    }
 }

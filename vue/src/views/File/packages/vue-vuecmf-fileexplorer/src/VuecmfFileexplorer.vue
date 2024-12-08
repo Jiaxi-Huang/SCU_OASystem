@@ -291,14 +291,16 @@
             clearable
             check-strictly />
       </el-form-item>
+      <!--            :http-request="service.handleHttpRequest"-->
       <el-form-item label="上传文件：" >
         <el-upload
             ref="uploadRef"
-            :http-request="service.handleHttpRequest"
+            :action="upload_api"
             :auto-upload="false"
             :multiple="true"
             :headers="headers"
-            :data="Object.assign(data,{folder_id: file.current_folder_id})"
+            :data="Object.assign(data,{folder_id: file.current_folder_id//上传时附带的额外参数
+               })"
             :on-success="service.onUploadSuccess"
             :on-error="service.onUploadError"
             :before-upload="service.beforeUpload"
@@ -390,7 +392,9 @@ const props = defineProps({
   //上传时附带的额外参数
   data: {
     type: Object,
-    default: null
+    default: {
+      accessToken: sessionStorage.getItem('accessToken')
+    }
   }
 
 })

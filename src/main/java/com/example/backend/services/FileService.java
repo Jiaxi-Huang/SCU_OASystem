@@ -47,8 +47,12 @@ public class FileService extends ServiceImpl<FileMapper, Files> {
     public int uploadFile(Files record) {
         System.out.println(record.getFileName());
         int res_code = fileMapper.uploadFile(record.getFileName(),record.getExt(),
-                    record.getSize(),record.getDirId(),record.getUserId(),record.getUrl());
+                    record.getSize(),record.getDirId(), String.valueOf(record.getUserId()),record.getUrl());
 
         return res_code;
+    }
+
+    public List<Files> getFile() {
+        return  fileMapper.getFile();
     }
 }

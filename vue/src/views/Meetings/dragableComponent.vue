@@ -248,11 +248,13 @@
       </el-col>
     </el-row>
     <el-row>
-      <el-row>
-        <el-col><el-button type="success">创建会议</el-button></el-col>
+      <el-row :gutter="20">
+        <el-col :span="11"><el-button type="success" @click="onCreateMeeting()">创建会议</el-button></el-col>
+        <el-col :span="11"><el-button type="success" @click="onAddMeeting()">添加会议</el-button></el-col>
       </el-row>
       <el-col :span="24">
         <div class="board">
+
           <div class="task">
             <h5 class="task-header text-upercase margin-top-0">已预订会议</h5>
             <div class="task-list-item">
@@ -280,7 +282,13 @@
                     <div class="flex flex-row flex-between">
                       <div class="handle"><el-icon class="pointer" @click="showMeetingDetails(item)"><View /></el-icon></div>
                       <div class="handle"><el-icon class="pointer" @click="onModifyClicked(item)"><Edit /></el-icon></div>
-                      <div class="handle"><el-icon class="pointer" @click="buttonClickTest()"><Delete /></el-icon></div>
+                      <el-popconfirm confirm-button-text="确定" cancel-button-text="取消"
+                                     icon="el-icon-info" icon-color="red" title="确定将该会议从您的列表中删除吗"
+                                     @confirm="onDelete(item)">
+                        <template #reference>
+                          <div class="handle"><el-icon class="pointer"><Delete /></el-icon></div>
+                        </template>
+                      </el-popconfirm>
                     </div>
                   </el-col>
                 </el-row>
@@ -320,7 +328,13 @@
                       <div class="flex flex-row flex-between">
                         <div class="handle"><el-icon class="pointer" @click="showMeetingDetails(item)"><View /></el-icon></div>
                         <div class="handle"><el-icon class="pointer" @click="onModifyClicked(item)"><Edit /></el-icon></div>
-                        <div class="handle"><el-icon class="pointer" @click="buttonClickTest()"><Delete /></el-icon></div>
+                        <el-popconfirm confirm-button-text="确定" cancel-button-text="取消"
+                                       icon="el-icon-info" icon-color="red" title="确定将该会议从您的列表中删除吗"
+                                       @confirm="onDelete(item)">
+                          <template #reference>
+                            <div class="handle"><el-icon class="pointer"><Delete /></el-icon></div>
+                          </template>
+                        </el-popconfirm>
                       </div>
                     </el-col>
                   </el-row>
@@ -360,7 +374,13 @@
                       <div class="flex flex-row flex-between">
                         <div class="handle"><el-icon class="pointer" @click="showMeetingDetails(item)"><View /></el-icon></div>
                         <div class="handle"><el-icon class="pointer" @click="onModifyClicked(item)"><Edit /></el-icon></div>
-                        <div class="handle"><el-icon class="pointer" @click="buttonClickTest()"><Delete /></el-icon></div>
+                        <el-popconfirm confirm-button-text="确定" cancel-button-text="取消"
+                                       icon="el-icon-info" icon-color="red" title="确定将该会议从您的列表中删除吗"
+                                       @confirm="onDelete(item)">
+                          <template #reference>
+                            <div class="handle"><el-icon class="pointer"><Delete /></el-icon></div>
+                          </template>
+                        </el-popconfirm>
                       </div>
                     </el-col>
                   </el-row>
@@ -414,7 +434,7 @@
           <el-dialog v-model="task.modifyFormVisible" title="修改会议详情">
             <el-form :model="task.modifyForm">
               <el-form-item label="会议标题&nbsp;&nbsp;" :label-width="formLabelWidth">
-                <el-input v-model="task.modifyForm. mtin_title" autocomplete="on"></el-input>
+                <el-input v-model="task.modifyForm.mtin_title" autocomplete="on"></el-input>
               </el-form-item>
               <el-form-item label="会议内容&nbsp;&nbsp;" :label-width="formLabelWidth">
                 <el-input v-model="task.modifyForm.mtin_ctnt" autosize type="textarea"/>
@@ -476,6 +496,58 @@
             </div>
           </el-dialog>
 
+          <el-dialog v-model="task.addFormVisible" title="为自己添加会议" width="25%">
+            <el-form :model="task.search_mtin_id">
+              <el-form-item label="请输入会议ID">
+                <el-input v-model="task.search_mtin_id" autocomplete="off" />
+              </el-form-item>
+            </el-form>
+            <template #footer>
+              <div class="dialog-footer">
+                <el-button @click="task.addFormVisible = false">取消</el-button>
+                <el-button type="primary" @click="search_by_mtin_id()">
+                  查询
+                </el-button>
+              </div>
+            </template>
+          </el-dialog>
+
+          <el-dialog v-model="task.detailFormVisible_add" title="会议详情">
+            <el-form :model="task.detailFormVisible_add">
+              <el-form-item label="会议标题&nbsp;&nbsp;" :label-width="formLabelWidth">
+                {{ task.detailForm_add.mtin_title }}
+              </el-form-item>
+              <el-form-item label="会议内容&nbsp;&nbsp;" :label-width="formLabelWidth">
+                {{ task.detailForm_add.mtin_ctnt }}
+              </el-form-item>
+              <el-form-item label="会议开始时间&nbsp;&nbsp;" :label-width="formLabelWidth">
+                {{ task.detailForm_add.mtin_st }}
+              </el-form-item>
+              <el-form-item label="会议长度&nbsp;&nbsp;" :label-width="formLabelWidth">
+                {{ task.detailForm_add.mtin_len }}
+              </el-form-item>
+              <el-form-item label="会议地点&nbsp;&nbsp;" :label-width="formLabelWidth">
+                {{ task.detailForm_add.mtin_loc }}
+              </el-form-item>
+              <el-form-item label="会议主持人ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+                {{ task.detailForm_add.mtin_host }}
+              </el-form-item>
+              <el-form-item label="会议ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+                {{ task.detailForm_add.mtin_id }}
+              </el-form-item>
+              <el-form-item label="会议状态&nbsp;&nbsp;" :label-width="formLabelWidth">
+                {{ task.detailForm_add.mtin_fin }}
+              </el-form-item>
+              <el-form-item label="会议创建时间&nbsp;&nbsp;" :label-width="formLabelWidth">
+                {{ task.detailForm_add.mtin_crt }}
+              </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+              <el-button type="secondary" @click="task.detailFormVisible_add = false">取消</el-button>
+              <el-button type="primary" @click="handleAdd()">确认添加</el-button>
+            </div>
+          </el-dialog>
+
         </div>
       </el-col>
     </el-row>
@@ -490,6 +562,8 @@ import Service from "@/views/Meetings/api/index";
 import {ElMessage} from "element-plus";
 import { useRouter } from 'vue-router'
 import permission from '@/directive/permission'
+
+const router = useRouter()
 
 let eventGuid = 0
 /**
@@ -531,6 +605,9 @@ const task = reactive<taskType>({
   ],
   modifyFormVisible: false,
   detailFormVisible: false,
+  addFormVisible: false,
+  search_mtin_id: 0,
+  detailFormVisible_add: false,
 })
 
 onMounted(() => {
@@ -563,6 +640,27 @@ const onModifyClicked = (item: any) => {
   task.mtin_crt_date = item.mtin_crt.split(' ')[0]
   task.mtin_crt_time = item.mtin_crt.split(' ')[1]
   task.modifyFormVisible = true
+}
+
+const onDelete = (item: any) => {
+  try {
+    Service.deleteMeetingPersonally(item).then((res) => {
+      if (res) {
+        ElMessage({
+          type: 'success',
+          message: "删除成功"
+        })
+        getPersonalMeetingList()
+      } else {
+        console.log('deleteMeeting error!')
+      }
+    });
+  } catch (err) {
+    ElMessage({
+      type: 'warning',
+      message: err.message
+    })
+  }
 }
 
 const handleEdit = () => {
@@ -610,4 +708,54 @@ const getPersonalMeetingList = () => {
   }
 }
 
+const onCreateMeeting = () => {
+  router.replace('/meetings/addMeeting')
+}
+
+const onAddMeeting = () => {
+  task.addFormVisible = true
+}
+
+const search_by_mtin_id = () => {
+  try {
+    Service.search_by_mtin_id(task.search_mtin_id).then((res) => {
+      if (res.status ===  0) {
+        task.detailForm_add = res.data[0]
+        task.detailFormVisible_add = true
+      } else if (res.status === 1) {
+        ElMessage({
+          type: 'warning',
+          message: "没有找到该会议"
+        })
+      }
+    });
+  } catch (err) {
+    ElMessage({
+      type: 'warning',
+      message: err.message
+    })
+  }
+}
+
+const handleAdd = () => {
+  const record = task.detailForm_add
+  try {
+    Service.addMeetingPersonally(record).then((res) => {
+      if (res.status ===  0) {
+        ElMessage({
+          type: 'success',
+          message: "成功添加会议"
+        })
+        task.detailFormVisible_add = false
+        task.addFormVisible = false
+        getPersonalMeetingList()
+      }
+    });
+  } catch (err) {
+    ElMessage({
+      type: 'warning',
+      message: err.message
+    })
+  }
+}
 </script>

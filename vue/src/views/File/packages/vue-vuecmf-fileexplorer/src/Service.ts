@@ -31,13 +31,16 @@ export default class Service {
         folder_tree_ref: ref(),
         folder: {
             root_path: ref('uploads'), //文件夹根目录
-            data: ref<AnyObject>([{id: 0, title: 'uploads', children: ref<AnyObject>([])}]),  //文件夹列表数据
+            data: ref<AnyObject>([{id: 0, title: '个人文件管理', children: ref<AnyObject>([])},
+                {id: -1, title: '部门文件管理', children: ref<AnyObject>([])},
+                {id: -2, title: '公司文件管理', children: ref<AnyObject>([])},
+            ]),  //文件夹列表数据
             defaultProps: {
                 children: 'children',
                 label: 'title',
                 value: 'id'
             },
-            current_select: ref(0), //当前选择的文件夹
+            current_select: ref(), //当前选择的文件夹
             current_select_key: ref(0), //当前选择的文件夹KEY
             folder_dlg: false,  //是否显示文件夹弹窗
             folder_dlg_title: '', //文件夹弹窗标题
@@ -362,7 +365,7 @@ export default class Service {
      * @param nodeObj
      */
     getFolderPath = (path:string, nodeObj: AnyObject):string => {
-        if(nodeObj.parent.data.id != 0){
+        if(nodeObj.parent.data.id != 0&&nodeObj.parent.data.id && -1||nodeObj.parent.data.id && -2){
             path = this.getFolderPath(nodeObj.parent.data.title + '/' +  path, nodeObj.parent)
         }
         return path
@@ -712,54 +715,54 @@ export default class Service {
      */
 
 
-    handleHttpRequest = (data: any) => {
-        console.log(data)
-        const file = data.file;
-        const formData = new FormData();
-        formData.append("file", file);
-        let folder_id=data.data.folder_id
-        let user=data.data.user
-        formData.append("folder_id", data.data.folder_id);
-        formData.append("user", data.data.user);
-
-        console.log(formData)
-        // 发起文件上传请求
-        fetch('http://localhost:8080/api/file/upload', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
-            .then(result => {
-                console.log("上传成功:", result);
-                if (result && result.data) {
-                    // 获取上传成功后的文件 URL
-                    this.onUploadSuccess(result.data); // 调用成功回调
-                } else {
-                    console.error("上传失败");
-                }
-            })
-            .catch(error => {
-                console.error("上传失败:", error);
-                this.onUploadError(error);
-            });
-    }
-
-    handleHttpRequest1=(data:AnyObject)=>{
-        console.log(data.file);
-        let file=data.file;
-        let record={
-            uid:file.uid,
-            lastModified:file.lastModified,
-            lastModifiedDate:file.lastModifiedDate,
-            name:file.name,
-            size:file.size,
-            type:file.type
-        }
-        console.log(record);
-        //let file=data.file;
-        //let fileData = new FormData();
-        //fileData.append("file",file)
-        this.emit('upload',{record:data})
-    }
+    // handleHttpRequest = (data: any) => {
+    //     console.log(data)
+    //     const file = data.file;
+    //     const formData = new FormData();
+    //     formData.append("file", file);
+    //     let folder_id=data.data.folder_id
+    //     let user=data.data.user
+    //     formData.append("folder_id", data.data.folder_id);
+    //     formData.append("user", data.data.user);
+    //
+    //     console.log(formData)
+    //     // 发起文件上传请求
+    //     fetch('http://localhost:8080/api/file/upload', {
+    //         method: 'POST',
+    //         body: formData
+    //     })
+    //         .then(response => response.json())
+    //         .then(result => {
+    //             console.log("上传成功:", result);
+    //             if (result && result.data) {
+    //                 // 获取上传成功后的文件 URL
+    //                 this.onUploadSuccess(result.data); // 调用成功回调
+    //             } else {
+    //                 console.error("上传失败");
+    //             }
+    //         })
+    //         .catch(error => {
+    //             console.error("上传失败:", error);
+    //             this.onUploadError(error);
+    //         });
+    // }
+    //
+    // handleHttpRequest1=(data:AnyObject)=>{
+    //     console.log(data.file);
+    //     let file=data.file;
+    //     let record={
+    //         uid:file.uid,
+    //         lastModified:file.lastModified,
+    //         lastModifiedDate:file.lastModifiedDate,
+    //         name:file.name,
+    //         size:file.size,
+    //         type:file.type
+    //     }
+    //     console.log(record);
+    //     //let file=data.file;
+    //     //let fileData = new FormData();
+    //     //fileData.append("file",file)
+    //     this.emit('upload',{record:data})
+    // }
 
 }

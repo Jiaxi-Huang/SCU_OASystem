@@ -1,8 +1,12 @@
 import request from '@/utils/request'
 
-const todolistApi = {
+const meetingApi = {
   getMeetingList: '/api/meetings/getMyMeetings',
   updateMeeting: '/api/meetings/updateMeeting',
+  createMeeting: '/api/meetings/createMeeting',
+  deleteMeetingPersonally: '/api/meetings/deleteMeetingPersonally',
+  addMeetingPersonally: '/api/meetings/addMeetingPersonally',
+  search_by_mtin_id: '/api/meetings/search_by_mtin_id',
   localHost:'http://localhost:8080',
 }
 
@@ -14,7 +18,7 @@ class Service {
   static getPersonalMeetingList() {
     const data = {'accessToken':sessionStorage.getItem('accessToken')}
     return request({
-      url: todolistApi.localHost + todolistApi.getMeetingList,
+      url: meetingApi.localHost + meetingApi.getMeetingList,
       method: 'POST',
       json: true,
       data: data,
@@ -27,11 +31,53 @@ class Service {
     })
   }
 
+  static addMeetingPersonally(item:any) {
+    const record = {
+      mtin_id: item.mtin_id,
+      accessToken: sessionStorage.getItem('accessToken')
+    }
+    return request({
+      url: meetingApi.localHost + meetingApi.addMeetingPersonally,
+      method: 'POST',
+      json: true,
+      data: record,
+    }).then((res) => {
+      if (res.status === 0) {
+        console.log("addMeetingPersonally success")
+        return res
+      } else {
+        console.log(res.message)
+      }
+      return null
+    })
+  }
+
+  static deleteMeetingPersonally(item:any) {
+    const record = {
+      mtin_id: item.mtin_id,
+      accessToken: sessionStorage.getItem('accessToken')
+    }
+    return request({
+      url: meetingApi.localHost + meetingApi.deleteMeetingPersonally,
+      method: 'POST',
+      json: true,
+      data: record,
+    }).then((res) => {
+      if (res.status === 0) {
+        console.log("deleteMeetingPersonaly success")
+        return res
+      } else {
+        console.log(res.message)
+      }
+      return null
+    })
+  }
+
   static updateMeeting(meeting :any) {
     meeting.acsTkn = sessionStorage.getItem('accessToken')
     console.log(meeting)
     return request({
-      url: todolistApi.localHost + todolistApi.updateMeeting,
+      url: meetingApi.localHost + meetingApi.updateMeeting,
       method: 'POST',
       json: true,
       data: meeting,
@@ -43,10 +89,10 @@ class Service {
     })
   }
 
-  static deleteTodo(record:any) {
+  static deleteMeeting(record:any) {
     record.todo_fin = '未完成'
     return request({
-      url: todolistApi.localHost + todolistApi.deleteTodo,
+      url: meetingApi.localHost + meetingApi.deleteTodo,
       method: 'POST',
       json: true,
       data: record,
@@ -58,21 +104,37 @@ class Service {
     })
   }
 
-  static addTodo(record:any) {
-    record.todo_fin = '未完成'
-    record.acsTkn = sessionStorage.getItem('accessToken')
-    // console.log(record.acsTkn)
+  static postCreateMeeting(record:any) {
     return request({
-      url: todolistApi.localHost + todolistApi.addTodolist,
+      url: meetingApi.localHost + meetingApi.createMeeting,
       method: 'POST',
       json: true,
       data: record,
     }).then((res) => {
+      // console.log(res)
       if (res.status === 0) {
-        return res
+        return Promise.resolve(res)
       }
-      return null
+      return Promise.reject(res)
     })
   }
+
+  static search_by_mtin_id(mtin_id: any) {
+    const data = {data:[Number(mtin_id)]}
+    console.log(data)
+    return request({
+      url: meetingApi.localHost + meetingApi.search_by_mtin_id,
+      method: 'POST',
+      json: true,
+      data: data,
+    }).then((res) => {
+      // console.log(res)
+      if (res.status ===  0 || res.status === 1) {
+        return Promise.resolve(res)
+      }
+      return Promise.reject(res)
+    })
+  }
+
 }
 export default Service

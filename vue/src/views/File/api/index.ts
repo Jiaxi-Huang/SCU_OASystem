@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import {ElMessage} from "element-plus";
 
 const fileApi = {
     localHost:'http://localhost:8080',
@@ -19,13 +20,14 @@ class Service {
     /**
      * @description POST 用户登录接口
      */
-    static loadFile() {
+    static loadFile(dir_id:any) {
         const data = {'accessToken':sessionStorage.getItem('accessToken')}
         return request({
-            url: fileApi.localHost + fileApi.loadFile,
+            url: `${fileApi.localHost + fileApi.loadFile}?dir_id=${dir_id}`,
+            //传递文件夹指向，确定是个人还是部门还是公司
             method: 'POST',
             json: true,
-            data: data,
+            data: data
         }).then((res) => {
             if (res.status === 0) {
                 console.log("loadFile success")
@@ -33,17 +35,18 @@ class Service {
                 return res
             }else{
                 console.log("loadFile error111")
+                console.log(res.status)
             }
             return null
         })
     }
-    static loadFolder() {
+    static loadFolder(i:any) {
         const data = {'accessToken':sessionStorage.getItem('accessToken')}
         return request({
-            url: fileApi.localHost + fileApi.loadFolder,
+            url:fileApi.localHost + fileApi.loadFolder,
             method: 'POST',
             json: true,
-            data: data,
+            data: data
         }).then((res) => {
             if (res.status === 0) {
                 console.log("loadFolder success")
@@ -51,8 +54,6 @@ class Service {
                 return res
             }else{
                 console.log("loadFolder error111")
-
-
             }
             return null
         })
@@ -71,7 +72,11 @@ class Service {
             data: record,
         }).then((res) => {
             if (res.status === 0) {
-                return res
+                return res;
+            }
+            if (res.status === -1){
+                // 权限不足时弹出提示
+                ElMessage.error('您的权限不够，无法创建文件夹')
             }
             return null
         })
@@ -80,6 +85,7 @@ class Service {
         let record = {
             id:folderData.folder_value,
             title: folderData.folder_name ,
+            acsTkn: sessionStorage.getItem('accessToken')
         }
         return request({
             url: fileApi.localHost + fileApi.modifyFolder,
@@ -88,7 +94,10 @@ class Service {
             data: record,
         }).then((res) => {
             if (res.status === 0) {
-                return res
+                return res;
+            }
+            if (res.status === -1){
+                ElMessage.error('您的权限不够，无法修改文件夹名称')
             }
             return null
         })
@@ -97,6 +106,7 @@ class Service {
         let record = {
             id:folderData.current_id,
             pid: folderData.target_pid ,
+            acsTkn: sessionStorage.getItem('accessToken')
         }
         return request({
             url: fileApi.localHost + fileApi.moveFolder,
@@ -107,6 +117,9 @@ class Service {
             if (res.status === 0) {
                 return res
             }
+            if (res.status === -1){
+                ElMessage.error('您的权限不够，无法移动文件夹')
+            }
             return null
         })
     }
@@ -115,6 +128,7 @@ class Service {
     static delFolder(folderData:any) {
         let record = {
             id:folderData.id,
+            acsTkn: sessionStorage.getItem('accessToken')
         }
         return request({
             url: fileApi.localHost + fileApi.delFolder,
@@ -124,6 +138,9 @@ class Service {
         }).then((res) => {
             if (res.status === 0) {
                 return res
+            }
+            if(res.status === -1){
+                ElMessage.error('您的权限不够，无法删除文件夹')
             }
             return null
         })

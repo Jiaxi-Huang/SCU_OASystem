@@ -20,7 +20,8 @@ public class Files {
     private String remark;
     private Date createTime;
     private Date updateTime;
-    private String userId;
+    private Integer userId;
     private String filePath;
-
+    private String department;
+    private Integer isShared;
 }

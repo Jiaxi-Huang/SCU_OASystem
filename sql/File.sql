@@ -8,7 +8,8 @@ CREATE TABLE `files` (
   `remark` text,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `user_id` int NOT NULL,
+  `user_id` int,
+  `department` varchar(255),
   PRIMARY KEY (`id`)
 );
 CREATE TABLE `folders` (
@@ -17,6 +18,7 @@ CREATE TABLE `folders` (
     `pid` int DEFAULT NULL,
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `user_id` int NOT NULL,
+    `user_id` int,
+    `department` varchar(255),
     PRIMARY KEY (`id`)
 ) 
