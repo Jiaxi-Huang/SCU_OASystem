@@ -1,5 +1,4 @@
 <template>
-  <meta name="referrer" content="no-referrer">
   <div class="navbar">
     <el-header height="50px">
       <hamburger id="Hamburger" :is-active="opened" class="hamburger-container" @toggleClick="toggleSideBar" />
@@ -22,11 +21,6 @@
                 </div>
               </div>
             </template>
-
-
-
-
-
 
             <el-badge
                 :value="pendingTodos.length + pendingLeaveApprovals.length + pendingReimbursement.length"
@@ -53,7 +47,7 @@
         </div>
         <el-dropdown class="avatar-container" trigger="hover">
           <div class="avatar-wrapper">
-            <el-avatar :src="getAvatarUrl(avatar)"></el-avatar>
+            <el-avatar :src="getAvatarUrl(avatar)" referrerPolicy="no-referrer"></el-avatar>
             <div class="nickname">{{ nickname }}</div>
           </div>
           <template #dropdown>

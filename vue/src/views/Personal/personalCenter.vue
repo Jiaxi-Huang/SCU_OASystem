@@ -1,5 +1,4 @@
 <template>
-  <meta name="referrer" content="no-referrer">
   <div class="page-container">
     <div class="info">
       <el-divider content-position="left">个人中心</el-divider>
@@ -13,7 +12,7 @@
       <el-col :span="7" :offset="1">
         <el-card class="box-card">
           <div class="account-avatar">
-            <img :src="getAvatarUrl(avatar)" alt="个人头像" />
+            <img :src="getAvatarUrl(avatar)" alt="个人头像" referrerPolicy="no-referrer"/>
           </div>
           <div class="account-detail">
             <el-descriptions class="detail" :column="1" :size="size">
@@ -86,12 +85,12 @@ export default defineComponent({
     const size = ref('medium')
     const showDesc = ref(true)
     const store = useStore()
-    let username = computed(() => store.state.permissionModule.username)
-    let role = computed(() => store.state.permissionModule.role)
-    let department = computed(() => store.state.permissionModule.department)
-    let phone = computed(() => store.state.permissionModule.phone)
-    let intro = computed(() => store.state.permissionModule.intro)
-    let avatar = computed(() => store.state.permissionModule.avatar)
+    const username = computed(() => store.state.permissionModule.username)
+    const role = computed(() => store.state.permissionModule.role)
+    const department = computed(() => store.state.permissionModule.department)
+    const phone = computed(() => store.state.permissionModule.phone)
+    const intro = computed(() => store.state.permissionModule.intro)
+    const avatar = computed(() => store.state.permissionModule.avatar)
     // mothods
     /**
      * @description 获取头像
