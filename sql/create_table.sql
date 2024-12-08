@@ -14,7 +14,7 @@ CREATE TABLE user_avatar (
     user_id INT PRIMARY KEY NOT NULL,
     avatar VARCHAR(511) NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user_infos(user_id)
-)
+);
 -- 创建部门信息表
 CREATE TABLE department_infos (
     department_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -114,5 +114,3 @@ CREATE TABLE UserMeetings (
     FOREIGN KEY (mtin_id) REFERENCES Meetings(mtin_id),            -- 外键，关联会议表
     FOREIGN KEY (adder_id) REFERENCES user_infos(user_id)          -- 外键，关联用户表
 );
-
-
