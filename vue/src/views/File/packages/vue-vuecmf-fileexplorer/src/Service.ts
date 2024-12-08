@@ -511,12 +511,16 @@ export default class Service {
      */
     moveFile = ():void => {
         const file_id:Array<number> = []
+        const file_before_dir_id=this.config.file.select_files[0].dir_id
         this.config.file.select_files.forEach((item:AnyObject)=>{
             file_id.push(item.id)
+
         })
+
 
         this.emit('moveFile', {
             select_file_id: file_id,
+            select_file_before_dir_id:file_before_dir_id,
             target_pid: this.config.file.move_pid,
             loadFile: () => {
                 this.emit('loadFile', this.config.file)
@@ -546,12 +550,14 @@ export default class Service {
      */
     remarkFile = ():void => {
         const file_id:Array<number> = []
+        const beforeDirId=this.config.file.select_files[0].dir_id
         this.config.file.select_files.forEach((item:AnyObject)=>{
             file_id.push(item.id)
         })
 
         this.emit('remarkFile', {
             select_file_id: file_id,
+            select_file_before_dir_id:beforeDirId,
             remark_content: this.config.file.remark_content,
             loadFile: () => {
                 this.emit('loadFile', this.config.file)
@@ -579,12 +585,14 @@ export default class Service {
             }
         ).then(() => {
             const file_id:Array<number> = []
+            const beforeDirId=this.config.file.select_files[0].dir_id
             this.config.file.select_files.forEach((item:AnyObject)=>{
                 file_id.push(item.id)
             })
 
             this.emit('delFile', {
                 select_file_id: file_id,
+                select_file_before_dir_id:beforeDirId,
                 loadFile: () => {
                     this.emit('loadFile', this.config.file)
                 }

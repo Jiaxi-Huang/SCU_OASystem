@@ -145,7 +145,11 @@ export default defineComponent({
     //加载文件列表
     const loadFile = (folderObj: AnyObject): void => {
       console.log("getPersonalFiles exc")
-      let dir_id=folderObj.filter.dir_id
+      let dir_id=0
+      if(folderObj.filter.dir_id!=null){
+        dir_id = folderObj.filter.dir_id
+      }
+      console.log("dir_id "+dir_id)
       Service.loadFile(dir_id).then((res) => {
         if (res) {
           // 处理返回的结果
@@ -287,7 +291,7 @@ export default defineComponent({
             }
           }
         } else {
-          console.log("getPersonalTodoList RES MISS");
+          console.log("FileLoader RES MISS");
         }
       }).catch(err => {
         ElMessage({

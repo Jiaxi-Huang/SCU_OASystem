@@ -24,4 +24,6 @@ public class Files {
     private String filePath;
     private String department;
     private Integer isShared;
+    private String acsTkn;
+    private Integer beforeDirId;
 }

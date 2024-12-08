@@ -150,7 +150,9 @@ class Service {
     static moveFile(folderData:any) {
         let record = {
             ids:folderData.select_file_id,
-            dirId:folderData.target_pid
+            dirId:folderData.target_pid,
+            beforeDirId:folderData.select_file_before_dir_id,
+            acsTkn: sessionStorage.getItem('accessToken')
         }
         return request({
             url: fileApi.localHost + fileApi.moveFile,
@@ -161,6 +163,9 @@ class Service {
             if (res.status === 0) {
                 return res
             }
+            if(res.status === -1){
+                ElMessage.error('您的权限不够，无法移动文件')
+            }
             return null
         })
     }
@@ -169,6 +174,8 @@ class Service {
     static delFile(folderData:any) {
         let record = {
             ids:folderData.select_file_id,
+            beforeDirId: folderData.select_file_before_dir_id,
+            acsTkn: sessionStorage.getItem('accessToken')
         }
         return request({
             url: fileApi.localHost + fileApi.delFile,
@@ -179,6 +186,9 @@ class Service {
             if (res.status === 0) {
                 return res
             }
+            if(res.status === -1){
+                ElMessage.error('您的权限不够，无法删除文件')
+            }
             return null
         })
     }
@@ -186,7 +196,9 @@ class Service {
     static remarkFile(folderData:any) {
         let record = {
             ids:folderData.select_file_id,
-            remark:folderData.remark_content
+            remark:folderData.remark_content,
+            beforeDirId:folderData.select_file_before_dir_id,
+            acsTkn: sessionStorage.getItem('accessToken')
         }
         return request({
             url: fileApi.localHost + fileApi.remarkFile,
@@ -196,6 +208,9 @@ class Service {
         }).then((res) => {
             if (res.status === 0) {
                 return res
+            }
+            if(res.status === -1){
+                ElMessage.error('您的权限不够，无法备注文件')
             }
             return null
         })
