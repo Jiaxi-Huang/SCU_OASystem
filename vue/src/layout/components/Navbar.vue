@@ -11,19 +11,18 @@
           <el-tooltip placement="bottom" effect="light">
             <template #content>
               <div>
-                <div @click="navigateTo('/todoList/todoTableList')" style="cursor: pointer;">
+                <div class="el-dropdown-menu__item" @click="navigateTo('/todoList/todoTableList')">
                   您有 <strong>{{ pendingTodos.length }}</strong> 个待办事项待处理
                 </div>
-                <div @click="navigateTo('/leaveApproval/leaveList')" style="cursor: pointer;">
+                <div class="el-dropdown-menu__item" @click="navigateTo('/leaveApproval/leaveList')">
                   您有 <strong>{{ pendingLeaveApprovals.length }}</strong> 条请假审批待处理
                 </div>
-                <div @click="navigateTo('/Reimbursement/reimbursementList')" style="cursor: pointer;">
+                <div class="el-dropdown-menu__item" @click="navigateTo('/Reimbursement/reimbursementList')">
                   您有 <strong>{{ pendingReimbursement.length }}</strong> 笔报销待处理
                 </div>
-                <div @click="navigateTo('/meetings/meetingsList')" style="cursor: pointer;">
+                <div class="el-dropdown-menu__item" @click="navigateTo('/meetings/meetingsList')">
                   您有 <strong>{{ pendingMeetings.length }}</strong> 个会议待处理
                 </div>
-
               </div>
             </template>
             <el-badge
@@ -162,6 +161,7 @@ export default defineComponent({
       }
     }
 
+
     const checkDueTodos = (todos: Todo[]) => {
       const now = new Date().getTime()
       todos.forEach((todo: Todo) => {
@@ -253,6 +253,12 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+:root {
+  --el-box-shadow-light: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  --el-color-primary-light-9: #ecf5ff;
+  --el-color-primary: #409eff;
+}
+
 .navbar {
   height: 50px;
   overflow: hidden;
@@ -331,21 +337,23 @@ export default defineComponent({
       }
     }
 
-    .right-menu-item {
-      display: inline-block;
-      padding: 0 8px;
-      height: 100%;
-      font-size: 18px;
-      color: #5a5e66;
-      vertical-align: text-bottom;
+    .el-dropdown-menu__item {
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      list-style: none;
+      line-height: 22px;
+      padding: 5px 16px;
+      margin: 0;
+      font-size: var(--el-font-size-base, 14px);
+      color: var(--el-text-color-regular, #606266);
+      cursor: pointer;
+      outline: 0;
+      transition: background-color 0.3s, color 0.3s;
 
-      &.hover-effect {
-        cursor: pointer;
-        transition: background 0.3s;
-
-        &:hover {
-          background: rgba(0, 0, 0, 0.025);
-        }
+      &:hover {
+        background-color: var(--el-dropdown-menuItem-hover-fill);
+        color: var(--el-dropdown-menuItem-hover-color);
       }
     }
 
