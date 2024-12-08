@@ -2,6 +2,7 @@ import request from '@/utils/request'
 
 const reimbursementApi = {
   getReimbursementList: '/api/reimbursement/getReimbursementList',
+  getAdminReimbursementList: '/api/reimbursement/getAdminReimbursementList',
   updateReimbursement: '/api/reimbursement/modifyReimbursementRecord',
   deleteReimbursement: '/api/reimbursement/deleteReimbursementRecord',
   addReimbursement: '/api/reimbursement/addReimbursementRecord',
@@ -67,11 +68,24 @@ class Service {
       json: true,
       data: record,
     }).then((res) => {
-      if (res.status === 0) {
+      if (res.status === 200) {
         return res
       }
       return null
     })
   }
+
+    static getAdminReimbursementList() {
+      return request({
+        url: reimbursementApi.localHost + reimbursementApi.getAdminReimbursementList,
+        method: 'POST',
+        json: true,
+      }).then((res) => {
+        if (res.status === 200) {
+          return res
+        }
+        return null
+      })
+    }
 }
 export default Service

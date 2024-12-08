@@ -149,9 +149,17 @@ export default defineComponent({
     }
 
     const getReimbursements = async () => {
-      const response = await ReimbursementService.getReimbursementList()
-      if (response && response.data) {
-        reimbursements.value = response.data
+      const role = localStorage.getItem("role")
+      if (role === "admin") {
+        const response = await ReimbursementService.getAdminReimbursementList()
+        if (response && response.data) {
+          reimbursements.value = response.data
+        }
+      }else{
+        const response = await ReimbursementService.getReimbursementList()
+        if (response && response.data) {
+          reimbursements.value = response.data
+        }
       }
     }
 
@@ -244,7 +252,7 @@ export default defineComponent({
       logout,
       pendingTodos: computed(() => todos.value.filter(todo => todo.todo_fin === '未完成')),
       pendingLeaveApprovals: computed(() => leaveApprovals.value.filter(leave => leave.status === '待审批')),
-      pendingReimbursement: computed(() => reimbursements.value.filter(reimbursement => reimbursement.status === '未完成')),
+      pendingReimbursement: computed(() => reimbursements.value.filter(reimbursement => reimbursement.status == '未审核' || reimbursement.status == '未通过')),
       pendingMeetings: computed(() => meetings.value.filter(meeting => meeting.mtin_fin === '未完成')),
       navigateTo
     }

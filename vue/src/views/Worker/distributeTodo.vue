@@ -51,19 +51,19 @@ import Service from "@/views/Worker/api";
 
 export default defineComponent({
   name: 'DistributeTodo',
-  emits: ['success'],
-  props: {
-    userIds: {
-      type: Array,
-      default: () => []
-    }
-  },
   components: {
     Edit,
     DeleteFilled,
     Check,
     ArrowLeft
   },
+  props: {
+    userIds: {
+      type: Array,
+      default: () => []
+    }
+  },
+  emits: ['success'],
   setup(props,{ emit }) {
     const router = useRouter()
     const sizeForm = reactive({
@@ -83,10 +83,10 @@ export default defineComponent({
     const submitForm = () => {
       activityForm.value.validate(async(valid: any) => {
         if (valid) {
-          let record = {
+          const record = {
             todo_title: sizeForm.todo_title,
             todo_ctnt: sizeForm.todo_ctnt,
-            todo_ddl: sizeForm.date1 + " " + sizeForm.date2,
+            todo_ddl: `${sizeForm.date1  } ${  sizeForm.date2}`,
             user_ids: props.userIds,
             accessToken: sessionStorage.getItem('accessToken'),
             todo_fin : '未完成'
