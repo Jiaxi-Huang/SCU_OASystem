@@ -1,7 +1,7 @@
 -- 创建文件夹表
 CREATE TABLE `folders` (
                            `id` bigint NOT NULL AUTO_INCREMENT,              -- 文件夹ID
-                           `title` varchar(255) NOT NULL,                     -- 文件夹名称
+                           `title` varchar(255),                     -- 文件夹名称
                            `pid` bigint DEFAULT NULL,                         -- 父文件夹ID，修改为 bigint
                            `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- 创建时间
                            `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- 更新时间
@@ -31,3 +31,4 @@ CREATE TABLE `files` (
                              REFERENCES `folders` (`id`)
                              ON DELETE CASCADE                                -- 删除文件夹时级联删除文件
 );
+-- 建表后在folders里添加id为-2，-1，0的数据，分别代表公司文件夹，部门文件夹，个人文件夹。
