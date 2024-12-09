@@ -7,6 +7,7 @@ CREATE TABLE `folders` (
                            `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- 更新时间
                            `user_id` int,                                    -- 用户ID
                            `department` varchar(255),                        -- 部门
+                           `is_shared` int,
                            PRIMARY KEY (`id`),
                            CONSTRAINT `fk_folders_pid` FOREIGN KEY (`pid`)  -- 外键约束
                                REFERENCES `folders` (`id`)
@@ -26,6 +27,7 @@ CREATE TABLE `files` (
                          `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- 更新时间
                          `user_id` int,                                    -- 用户ID
                          `department` varchar(255),                        -- 部门
+                         `is_shared` int,
                          PRIMARY KEY (`id`),
                          CONSTRAINT `fk_files_dir_id` FOREIGN KEY (`dir_id`)  -- 外键约束
                              REFERENCES `folders` (`id`)
