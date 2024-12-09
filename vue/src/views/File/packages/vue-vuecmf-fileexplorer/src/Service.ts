@@ -295,6 +295,7 @@ export default class Service {
             }
         })
 
+
         this.config.folder.move_folder_dlg = false
     }
 

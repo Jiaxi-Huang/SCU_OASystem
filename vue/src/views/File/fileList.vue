@@ -1,5 +1,5 @@
 <template>
-  <h3>个人文件管理</h3>
+  <h3>文件管理</h3>
 
   <vuecmf-fileexplorer
       root_path="个人文件管理"
@@ -43,14 +43,14 @@ export default defineComponent({
   setup(){
     //加载文件夹列表
     const loadFolder = (folderObj: AnyObject): void => {
+      console.log("loadFile exc")
       Service.loadFolder().then((res) => {
         if (res) {
+
           const data = res.data;
           if (data && Array.isArray(data)) {
             let user=data[data.length-1];
             data.pop();
-            console.log(data);
-            console.log(user);
             //0是个人，1是部门，2是公司，文件夹id是0，-1，-2
             for(let i = 0;i <= 2;i++){
               //folderObj.total = data.length; // 更新文件夹的总数
@@ -65,7 +65,6 @@ export default defineComponent({
               });
               data.forEach(item => {
                 if(i===0&&((item.department===null)||(item.department===""))&&item.userId===user.userId){
-                  console.log("个人")
                   if (item.pid === -i) {
                     // 如果是根节点（pid为0），加入结果数组
                     folderObj.data[i].children.push(map[item.id]);
@@ -77,7 +76,6 @@ export default defineComponent({
                   }
                 }
                 if(i===1&&item.department===user.department){
-                  console.log("部门")
                   if (item.pid === -i) {
                     // 如果是根节点（pid为0），加入结果数组
                     folderObj.data[i].children.push(map[item.id]);
@@ -89,7 +87,6 @@ export default defineComponent({
                   }
                 }
                 if(i===2&&((item.department===null)||(item.department===""))){
-                  console.log("公司")
                   if (item.pid === -i) {
                     // 如果是根节点（pid为0），加入结果数组
                     folderObj.data[i].children.push(map[item.id]);
@@ -118,8 +115,6 @@ export default defineComponent({
                     //folderObj.data[0].title="没找到";
                   }
                 });
-                console.log(JSON.stringify(folderObj, null, 2));
-                console.log(folderObj.is_new);
               }
             }
 
@@ -144,7 +139,7 @@ export default defineComponent({
 
     //加载文件列表
     const loadFile = (folderObj: AnyObject): void => {
-      console.log("getPersonalFiles exc")
+      console.log("loadFile exc")
       let dir_id=0
       if(folderObj.filter.dir_id!=null){
         dir_id = folderObj.filter.dir_id
@@ -154,11 +149,8 @@ export default defineComponent({
         if (res) {
           // 处理返回的结果
           const data = res.data;
-          console.log(data);
           let folderType=data[data.length-2];
           let user=data[data.length-1];
-          console.log(folderType)
-          console.log(user)
           data.pop()
           data.pop()
           if (data && Array.isArray(data)) {
@@ -188,7 +180,7 @@ export default defineComponent({
               }else{
                 console.log(folderObj.filter.dir_id)
                 for (let i = 0; i < data.length; i++) {
-                  if(data[i].dirId === folderObj.filter.dir_id
+                  if(data[i].dirId === dir_id
                       &&data[i].userId===user.userId
                       &&((data[i].department==="")||(data[i].department===null))
                   ){
@@ -311,6 +303,7 @@ export default defineComponent({
           Service.createFolder(folderData).then((res) => {
             if (res) {
               // console.log(res)
+              folderData.loadFolder();
             } else {
             }
           });
@@ -326,6 +319,7 @@ export default defineComponent({
           Service.modifyFolder(folderData).then((res) => {
             if (res) {
               // console.log(res)
+              folderData.loadFolder();
             } else {
             }
           });
@@ -337,6 +331,7 @@ export default defineComponent({
         }
       }
       console.log(folderData)
+
     }
 
     //移动文件夹
@@ -347,6 +342,7 @@ export default defineComponent({
         Service.moveFolder(data).then((res) => {
           if (res) {
             // console.log(res)
+            data.loadFolder()
           } else {
           }
         });
@@ -356,7 +352,7 @@ export default defineComponent({
           message: err.message
         })
       }
-      data.loadFolder()
+
 
     }
 
@@ -367,6 +363,7 @@ export default defineComponent({
         Service.delFolder(folderData).then((res) => {
           if (res) {
             // console.log(res)
+            folderData.loadFolder();
           } else {
           }
         });
@@ -393,6 +390,7 @@ export default defineComponent({
       try {
         Service.moveFile(data).then((res) => {
           if (res) {
+            data.loadFile()
             // console.log(res)
           } else {
           }
@@ -404,7 +402,7 @@ export default defineComponent({
         })
       }
 
-      data.loadFile()
+
     }
 
     //删除文件
@@ -415,6 +413,7 @@ export default defineComponent({
       try {
         Service.delFile(data).then((res) => {
           if (res) {
+            data.loadFile()
             // console.log(res)
           } else {
           }
@@ -425,7 +424,7 @@ export default defineComponent({
           message: err.message
         })
       }
-      data.loadFile()
+
     }
 
     //保存文件
@@ -440,6 +439,7 @@ export default defineComponent({
       try {
         Service.remarkFile(data).then((res) => {
           if (res) {
+            data.loadFile()
             // console.log(res)
           } else {
           }
