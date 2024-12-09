@@ -8,8 +8,6 @@
       :tool_config="['new_folder','update_folder','move_folder','del_folder','upload','move_file','del_file','remark_file']"
       upload_api="http://localhost:8080/api/file/upload"
 
-      :data="{user:'2'}"
-
       @loadFolder="loadFolder"
       @moveFolder="moveFolder"
       @saveFolder="saveFolder"

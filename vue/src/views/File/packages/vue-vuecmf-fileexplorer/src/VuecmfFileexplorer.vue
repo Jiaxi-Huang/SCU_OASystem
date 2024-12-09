@@ -299,7 +299,7 @@
             :auto-upload="false"
             :multiple="true"
             :headers="headers"
-            :data="Object.assign(data,{folder_id: file.current_folder_id//上传时附带的额外参数
+            :data="Object.assign(additionalParams,{folder_id: file.current_folder_id//上传时附带的额外参数
                })"
             :on-success="service.onUploadSuccess"
             :on-error="service.onUploadError"
@@ -355,9 +355,22 @@
 
 <script lang="ts" setup>
 import Service from './Service'
-import {defineEmits, toRefs, ref} from "vue"
+import {defineEmits, toRefs, ref, reactive} from "vue"
 import {ElTable, UploadInstance} from "element-plus";
 const emit = defineEmits(['loadFolder','saveFolder','moveFolder','delFolder','loadFile','uploadFile','saveFile','moveFile','delFile','selectFile', 'onUploadSuccess', 'onUploadError','beforeUpload', 'onPreview', 'onRemove','onProgress','onChange', 'onExceed','remarkFile','upload'])
+// 获取 accessToken
+
+const settingForm = reactive({
+  nickname: '',
+  address: '',
+  phone: '',
+  accessToken: sessionStorage.getItem('accessToken')
+})
+
+const additionalParams = reactive({
+  'accessToken': `${settingForm.accessToken}` // 假设 accessToken 存储在 sessionStorage 中
+});
+
 const props = defineProps({
   //当前文件夹根目录
   root_path: {
@@ -390,10 +403,10 @@ const props = defineProps({
     default: null
   },
   //上传时附带的额外参数
+
   data: {
     type: Object,
     default: {
-      accessToken: sessionStorage.getItem('accessToken')
     }
   }
 

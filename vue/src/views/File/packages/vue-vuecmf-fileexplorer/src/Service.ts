@@ -626,7 +626,11 @@ export default class Service {
      * @param uploadFiles
      */
     onUploadSuccess = (response: AnyObject, uploadFile: UploadFile, uploadFiles: UploadFiles):void => {
-        this.emit('onUploadSuccess',{response:response, uploadFile: uploadFile, uploadFiles: uploadFiles, uploadInstance: this.config.file.uploadInstance})
+        if(response.status===-1){
+            ElMessage.error('您的权限不够，无法在公司共享文件夹上传文件')
+        }else{
+            this.emit('onUploadSuccess',{response:response, uploadFile: uploadFile, uploadFiles: uploadFiles, uploadInstance: this.config.file.uploadInstance})
+        }
     }
 
     /**
