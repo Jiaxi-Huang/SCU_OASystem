@@ -47,7 +47,8 @@ public class FolderController {
             for (Folder record : records) {
                 res.pushData(record);
             }
-            res.pushData(userInfo);
+            res.pushData(userInfo.getUserId());
+            res.pushData(userInfo.getDepartment());
         }
         catch (Exception e) {
             res.setStatus(-1);

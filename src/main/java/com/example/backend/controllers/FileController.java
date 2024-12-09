@@ -39,7 +39,6 @@ public class FileController {
     @Autowired
     private FolderController folderController;
 
-
     @PostMapping("/loadFile")
     public ResponseBase loadFile(@RequestBody adminUserInfoRequest request,@RequestParam String dir_id) {
         ResponseBase res = new ResponseBase();
@@ -53,7 +52,8 @@ public class FileController {
                 res.pushData(record);
             }
             res.pushData(FolderType);
-            res.pushData(userInfo);
+            res.pushData(userInfo.getUserId());
+            res.pushData(userInfo.getDepartment());
 
         }
         catch (Exception e) {
@@ -83,7 +83,7 @@ public class FileController {
         String accessToken = record.getAcsTkn();
         int userId = accessService.getAuthenticatedId(accessToken);
         User userInfo = userMapper.findByUserId(userId);
-        int res_code = fileService.delFolder(userInfo,record);
+        int res_code = fileService.delFile(userInfo,record);
         if (res_code==0) {
             response.setStatus(-1);
         }
@@ -161,20 +161,9 @@ public class FileController {
             record.setSize(String.valueOf(file.getSize()));
             System.out.println(file.getSize());
             System.out.println(record);
-            int fileType = folderController.judgeFolder(record.getDirId());
+
             int res_code=0;
-            if(fileType==0){
-                 res_code = fileService.uploadFile(null,record);
-            }
-            if (fileType==-1){
-               // record.setDepartment();
-                res_code = fileService.uploadFile(userInfo.getDepartment(),record);
-            }
-            if(fileType==-2){
-                if(Objects.equals(userInfo.getRole(), "admin")) {
-                    res_code = fileService.uploadFile(null, record);
-                }
-            }
+            res_code = fileService.uploadFile(userInfo,record);
             if(res_code==0) {
                 response.setStatus(-1);
                 System.out.println("无权限");

@@ -31,7 +31,7 @@ public class FileService extends ServiceImpl<FileMapper, Files> {
         if(FileTypeFrom==-2&&FileTypeTo==-2){
             if(Objects.equals(userinfo.getRole(), "admin")) {
                 for (int id : record.getIds()) {
-                    res_code = fileMapper.moveFile(id, record.getDirId(),userinfo.getUserId(),null);
+                    res_code = fileMapper.moveFile(id, record.getDirId(),userinfo.getUserId(),null,1);
                 }
             }
             return res_code;
@@ -39,7 +39,7 @@ public class FileService extends ServiceImpl<FileMapper, Files> {
         if(FileTypeFrom==-2&&FileTypeTo==-1){
             if(Objects.equals(userinfo.getRole(), "admin")) {
                 for (int id : record.getIds()) {
-                    res_code = fileMapper.moveFile(id, record.getDirId(),userinfo.getUserId(),userinfo.getDepartment());
+                    res_code = fileMapper.moveFile(id, record.getDirId(),userinfo.getUserId(),userinfo.getDepartment(),0);
                 }
             }
             return res_code;
@@ -47,7 +47,7 @@ public class FileService extends ServiceImpl<FileMapper, Files> {
         if(FileTypeFrom==-2&&FileTypeTo==0){
             if(Objects.equals(userinfo.getRole(), "admin")) {
                 for (int id : record.getIds()) {
-                    res_code = fileMapper.moveFile(id, record.getDirId(),userinfo.getUserId(),null);
+                    res_code = fileMapper.moveFile(id, record.getDirId(),userinfo.getUserId(),null,0);
                 }
             }
             return res_code;
@@ -55,7 +55,7 @@ public class FileService extends ServiceImpl<FileMapper, Files> {
         if(FileTypeFrom==0&&FileTypeTo==-2){
             if(Objects.equals(userinfo.getRole(), "admin")) {
                 for (int id : record.getIds()) {
-                    res_code = fileMapper.moveFile(id, record.getDirId(),userinfo.getUserId(),null);
+                    res_code = fileMapper.moveFile(id, record.getDirId(),userinfo.getUserId(),null,1);
                 }
             }
             return res_code;
@@ -63,51 +63,51 @@ public class FileService extends ServiceImpl<FileMapper, Files> {
         if(FileTypeFrom==-1&&FileTypeTo==-2){
             if(Objects.equals(userinfo.getRole(), "admin")) {
                 for (int id : record.getIds()) {
-                    res_code = fileMapper.moveFile(id, record.getDirId(),userinfo.getUserId(),null);
+                    res_code = fileMapper.moveFile(id, record.getDirId(),userinfo.getUserId(),null,1);
                 }
             }
             return res_code;
         }
         if(FileTypeFrom==0&&FileTypeTo==-1){
             for (int id : record.getIds()) {
-                res_code = fileMapper.moveFile(id, record.getDirId(),userinfo.getUserId(), userinfo.getDepartment());
+                res_code = fileMapper.moveFile(id, record.getDirId(),userinfo.getUserId(), userinfo.getDepartment(),0);
             }
             return res_code;
         }
         if(FileTypeFrom==0&&FileTypeTo==0){
             for (int id : record.getIds()) {
-                res_code = fileMapper.moveFile(id, record.getDirId(),userinfo.getUserId(), null);
+                res_code = fileMapper.moveFile(id, record.getDirId(),userinfo.getUserId(), null,0);
             }
             return res_code;
         }
         if(FileTypeFrom==-1&&FileTypeTo==0){
             for (int id : record.getIds()) {
-                res_code = fileMapper.moveFile(id, record.getDirId(),userinfo.getUserId(), null);
+                res_code = fileMapper.moveFile(id, record.getDirId(),userinfo.getUserId(), null,0);
             }
             return res_code;
         }
         if(FileTypeFrom==-1&&FileTypeTo==-1){
             for (int id : record.getIds()) {
-                res_code = fileMapper.moveFile(id, record.getDirId(),userinfo.getUserId(), userinfo.getDepartment());
+                res_code = fileMapper.moveFile(id, record.getDirId(),userinfo.getUserId(), userinfo.getDepartment(),0);
             }
             return res_code;
         }
         return res_code;
     }
 
-    public int delFolder(User userinfo,Files record) {
+    public int delFile(User userinfo,Files record) {
         int res_code = 0;
         int FileType=folderController.judgeFolder(record.getBeforeDirId());
         if(FileType==-2){
             if(Objects.equals(userinfo.getRole(), "admin")) {
                 for (int id : record.getIds()) {
-                    res_code = fileMapper.delFolder(id);
+                    res_code = fileMapper.delFile(id);
                 }
             }
             return res_code;
         }
         for (int id : record.getIds()) {
-            res_code = fileMapper.delFolder(id);
+            res_code = fileMapper.delFile(id);
         }
         return res_code;
     }
@@ -131,11 +131,28 @@ public class FileService extends ServiceImpl<FileMapper, Files> {
     }
 
 
-    public int uploadFile(String department,Files record) {
+    public int uploadFile(User userinfo,Files record) {
         System.out.println(record.getFileName());
-        int res_code = fileMapper.uploadFile(record.getFileName(),record.getExt(),
-                    record.getSize(),record.getDirId(), String.valueOf(record.getUserId()),record.getUrl(),department);
-
+        int fileType = folderController.judgeFolder(record.getDirId());
+        int res_code=0;
+        if(fileType==-2){
+            if(Objects.equals(userinfo.getRole(), "admin")) {
+                res_code = fileMapper.uploadFile(record.getFileName(), record.getExt(),
+                        record.getSize(), record.getDirId(),
+                        String.valueOf(record.getUserId()), record.getUrl(), record.getDepartment(),1);
+            }
+            return res_code;
+        }
+        if(fileType==-1){
+            res_code = fileMapper.uploadFile(record.getFileName(), record.getExt(),
+                    record.getSize(), record.getDirId(),
+                    String.valueOf(record.getUserId()), record.getUrl(), record.getDepartment(),0);
+        }
+        if(fileType==0){
+            res_code = fileMapper.uploadFile(record.getFileName(), record.getExt(),
+                    record.getSize(), record.getDirId(),
+                    String.valueOf(record.getUserId()), record.getUrl(), record.getDepartment(),0);
+        }
         return res_code;
     }
 

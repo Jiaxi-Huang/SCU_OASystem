@@ -26,7 +26,7 @@
 
   >
   </vuecmf-fileexplorer>
-  <!--      这个data里的user没用，这里应该传token但还不知道怎么弄-->
+
 </template>
 
 <script lang="ts">
@@ -47,7 +47,11 @@ export default defineComponent({
 
           const data = res.data;
           if (data && Array.isArray(data)) {
-            let user=data[data.length-1];
+            let user={
+              userId:data[data.length-2],
+              department:data[data.length-1]
+            }
+            console.log(user)
             data.pop();
             //0是个人，1是部门，2是公司，文件夹id是0，-1，-2
             for(let i = 0;i <= 2;i++){
@@ -62,7 +66,8 @@ export default defineComponent({
                 map[item.id] = {...item, children: []};
               });
               data.forEach(item => {
-                if(i===0&&((item.department===null)||(item.department===""))&&item.userId===user.userId){
+                if(i===0&&((item.department===null)||(item.department===""))&&
+                    item.userId===user.userId&&item.isShared===0){
                   if (item.pid === -i) {
                     // 如果是根节点（pid为0），加入结果数组
                     folderObj.data[i].children.push(map[item.id]);
@@ -73,7 +78,7 @@ export default defineComponent({
                     // 否则将其添加到对应父节点的 children 数组中
                   }
                 }
-                if(i===1&&item.department===user.department){
+                if(i===1&&item.department===user.department&&item.isShared===0){
                   if (item.pid === -i) {
                     // 如果是根节点（pid为0），加入结果数组
                     folderObj.data[i].children.push(map[item.id]);
@@ -84,7 +89,8 @@ export default defineComponent({
                     // 否则将其添加到对应父节点的 children 数组中
                   }
                 }
-                if(i===2&&((item.department===null)||(item.department===""))){
+                if(i===2&&((item.department===null)||(item.department===""))
+                          &&item.isShared===1){
                   if (item.pid === -i) {
                     // 如果是根节点（pid为0），加入结果数组
                     folderObj.data[i].children.push(map[item.id]);
@@ -102,15 +108,34 @@ export default defineComponent({
                 console.log("进入查询")
                 folderObj.data[i].children=[];
                 data.forEach(item => {
-                  if(item.title === folderObj.keywords){
-                    //folderObj.data[0].id=-3;
-                    //folderObj.data[0].title="找到了";
+                  if(item.title === folderObj.keywords&&i===0
+                      &&((item.department===null)||(item.department===""))
+                      &&item.userId===user.userId
+                      &&item.isShared===0){
+                    folderObj.data[i].id=-i-3;
+                    //folderObj.data[i].title="找到了";
+                    folderObj.data[i].children.push(map[item.id]);
+                    is_exist=1;
+                  }
+                  if(item.title === folderObj.keywords&&i===1
+                      &&item.department===user.department
+                      &&item.isShared===0){
+                    folderObj.data[i].id=-i-3;
+                    //folderObj.data[i].title="找到了";
+                    folderObj.data[i].children.push(map[item.id]);
+                    is_exist=1;
+                  }
+                  if(item.title === folderObj.keywords&&i===2
+                      &&((item.department===null)||(item.department===""))
+                      &&item.isShared===1){
+                    folderObj.data[i].id=-i-3;
+                    //folderObj.data[i].title="找到了";
                     folderObj.data[i].children.push(map[item.id]);
                     is_exist=1;
                   }
                   if(!is_exist){
-                    //folderObj.data[0].id=-3;
-                    //folderObj.data[0].title="没找到";
+                    folderObj.data[i].id=i-3;
+                    //folderObj.data[i].title="没找到";
                   }
                 });
               }
@@ -147,40 +172,43 @@ export default defineComponent({
         if (res) {
           // 处理返回的结果
           const data = res.data;
-          let folderType=data[data.length-2];
-          let user=data[data.length-1];
+          let folderType=data[data.length-3];
+          let user={
+            userId:data[data.length-2],
+            department:data[data.length-1]
+          }
+          data.pop()
           data.pop()
           data.pop()
           if (data && Array.isArray(data)) {
             folderObj.data=[];
-
-
-            if(folderType==0){
-              //个人
-              //folderObj.total = data.length;
-              console.log(folderObj.keywords)
-              if(folderObj.keywords){
-                //keywords是搜索的关键词，这部分是搜索，else是文件加载，后面同理
-                for (let i = 0; i < data.length; i++) {
-                  if(folderObj.keywords === data[i].fileName)
-                    folderObj.data.push({
-                      "id": data[i].id,
-                      "file_name": data[i].fileName,
-                      "ext": data[i].ext,
-                      "size": data[i].size,
-                      "dir_id": data[i].dirId,
-                      "url": data[i].url,
-                      "remark": data[i].remark,
-                      "create_time": data[i].createTime,
-                      "update_time": data[i].updateTime,
-                    })
-                }
-              }else{
+            console.log(folderObj.keywords)
+            if(folderObj.keywords){
+              //keywords是搜索的关键词，这部分是搜索，else是文件加载，后面同理
+              for (let i = 0; i < data.length; i++) {
+                if(folderObj.keywords === data[i].fileName)
+                  folderObj.data.push({
+                    "id": data[i].id,
+                    "file_name": data[i].fileName,
+                    "ext": data[i].ext,
+                    "size": data[i].size,
+                    "dir_id": data[i].dirId,
+                    "url": data[i].url,
+                    "remark": data[i].remark,
+                    "create_time": data[i].createTime,
+                    "update_time": data[i].updateTime,
+                  })
+              }
+            }else{
+              if(folderType===0){
+                //个人
+                //folderObj.total = data.length;
                 console.log(folderObj.filter.dir_id)
                 for (let i = 0; i < data.length; i++) {
                   if(data[i].dirId === dir_id
                       &&data[i].userId===user.userId
                       &&((data[i].department==="")||(data[i].department===null))
+                      &&data[i].isShared===0
                   ){
                     folderObj.data.push({
                       "id": data[i].id,
@@ -196,32 +224,36 @@ export default defineComponent({
                   }
                 }
               }
-            }
-
-            if(folderType===-1){
-              //部门
-              //folderObj.total = data.length;
-              console.log(folderObj.keywords)
-              if(folderObj.keywords){
-                for (let i = 0; i < data.length; i++) {
-                  if(folderObj.keywords === data[i].fileName)
-                    folderObj.data.push({
-                      "id": data[i].id,
-                      "file_name": data[i].fileName,
-                      "ext": data[i].ext,
-                      "size": data[i].size,
-                      "dir_id": data[i].dirId,
-                      "url": data[i].url,
-                      "remark": data[i].remark,
-                      "create_time": data[i].createTime,
-                      "update_time": data[i].updateTime,
-                    })
-                }
-              }else{
+              if(folderType===-1){
+                //部门
+                //folderObj.total = data.length;
                 console.log(folderObj.filter.dir_id)
                 for (let i = 0; i < data.length; i++) {
                   if(data[i].dirId === folderObj.filter.dir_id
                       &&data[i].department===user.department
+                      &&data[i].isShared===0
+                  ){
+                    folderObj.data.push({
+                      "id": data[i].id,
+                      "file_name": data[i].fileName,
+                      "ext": data[i].ext,
+                      "size": data[i].size,
+                      "dir_id": data[i].dirId,
+                      "url": data[i].url,
+                      "remark": data[i].remark,
+                      "create_time": data[i].createTime,
+                      "update_time": data[i].updateTime,
+                    })
+                  }
+                }
+              }
+              if(folderType===-2){
+                //公司
+                console.log(folderObj.filter.dir_id)
+                for (let i = 0; i < data.length; i++) {
+                  if(data[i].dirId === folderObj.filter.dir_id
+                      &&((data[i].department==="")||(data[i].department===null))
+                      &&data[i].isShared===1
                   ){
                     folderObj.data.push({
                       "id": data[i].id,
@@ -239,47 +271,8 @@ export default defineComponent({
               }
             }
 
-            if(folderType===-2){
-              //公司
-              //folderObj.total = data.length;
-              console.log(folderObj.keywords)
-              if(folderObj.keywords){
-                for (let i = 0; i < data.length; i++) {
-                  if(folderObj.keywords === data[i].fileName)
-                    folderObj.data.push({
-                      "id": data[i].id,
-                      "file_name": data[i].fileName,
-                      "ext": data[i].ext,
-                      "size": data[i].size,
-                      "dir_id": data[i].dirId,
-                      "url": data[i].url,
-                      "remark": data[i].remark,
-                      "create_time": data[i].createTime,
-                      "update_time": data[i].updateTime,
-                    })
-                }
-              }else{
-                console.log(folderObj.filter.dir_id)
-                for (let i = 0; i < data.length; i++) {
-                  if(data[i].dirId === folderObj.filter.dir_id
-                      &&((data[i].department==="")||(data[i].department===null))
-                  ){
-                    folderObj.data.push({
-                      "id": data[i].id,
-                      "file_name": data[i].fileName,
-                      "ext": data[i].ext,
-                      "size": data[i].size,
-                      "dir_id": data[i].dirId,
-                      "url": data[i].url,
-                      "remark": data[i].remark,
-                      "create_time": data[i].createTime,
-                      "update_time": data[i].updateTime,
-                    })
-                  }
-                }
-              }
             }
-          }
+
         } else {
           console.log("FileLoader RES MISS");
         }

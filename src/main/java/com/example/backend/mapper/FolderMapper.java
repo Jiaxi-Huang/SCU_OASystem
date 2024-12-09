@@ -9,9 +9,9 @@ import java.util.List;
 @Mapper
 public interface FolderMapper extends BaseMapper<Folder> {
 
-    @Insert("INSERT INTO folders ( user_id, title, pid, department)" +
-            " VALUES( #{user_id}, #{title}, #{pid}, #{department} )")
-    int createFolder( int user_id,String department, String title, Integer pid);
+    @Insert("INSERT INTO folders ( user_id, title, pid, department, is_shared)" +
+            " VALUES( #{user_id}, #{title}, #{pid}, #{department}, #{isShared} )")
+    int createFolder( int user_id,String department, String title, Integer pid,Integer isShared);
 
     @Select(" SELECT * FROM folders WHERE user_id = #{userId}")
     List<Folder> getFolderByUserId(int userId);
@@ -19,8 +19,8 @@ public interface FolderMapper extends BaseMapper<Folder> {
     @Update(" UPDATE folders SET title = #{title} WHERE id = #{id}")
     int modifyFolder(int id, String title );
 
-    @Update(" UPDATE folders SET pid = #{pid}, department = #{department},user_id = #{userId} WHERE id = #{id}")
-    int moveFolder(int id, int pid, String department,int userId );
+    @Update(" UPDATE folders SET pid = #{pid}, department = #{department},user_id = #{userId},is_shared = #{isShared} WHERE id = #{id}")
+    int moveFolder(int id, int pid, String department,int userId,Integer isShared );
 
     @Delete("DELETE FROM folders WHERE id = #{id}")
     int delFolder(Integer id);

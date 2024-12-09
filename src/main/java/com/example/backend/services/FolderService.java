@@ -27,16 +27,16 @@ public class FolderService extends ServiceImpl<FolderMapper, Folder> {
         int res_code=0;
         if(FolderType==0){
             res_code = folderMapper.createFolder(userinfo.getUserId(),
-                    null,record.getTitle(), record.getPid());
+                    null,record.getTitle(), record.getPid(),0);
         }
         if(FolderType==-1){
             res_code = folderMapper.createFolder(userinfo.getUserId(),
-                    userinfo.getDepartment(),record.getTitle(), record.getPid());
+                    userinfo.getDepartment(),record.getTitle(), record.getPid(),0);
         }
         if(FolderType==-2){
             if(Objects.equals(userinfo.getRole(), "admin")){
                 res_code = folderMapper.createFolder(userinfo.getUserId(),
-                        null,record.getTitle(), record.getPid());
+                        null,record.getTitle(), record.getPid(),1);
             }
 
         }
@@ -71,29 +71,29 @@ public class FolderService extends ServiceImpl<FolderMapper, Folder> {
         int res_code=0;
         if(FolderTypeTo==0){
             if(FolderTypeFrom==-1||FolderTypeFrom==0){
-                res_code = folderMapper.moveFolder(record.getId(), record.getPid(), null,userinfo.getUserId());
+                res_code = folderMapper.moveFolder(record.getId(), record.getPid(), null,userinfo.getUserId(),0);
             }
             if(FolderTypeFrom==-2){
                 if(Objects.equals(userinfo.getRole(), "admin")) {
-                    res_code = folderMapper.moveFolder(record.getId(), record.getPid(), null,userinfo.getUserId());
+                    res_code = folderMapper.moveFolder(record.getId(), record.getPid(), null,userinfo.getUserId(),0);
                 }
             }
             return res_code;
         }
         if(FolderTypeTo==-1){
             if(FolderTypeFrom==-1||FolderTypeFrom==0){
-                res_code = folderMapper.moveFolder(record.getId(), record.getPid(), department,userinfo.getUserId());
+                res_code = folderMapper.moveFolder(record.getId(), record.getPid(), department,userinfo.getUserId(),0);
             }
             if(FolderTypeFrom==-2){
                 if(Objects.equals(userinfo.getRole(), "admin")) {
-                    res_code = folderMapper.moveFolder(record.getId(),record.getPid(),department,userinfo.getUserId());
+                    res_code = folderMapper.moveFolder(record.getId(),record.getPid(),department,userinfo.getUserId(),0);
                 }
             }
             return res_code;
         }
         if(FolderTypeTo==-2){
             if(Objects.equals(userinfo.getRole(), "admin")) {
-                res_code = folderMapper.moveFolder(record.getId(), record.getPid(), null,userinfo.getUserId());
+                res_code = folderMapper.moveFolder(record.getId(), record.getPid(), null,userinfo.getUserId(),1);
             }
             return res_code;
         }
