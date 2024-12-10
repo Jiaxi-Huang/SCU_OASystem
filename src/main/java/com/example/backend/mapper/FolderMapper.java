@@ -16,10 +16,11 @@ public interface FolderMapper extends BaseMapper<Folder> {
     @Select(" SELECT * FROM folders WHERE user_id = #{userId}")
     List<Folder> getFolderByUserId(int userId);
 
-    @Update(" UPDATE folders SET title = #{title} WHERE id = #{id}")
-    int modifyFolder(int id, String title );
+    @Update(" UPDATE folders SET title = #{title},user_id = #{userId}, update_time = NOW() WHERE id = #{id}")
+    int modifyFolder(int id, String title, int userId );
 
-    @Update(" UPDATE folders SET pid = #{pid}, department = #{department},user_id = #{userId},is_shared = #{isShared} WHERE id = #{id}")
+    @Update(" UPDATE folders SET pid = #{pid}, department = #{department}," +
+            " user_id = #{userId},is_shared = #{isShared}, update_time = NOW() WHERE id = #{id}")
     int moveFolder(int id, int pid, String department,int userId,Integer isShared );
 
     @Delete("DELETE FROM folders WHERE id = #{id}")

@@ -104,6 +104,20 @@ public class FileController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @PostMapping("/modifyFile")
+    public ResponseEntity<ResponseBase> modifyFile(@RequestBody Files record) {
+        ResponseBase response = new ResponseBase();
+        String accessToken = record.getAcsTkn();
+        int userId = accessService.getAuthenticatedId(accessToken);
+        User userInfo = userMapper.findByUserId(userId);
+        int res_code = fileService.modifyFile(userInfo,record);
+        if (res_code==0) {
+            response.setStatus(-1);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 
     @PostMapping("/uploadFile")
     public ResponseEntity<ResponseBase> uploadFile(@RequestBody Files record) {

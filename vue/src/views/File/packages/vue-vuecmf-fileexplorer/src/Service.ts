@@ -389,6 +389,7 @@ export default class Service {
      * @param size 每页显示的条数
      */
     handleSizeChange = (size:number):void => {
+        console.log("handleSizeChange "+size)
         this.config.file.page_size = size
         this.searchFile()
     }

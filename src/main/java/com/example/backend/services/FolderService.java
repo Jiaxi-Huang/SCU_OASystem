@@ -49,11 +49,11 @@ public class FolderService extends ServiceImpl<FolderMapper, Folder> {
         int FolderType=judgeFolder(record.getId());
         int res_code=0;
         if(FolderType==0||FolderType==-1){
-            res_code = folderMapper.modifyFolder(record.getId(), record.getTitle());
+            res_code = folderMapper.modifyFolder(record.getId(), record.getTitle(),userinfo.getUserId());
         }
         if(FolderType==-2){
             if(Objects.equals(userinfo.getRole(), "admin")){
-                res_code = folderMapper.modifyFolder(record.getId(), record.getTitle());
+                res_code = folderMapper.modifyFolder(record.getId(), record.getTitle(),userinfo.getUserId());
             }
 
         }

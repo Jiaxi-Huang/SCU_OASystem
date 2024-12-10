@@ -136,6 +136,7 @@
                   {{ service.formatFileSize(scope.row.size) }}
                 </template>
               </el-table-column>
+              <el-table-column prop="user_id" label="最后一次修改人ID" min-width="150" />
               <el-table-column prop="remark" label="备注" min-width="100" />
               <el-table-column label="操作"  min-width="60">
                 <template #default="scope">

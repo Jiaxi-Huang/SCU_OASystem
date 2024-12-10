@@ -12,7 +12,8 @@ const fileApi = {
     moveFile:'/api/file/moveFile',
     delFile:'/api/file/delFile',
     remarkFile:'/api/file/remarkFile',
-    uploadFile:'/api/file/uploadFile'
+    uploadFile:'/api/file/uploadFile',
+    modifyFile:'/api/file/modifyFile'
 }
 
 
@@ -211,6 +212,30 @@ class Service {
             }
             if(res.status === -1){
                 ElMessage.error('您的权限不够，无法备注文件')
+            }
+            return null
+        })
+    }
+
+    static modifyFile(Data:any) {
+        let record = {
+            id:Data.id,
+            fileName:Data.file_name,
+            dirId:Data.dir_id,
+            acsTkn: sessionStorage.getItem('accessToken')
+        }
+        console.log(record)
+        return request({
+            url: fileApi.localHost + fileApi.modifyFile,
+            method: 'POST',
+            json: true,
+            data: record,
+        }).then((res) => {
+            if (res.status === 0) {
+                return res
+            }
+            if(res.status === -1){
+                ElMessage.error('您的权限不够，无法修改文件名称')
             }
             return null
         })

@@ -159,4 +159,21 @@ public class FileService extends ServiceImpl<FileMapper, Files> {
     public List<Files> getFile() {
         return  fileMapper.getFile();
     }
+
+    public int modifyFile(User userInfo, Files record) {
+        int fileType = folderController.judgeFolder(record.getDirId());
+        int res_code=0;
+        if(fileType==-2){
+            if(Objects.equals(userInfo.getRole(), "admin")) {
+                res_code = fileMapper.modifyFile(record.getId(), record.getFileName(),
+                        userInfo.getUserId());
+            }
+            return res_code;
+        }
+        if(fileType==-1||fileType==0){
+            res_code = fileMapper.modifyFile(record.getId(), record.getFileName(),
+                    userInfo.getUserId());
+        }
+        return  res_code;
+    }
 }
