@@ -49,11 +49,14 @@ public class FileController {
             User userInfo = userMapper.findByUserId(userId);
             int FolderType =folderController.judgeFolder(Integer.parseInt(dir_id));
             for (Files record : records) {
+                User fileUser=userMapper.findByUserId(record.getUserId());
+                record.setUserName(fileUser.getUsername());
                 res.pushData(record);
             }
             res.pushData(FolderType);
             res.pushData(userInfo.getUserId());
             res.pushData(userInfo.getDepartment());
+            System.out.println(userInfo.getUsername());
 
         }
         catch (Exception e) {

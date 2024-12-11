@@ -56,7 +56,7 @@ export default class Service {
 
         file_table_ref: ref(),
         file: {
-            table_height: 'calc(80VH - 80px)',        //列表表格高度
+            table_height: 'calc(70VH - 80px)',        //列表表格高度
             page_layout: "total, prev, pager, next", //分页条展示形式
             current_page: 1, //当前页码数
             page_size: 30,   //每页显示条数

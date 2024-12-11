@@ -48,6 +48,7 @@
               </template>
             </el-input>
             <el-input
+
                 class="file-search"
                 v-model="file.keywords"
                 placeholder="请输入文件名关键词"
@@ -62,7 +63,7 @@
           <template v-if="file.list_show === 'card'">
             <el-row :gutter="10">
               <template :key="'card_' + index" v-for="(item,index) in file.data">
-                <el-col :xs="12" :sm="8" :md="6" :lg="4" :xl="3" class="card-warpper">
+                <el-col :xs="12" :sm="8" :md="6" :lg="6" :xl="3" class="card-warpper">
                   <el-card  :class="service.checkFileSelect(item)" shadow="hover" @click="service.clickCard(item)">
                     <template v-if="['png','jpg','jpeg','gif','bmp','ico'].indexOf(item.ext.toLowerCase()) != -1">
                       <img :src="item.url" class="card-img-top" :alt="item.file_name">
@@ -109,7 +110,7 @@
                 :default-sort="{ prop: file.order_field.value, order: file.order_sort.value === 'desc' ? 'descending': 'ascending' }"
                 style="width: 100%"
                 :height="file.table_height"
-                size="small"
+                size="large"
                 @selection-change="service.tableSelectionChange"
                 @sort-change="service.fileSortChange"
             >
@@ -120,23 +121,23 @@
                   <el-input
                       v-model="scope.row.file_name"
                       clearable
-                      size="small"
+                      size="large"
                       v-if="file.current_input_file != null && file.current_input_file.id == scope.row.id"
                   >
                     <template #append>
-                      <el-button @click="service.saveFile" size="small">保存</el-button>
+                      <el-button @click="service.saveFile" size="large">保存</el-button>
                     </template>
                   </el-input>
                 </template>
               </el-table-column>
               <el-table-column prop="update_time" label="修改时间" sortable min-width="150" />
+              <el-table-column prop="user_name" label="修改人" min-width="100" />
               <el-table-column prop="ext" label="扩展名" sortable min-width="100" />
               <el-table-column prop="size" label="大小" sortable min-width="100" >
                 <template #default="scope">
                   {{ service.formatFileSize(scope.row.size) }}
                 </template>
               </el-table-column>
-              <el-table-column prop="user_id" label="最后一次修改人ID" min-width="150" />
               <el-table-column prop="remark" label="备注" min-width="100" />
               <el-table-column label="操作"  min-width="60">
                 <template #default="scope">
@@ -472,7 +473,7 @@ export default defineComponent({
     padding: 5px 0;
     .el-button{ margin:3px 6px 3px 0; padding: 8px 9px; }
     i {
-      font-size: 16px; margin-right: 4px;
+      font-size: 25px; margin-right: 4px;
     }
   }
 
@@ -502,7 +503,7 @@ export default defineComponent({
   .main-top{
     display: flex;
     padding-bottom: 6px;
-    .file-search{ max-width: 220px;}
+    .file-search{ max-width: 300px;}
     .el-input+.el-input{ margin-left: 6px;}
     i{ font-size: 16px;}
     .el-button{ padding: 8px; }
@@ -519,10 +520,10 @@ export default defineComponent({
       padding: 8px;
     }
     .card-title{
-      font-size: 12px; padding: 5px 0;
+      font-size: 16px; padding: 5px 0;
     }
     .card-text{
-      font-size: 12px; padding-bottom: 5px;
+      font-size: 16px; padding-bottom: 5px;
     }
   }
   /* 缩略图默认状态 */

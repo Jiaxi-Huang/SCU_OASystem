@@ -3,7 +3,7 @@
 
   <vuecmf-fileexplorer
       root_path="个人文件管理"
-      :page_size="5"
+      :page_size="10"
       list_show="list"
       :tool_config="['new_folder','update_folder','move_folder','del_folder','upload','move_file','del_file','remark_file']"
       upload_api="http://localhost:8080/api/file/upload"
@@ -192,7 +192,6 @@ export default defineComponent({
           data.pop()
           data.pop()
           data.pop()
-          let total=0;
           if (data && Array.isArray(data)) {
             folderObj.data=[];
             let tmp = []
@@ -223,9 +222,8 @@ export default defineComponent({
                         "remark": data[i].remark,
                         "create_time": formatDate(data[i].createTime),
                         "update_time": formatDate(data[i].updateTime),
-                        "user_id": data[i].userId,
+                        "user_name": data[i].userName,
                       })
-                      total++;
                     }
                   }else{
                     tmp.push({
@@ -238,11 +236,9 @@ export default defineComponent({
                       "remark": data[i].remark,
                       "create_time": formatDate(data[i].createTime),
                       "update_time": formatDate(data[i].updateTime),
-                      "user_id": data[i].userId,
+                      "user_name": data[i].userName,
                     })
-                    total++;
                   }
-
                 }
               }
             }
@@ -269,9 +265,8 @@ export default defineComponent({
                         "remark": data[i].remark,
                         "create_time": formatDate(data[i].createTime),
                         "update_time": formatDate(data[i].updateTime),
-                        "user_id": data[i].userId,
+                        "user_name": data[i].userName,
                       })
-                      total++;
                     }
                   }else{
                     tmp.push({
@@ -284,9 +279,8 @@ export default defineComponent({
                       "remark": data[i].remark,
                       "create_time": formatDate(data[i].createTime),
                       "update_time": formatDate(data[i].updateTime),
-                      "user_id": data[i].userId,
+                      "user_name": data[i].userName,
                     })
-                    total++;
                   }
                 }
               }
@@ -313,9 +307,8 @@ export default defineComponent({
                         "remark": data[i].remark,
                         "create_time": formatDate(data[i].createTime),
                         "update_time": formatDate(data[i].updateTime),
-                        "user_id": data[i].userId,
+                        "user_name": data[i].userName,
                       })
-                      total++;
                     }
                   }else{
                     tmp.push({
@@ -328,9 +321,8 @@ export default defineComponent({
                       "remark": data[i].remark,
                       "create_time": formatDate(data[i].createTime),
                       "update_time": formatDate(data[i].updateTime),
-                      "user_id": data[i].userId,
+                      "user_name": data[i].userName,
                     })
-                    total++;
                   }
                 }
               }
@@ -349,12 +341,11 @@ export default defineComponent({
                 "remark": tmp[i].remark,
                 "create_time": formatDate(tmp[i].create_time),
                 "update_time": formatDate(tmp[i].update_time),
-                "user_id": tmp[i].user_id,
+                "user_name": tmp[i].user_name,
               })
             }
-
             console.log("page_size:"+folderObj.page_size)
-            folderObj.total=total;
+            folderObj.total=tmp.length;
           }
         } else {
           console.log("FileLoader RES MISS");

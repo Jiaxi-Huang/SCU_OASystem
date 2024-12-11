@@ -26,4 +26,5 @@ public class Files {
     private Integer isShared;
     private String acsTkn;
     private Integer beforeDirId;
+    private String userName;
 }
