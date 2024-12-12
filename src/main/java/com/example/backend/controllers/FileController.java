@@ -176,6 +176,7 @@ public class FileController {
             record.setExt(ext);
             record.setFileName(fileName);
             record.setSize(String.valueOf(file.getSize()));
+            record.setDepartment(userInfo.getDepartment());
             System.out.println(file.getSize());
             System.out.println(record);
 

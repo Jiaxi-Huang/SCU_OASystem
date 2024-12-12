@@ -31,4 +31,7 @@ public interface FolderMapper extends BaseMapper<Folder> {
 
     @Select(" SELECT * FROM folders")
     List<Folder> getFolder();
+
+    @Update(" UPDATE folders SET department = #{department},is_shared = #{isShared}, user_id = #{userId} WHERE id = #{currentFolderId}")
+    int updateFolderDepartmentAndShared(int currentFolderId, String department, int isShared, int userId);
 }

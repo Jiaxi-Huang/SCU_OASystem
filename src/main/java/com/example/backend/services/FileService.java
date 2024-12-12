@@ -1,7 +1,6 @@
 package com.example.backend.services;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.example.backend.controllers.FolderController;
 import com.example.backend.entity.Files;
 import com.example.backend.entity.User;
 import com.example.backend.mapper.FileMapper;
@@ -16,18 +15,18 @@ public class FileService extends ServiceImpl<FileMapper, Files> {
 
     @Autowired
     private FileMapper fileMapper;
+
     @Autowired
-    private FolderController folderController;
+    private FolderService folderService;
 
     public List<Files> getFileByUserId(int userId) {
         return  fileMapper.getFileByUserId(userId);
     }
 
-
     public int moveFile(User userinfo, Files record) {
         int res_code = 0;
-        int FileTypeFrom=folderController.judgeFolder(record.getBeforeDirId());
-        int FileTypeTo=folderController.judgeFolder(record.getDirId());
+        int FileTypeFrom=folderService.judgeFolder(record.getBeforeDirId());
+        int FileTypeTo=folderService.judgeFolder(record.getDirId());
         if(FileTypeFrom==-2&&FileTypeTo==-2){
             if(Objects.equals(userinfo.getRole(), "admin")) {
                 for (int id : record.getIds()) {
@@ -97,7 +96,7 @@ public class FileService extends ServiceImpl<FileMapper, Files> {
 
     public int delFile(User userinfo,Files record) {
         int res_code = 0;
-        int FileType=folderController.judgeFolder(record.getBeforeDirId());
+        int FileType=folderService.judgeFolder(record.getBeforeDirId());
         if(FileType==-2){
             if(Objects.equals(userinfo.getRole(), "admin")) {
                 for (int id : record.getIds()) {
@@ -115,7 +114,7 @@ public class FileService extends ServiceImpl<FileMapper, Files> {
     public int remarkFile(User userinfo,Files record) {
         System.out.println(record.getIds());
         int res_code = 0;
-        int FileType=folderController.judgeFolder(record.getBeforeDirId());
+        int FileType=folderService.judgeFolder(record.getBeforeDirId());
         if(FileType==-2){
             if(Objects.equals(userinfo.getRole(), "admin")) {
                 for (int id : record.getIds()) {
@@ -133,13 +132,13 @@ public class FileService extends ServiceImpl<FileMapper, Files> {
 
     public int uploadFile(User userinfo,Files record) {
         System.out.println(record.getFileName());
-        int fileType = folderController.judgeFolder(record.getDirId());
+        int fileType = folderService.judgeFolder(record.getDirId());
         int res_code=0;
         if(fileType==-2){
             if(Objects.equals(userinfo.getRole(), "admin")) {
                 res_code = fileMapper.uploadFile(record.getFileName(), record.getExt(),
                         record.getSize(), record.getDirId(),
-                        String.valueOf(record.getUserId()), record.getUrl(), record.getDepartment(),1);
+                        String.valueOf(record.getUserId()), record.getUrl(), null,1);
             }
             return res_code;
         }
@@ -151,7 +150,7 @@ public class FileService extends ServiceImpl<FileMapper, Files> {
         if(fileType==0){
             res_code = fileMapper.uploadFile(record.getFileName(), record.getExt(),
                     record.getSize(), record.getDirId(),
-                    String.valueOf(record.getUserId()), record.getUrl(), record.getDepartment(),0);
+                    String.valueOf(record.getUserId()), record.getUrl(), null,0);
         }
         return res_code;
     }
@@ -161,7 +160,7 @@ public class FileService extends ServiceImpl<FileMapper, Files> {
     }
 
     public int modifyFile(User userInfo, Files record) {
-        int fileType = folderController.judgeFolder(record.getDirId());
+        int fileType = folderService.judgeFolder(record.getDirId());
         int res_code=0;
         if(fileType==-2){
             if(Objects.equals(userInfo.getRole(), "admin")) {
@@ -175,5 +174,10 @@ public class FileService extends ServiceImpl<FileMapper, Files> {
                     userInfo.getUserId());
         }
         return  res_code;
+    }
+
+    public void updateFileDepartmentAndShared(Integer id, String department, int isShared, int userId) {
+        System.out.println("updateFileDepartmentAndShared"+id);
+        int res_code = fileMapper.updateFolderDepartmentAndShared(id,department,isShared,userId);
     }
 }

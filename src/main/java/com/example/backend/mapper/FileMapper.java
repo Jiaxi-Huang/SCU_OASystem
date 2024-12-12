@@ -30,4 +30,7 @@ public interface FileMapper extends BaseMapper<Files> {
 
     @Update(" UPDATE files SET file_name = #{fileName}, user_id=#{userId}, update_time = NOW() WHERE id = #{id}")
     int modifyFile(Integer id, String fileName, int userId);
+
+    @Update(" UPDATE files SET department = #{department}, is_shared=#{isShared}, user_id = #{userId} WHERE id = #{id}")
+    int updateFolderDepartmentAndShared(Integer id, String department, int isShared, int userId);
 }

@@ -62,13 +62,14 @@ public class FolderService extends ServiceImpl<FolderMapper, Folder> {
 
     }
 
-    public int moveFolder(User userinfo, Folder record) {
+    public String[] moveFolder(User userinfo, Folder record) {
         System.out.println(record.getId());
         int FolderTypeFrom=judgeFolder(record.getId());
         int FolderTypeTo=judgeFolder(record.getPid());
         String department = userinfo.getDepartment();
         System.out.println("department"+department);
         int res_code=0;
+        String[] result = new String[3]; // 初始化一个固定大小的字符串数组
         if(FolderTypeTo==0){
             if(FolderTypeFrom==-1||FolderTypeFrom==0){
                 res_code = folderMapper.moveFolder(record.getId(), record.getPid(), null,userinfo.getUserId(),0);
@@ -78,7 +79,9 @@ public class FolderService extends ServiceImpl<FolderMapper, Folder> {
                     res_code = folderMapper.moveFolder(record.getId(), record.getPid(), null,userinfo.getUserId(),0);
                 }
             }
-            return res_code;
+            result[0]= String.valueOf(res_code);
+            result[1]= null;
+            result[2]="0";
         }
         if(FolderTypeTo==-1){
             if(FolderTypeFrom==-1||FolderTypeFrom==0){
@@ -89,15 +92,20 @@ public class FolderService extends ServiceImpl<FolderMapper, Folder> {
                     res_code = folderMapper.moveFolder(record.getId(),record.getPid(),department,userinfo.getUserId(),0);
                 }
             }
-            return res_code;
+            result[0]= String.valueOf(res_code);
+            result[1]= department;
+            result[2]="0";
         }
         if(FolderTypeTo==-2){
             if(Objects.equals(userinfo.getRole(), "admin")) {
                 res_code = folderMapper.moveFolder(record.getId(), record.getPid(), null,userinfo.getUserId(),1);
             }
-            return res_code;
+            result[0]= String.valueOf(res_code);
+            result[1]= null;
+            result[2]="1";
         }
-        return res_code;
+
+        return result;
     }
 
 
@@ -136,4 +144,11 @@ public class FolderService extends ServiceImpl<FolderMapper, Folder> {
     public List<Folder> getFolder() {
         return  folderMapper.getFolder();
     }
+
+    public void updateFolderDepartmentAndShared(int currentFolderId, String department, int isShared,int userId) {
+        System.out.println(currentFolderId);
+        int res_code = folderMapper.updateFolderDepartmentAndShared(currentFolderId,department,isShared,userId);
+    }
+
+
 }
