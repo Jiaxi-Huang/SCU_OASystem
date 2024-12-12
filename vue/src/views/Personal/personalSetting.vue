@@ -151,13 +151,12 @@ export default defineComponent({
     const additionalParams = reactive({
       'accessToken': `${settingForm.accessToken}` // 假设 accessToken 存储在 sessionStorage 中
     });
-    const getAvatarUrl = (avatar: string) => {
+    const getAvatarUrl = (avatar: string|null) => {
       if(avatar) {
-          new URL(avatar);
           return avatar;
       }
       else {
-        return '../../assets/avatar-default.jpg';
+        return 'src/assets/avatar-default.jpg';
       }
     }
     // eslint-disable-next-line no-unused-vars

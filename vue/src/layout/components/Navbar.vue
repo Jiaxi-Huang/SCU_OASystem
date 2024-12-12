@@ -121,16 +121,13 @@ export default defineComponent({
     const reimbursements = ref<Reimbursement[]>([])
     const meetings = ref<Meeting[]>([])  // 定义 meetings 变量
 
-    const getAvatarUrl = (avatar: string) => {
-      if (typeof avatar === 'string' && avatar.trim().length > 0) {
-        try {
-          new URL(avatar)
-          return avatar
-        } catch (e) {
-          console.error('Invalid avatar URL:', e)
-        }
+    const getAvatarUrl = (avatar: string|null) => {
+      if (avatar) {
+        return avatar
       }
-      return '../../assets/avatar-default.jpg'
+      else{
+        return 'src/assets/avatar-default.jpg';
+      }
     }
 
     const getTodos = async () => {

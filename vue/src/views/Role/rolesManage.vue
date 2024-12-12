@@ -10,9 +10,16 @@
             新增用户</el-button
           >
         </el-col>
+        <el-col :span="16" style="text-align: right">
+          <el-input
+              v-model="searchKeyword"
+              placeholder="请输入关键词"            style="width: 200px; margin-right: 10px"
+          ></el-input>
+          <el-button type="primary" size="small" @click="onSearch">搜索</el-button>
+        </el-col>
       </el-row>
       <br />
-      <el-table v-loading="loading" :data="data" stripe class="table">
+      <el-table v-loading="loading" :data="displayData()" stripe class="table">
         <el-table-column type="selection" width="55" align="center"></el-table-column>
         <el-table-column prop="userId" label="用户ID" align="center"></el-table-column>
         <el-table-column prop="userName" label="用户名" align="center"></el-table-column>
@@ -59,7 +66,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, computed } from 'vue'
+import {defineComponent, reactive, toRefs, computed, onMounted} from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Edit, Minus, Plus, Refresh } from '@element-plus/icons-vue'
 import RoleEdit from './rolesEdit.vue'
@@ -91,6 +98,7 @@ export default defineComponent({
       data: [
         //{ userName: '超级管理员', userDepartment:'',userRole:'',userPhone:''},
       ],
+      filteredData: [],
       loading: false,
       is_search: false,
       add_visible: false,
@@ -104,7 +112,8 @@ export default defineComponent({
           userDepartment:''
         }
       },
-      selectionRows:[]
+      selectionRows:[],
+      searchKeyword: '' // 添加 searchKeyword 变量
     })
     // 动态计算total;
     const total = computed(() => state.data.length)
@@ -145,10 +154,21 @@ export default defineComponent({
       state.edit_visible = false
       fetchData()
     }
-
-    /**
-     * @description 选择点击编辑授权角色；roleName
-     */
+    const displayData = ()=>{
+        return state.is_search ? state.filteredData : state.data;
+    }
+    const onSearch = () => {
+      state.is_search = true
+      state.param.page = 1; // 重置页码为第一页
+      /**
+      state.filteredData = state.data.filter(item =>
+          item.userName.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
+          item.userRole.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
+          item.userDepartment.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
+          item.userPhone.toLowerCase().includes(state.searchKeyword.toLowerCase())
+      );
+      */
+    }
     const onEdit = (index: any, row: any) => {
       console.log('row', row)
       state.posted.userRow.userId = row.userId
@@ -195,12 +215,16 @@ export default defineComponent({
       console.log(index, row)
       useConfirmDelete(row)
     }
-    //初始调用
-    fetchData()
-    getSelectionRows()
+    onMounted(() => {
+      //初始调用
+      fetchData()
+      getSelectionRows()
+      displayData()
+    })
     return {
       ...toRefs(state),
       total,
+      displayData,
       getSelectionRows,
       onCurrentChange,
       onSizeChange,
@@ -209,6 +233,7 @@ export default defineComponent({
       onEditSuccess,
       onEdit,
       onDelete,
+      onSearch,
       fetchData
     }
   }

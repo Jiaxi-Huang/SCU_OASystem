@@ -124,10 +124,10 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         try {
             User user = userMapper.findByUserId(user_id);
             String role = user.getRole();
-            if (role.equals("admin")){
+            if (role.equals("admin")) {
                 return userMapper.findAllUser();
             }
-            if(role.equals("manager")){
+            if (role.equals("manager")) {
                 return userMapper.findDepartmentUser(user.getDepartment());
             }
             return null;

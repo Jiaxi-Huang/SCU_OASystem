@@ -14,9 +14,16 @@
             新建会议</el-button
           >
         </el-col>
+        <el-col :span="16" style="text-align: right">
+          <el-input
+              v-model="searchKeyword"
+              placeholder="请输入关键词"            style="width: 200px; margin-right: 10px"
+          ></el-input>
+          <el-button type="primary" size="small" @click="onSearch">搜索</el-button>
+        </el-col>
       </el-row>
       <br />
-      <el-table v-loading="loading" :data="data" stripe class="table" @selection-change="handleSelectionChange">
+      <el-table v-loading="loading" :data="displayData()" stripe class="table" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center"></el-table-column>
         <el-table-column prop="userName" label="用户名" align="center"></el-table-column>
         <el-table-column prop="userDepartment" label="部门" align="center"></el-table-column>
@@ -59,23 +66,19 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, computed } from 'vue'
+import {defineComponent, reactive, toRefs, computed, onMounted} from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Edit, Minus, Plus, Refresh } from '@element-plus/icons-vue'
 import WorkerEdit from './workersEdit.vue'
-import DistributeTodo from "@/views/Worker/distributeTodo.vue";
-import DistributeMeeting from "@/views/Worker/distributeMeeting.vue";
+import DistributeTodo from "@/views/Worker/components/distributeTodo.vue";
+import DistributeMeeting from "@/views/Worker/components/distributeMeeting.vue";
 import Service from './api/index'
-import RoleEdit from "@/views/Role/rolesEdit.vue";
-import RoleNew from "@/views/Role/rolesNew.vue";
 
 export default defineComponent({
   name: 'WorkerManage',
   components: {
     WorkerEdit,
     DistributeTodo,DistributeMeeting,
-    RoleNew,
-    RoleEdit,
     Edit,
     Minus,
     Plus,
@@ -96,6 +99,7 @@ export default defineComponent({
       data: [
         //{ userName: '超级管理员', userDepartment:'',userRole:'',userPhone:''},
       ],
+      filteredData: [],
       loading: false,
       is_search: false,
       edit_visible: false,
@@ -111,6 +115,7 @@ export default defineComponent({
         }
       },
       selectionRows: [] as { userId: number }[], // 假设 userId 是字符串或数字
+      searchKeyword: '' // 添加 searchKeyword 变量
     })
     // 动态计算total;
     const total = computed(() => state.data.length)
@@ -138,7 +143,6 @@ export default defineComponent({
     const onCurrentChange = () => {
       fetchData()
     }
-
     const onSizeChange = (val: number) => {
       state.param.limit = val
       fetchData()
@@ -159,6 +163,19 @@ export default defineComponent({
       state.edit_visible = false
       fetchData()
     }
+    const displayData = ()=>{
+      return state.is_search ? state.filteredData : state.data;
+    }
+    const onSearch = () => {
+      state.is_search = true
+      state.param.page = 1; // 重置页码为第一页
+      state.filteredData = state.data.filter(item =>
+          item.userName.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
+          item.userRole.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
+          item.userDepartment.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
+          item.userPhone.toLowerCase().includes(state.searchKeyword.toLowerCase())
+      );
+    }
     /**
      * @description 选择点击编辑授权角色；roleName
      */
@@ -169,11 +186,16 @@ export default defineComponent({
       state.posted.userRow.userDepartment = row.userDepartment
       state.edit_visible = true
     }
+    onMounted(() => {
+      //初始调用
+      fetchData()
+      displayData()
+    })
 
-    fetchData()
     return {
       ...toRefs(state),
       total,
+      displayData,
       handleSelectionChange,
       onCurrentChange,
       onSizeChange,
@@ -183,6 +205,7 @@ export default defineComponent({
       onDistributeMeetingSuccess,
       onEdit,
       onEditSuccess,
+      onSearch,
       fetchData
     }
   }

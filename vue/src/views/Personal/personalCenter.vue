@@ -69,7 +69,6 @@ import { defineComponent, reactive, toRefs, ref, onMounted, computed } from 'vue
 import { useStore } from '@/store'
 import Service from './api/index'
 import fullcalendar from './components/fullCalendar/index.vue'
-import defaultAvatar from '../../assets/avatar-default.jpg';
 interface stateType {
   inputVisible: boolean
   inputValue: string
@@ -95,14 +94,12 @@ export default defineComponent({
     /**
      * @description 获取头像
      */
-    const getAvatarUrl = (avatar: string) => {
+    const getAvatarUrl = (avatar: string|null) => {
       if (avatar) {
-        // 简单的 URL 验证
-        new URL(avatar)
         return avatar
         }
       else{
-        return defaultAvatar;
+        return 'src/assets/avatar-default.jpg';
       }
     }
     onMounted(() => {})
