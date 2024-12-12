@@ -19,7 +19,6 @@
               v-model="searchKeyword"
               placeholder="请输入关键词"            style="width: 200px; margin-right: 10px"
           ></el-input>
-          <el-button type="primary" size="small" @click="onSearch">搜索</el-button>
         </el-col>
       </el-row>
       <br />
@@ -66,7 +65,7 @@
   </div>
 </template>
 <script lang="ts">
-import {defineComponent, reactive, toRefs, computed, onMounted} from 'vue'
+import {defineComponent, reactive, toRefs, computed, onMounted, watch} from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Edit, Minus, Plus, Refresh } from '@element-plus/icons-vue'
 import WorkerEdit from './workersEdit.vue'
@@ -110,8 +109,8 @@ export default defineComponent({
         userRow: {
           userId: null,
           userName:'',
-          userRole: '',
-          userDepartment:''
+          userDepartment:'',
+          userRole: ''
         }
       },
       selectionRows: [] as { userId: number }[], // 假设 userId 是字符串或数字
@@ -167,27 +166,41 @@ export default defineComponent({
       return state.is_search ? state.filteredData : state.data;
     }
     const onSearch = () => {
-      state.is_search = true
-      state.param.page = 1; // 重置页码为第一页
-      state.filteredData = state.data.filter(item =>
-          item.userName.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-          item.userRole.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-          item.userDepartment.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-          item.userPhone.toLowerCase().includes(state.searchKeyword.toLowerCase())
-      );
+      if (state.searchKeyword != '') {
+        state.is_search = true
+        state.param.page = 1; // 重置页码为第一页
+        state.filteredData = state.data.filter(item =>
+            item.userName.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
+            item.userRole.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
+            item.userDepartment.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
+            item.userPhone.toLowerCase().includes(state.searchKeyword.toLowerCase())
+        );
+      }
+      else{
+        state.is_search = false
+      }
     }
     /**
      * @description 选择点击编辑授权角色；roleName
      */
     const onEdit = (index: any, row: any) => {
       console.log('row', row)
+      state.posted.userRow.userId = row.userId
       state.posted.userRow.userName = row.userName
       state.posted.userRow.userRole = row.userRole
       state.posted.userRow.userDepartment = row.userDepartment
       state.edit_visible = true
     }
+    // 使用 watch 监视 searchKeyword 的变化
+    watch(() => state.searchKeyword, (newVal) => {
+      if (newVal !== '') {
+        onSearch()
+      } else {
+        state.is_search = false
+      }
+    })
+    //初始调用
     onMounted(() => {
-      //初始调用
       fetchData()
       displayData()
     })

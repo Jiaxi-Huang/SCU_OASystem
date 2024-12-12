@@ -15,7 +15,6 @@ class Service {
       json: true,
       data
     }).then((res) => {
-      console.log(res)
       if (res.status === 0) {
         return Promise.resolve(res)
       }
@@ -32,7 +31,6 @@ class Service {
       json: true,
       data
     }).then((res) => {
-      console.log(res)
       if (res.status === 0) {
         return Promise.resolve(res)
       }
@@ -43,14 +41,12 @@ class Service {
    * @description POST 经理分发指定用户列表待办事项
    */
   static postManagerDistributeTodo(data: any){
-    console.log(data)
     return request({
       url: 'http://localhost:8080/api/todolist/distributed_create',
       method: 'POST',
       json: true,
       data
     }).then((res) => {
-      console.log(res)
       if (res.status === 0) {
         return Promise.resolve(res)
       }
@@ -61,14 +57,25 @@ class Service {
    * @description POST 经理分发指定用户会议
    */
   static postManagerDistributeMeeting(data: any){
-      console.log(data)
     return request({
       url: 'http://localhost:8080/api/meetings/distributed_create',
       method: 'POST',
       json: true,
       data
     }).then((res) => {
-      console.log(res)
+      if (res.status === 0) {
+        return Promise.resolve(res)
+      }
+      return Promise.reject(res)
+    })
+  }
+  static postManagerUpdateMenu(data: any){
+    return request({
+      url: 'http://localhost:8080/api/admin/menu/update',
+      method: 'POST',
+      json: true,
+      data
+    }).then((res) => {
       if (res.status === 0) {
         return Promise.resolve(res)
       }

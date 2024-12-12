@@ -15,7 +15,6 @@
               v-model="searchKeyword"
               placeholder="请输入关键词"            style="width: 200px; margin-right: 10px"
           ></el-input>
-          <el-button type="primary" size="small" @click="onSearch">搜索</el-button>
         </el-col>
       </el-row>
       <br />
@@ -66,7 +65,7 @@
   </div>
 </template>
 <script lang="ts">
-import {defineComponent, reactive, toRefs, computed, onMounted} from 'vue'
+import {defineComponent, reactive, toRefs, computed, onMounted, watch} from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Edit, Minus, Plus, Refresh } from '@element-plus/icons-vue'
 import RoleEdit from './rolesEdit.vue'
@@ -107,12 +106,12 @@ export default defineComponent({
       posted: {
         userRow: {
           userId: null,
-          userName:'',
+          userName: '',
           userRole: '',
-          userDepartment:''
+          userDepartment: ''
         }
       },
-      selectionRows:[],
+      selectionRows: [],
       searchKeyword: '' // 添加 searchKeyword 变量
     })
     // 动态计算total;
@@ -128,9 +127,9 @@ export default defineComponent({
     /**
      * @description 请求接口获取当前设置角色，默认始终有超级管理员角色
      */
-    const fetchData = async() => {
+    const fetchData = async () => {
       state.is_search = false
-      const data = {'accessToken':sessionStorage.getItem('accessToken')}
+      const data = {'accessToken': sessionStorage.getItem('accessToken')}
       const adminUserInfo = await Service.postAdminQueryUserList(data)
       if (adminUserInfo.status === 0) {
         state.data = adminUserInfo.data
@@ -154,89 +153,99 @@ export default defineComponent({
       state.edit_visible = false
       fetchData()
     }
-    const displayData = ()=>{
-        return state.is_search ? state.filteredData : state.data;
+    const displayData = () => {
+      return state.is_search ? state.filteredData : state.data;
     }
     const onSearch = () => {
-      state.is_search = true
-      state.param.page = 1; // 重置页码为第一页
-      /**
-      state.filteredData = state.data.filter(item =>
-          item.userName.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-          item.userRole.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-          item.userDepartment.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-          item.userPhone.toLowerCase().includes(state.searchKeyword.toLowerCase())
-      );
-      */
+      if (state.searchKeyword != '') {
+        state.is_search = true
+        state.param.page = 1; // 重置页码为第一页
+        state.filteredData = state.data.filter(item =>
+            item.userName.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
+            item.userRole.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
+            item.userDepartment.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
+            item.userPhone.toLowerCase().includes(state.searchKeyword.toLowerCase())
+        );
+      }
+      else{
+        state.is_search = false
+      }
     }
-    const onEdit = (index: any, row: any) => {
-      console.log('row', row)
-      state.posted.userRow.userId = row.userId
-      state.posted.userRow.userName = row.userName
-      state.posted.userRow.userRole = row.userRole
-      state.posted.userRow.userDepartment = row.userDepartment
-      state.edit_visible = true
-    }
-    const useConfirmDelete = async(row: any) => {
-      ElMessageBox.confirm('此操作将删除该员工所有数据, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-          .then(async() => {
-            // 此处执行接口异步删除员工
-            const data = {
-              userId : row.userId,
-              accessToken: sessionStorage.getItem('accessToken')
-            }
-            const res = await Service.postAdminDeleteUser(data);
-            if(res.status === 0) {
-              ElMessage({
-                type: 'success',
-                message: '删除成功'
-              })
-              fetchData()
-            }
-            else{
-              ElMessage({
-                type: 'error',
-                message: '删除失败'
-              })
-            }
-          })
-          .catch(() => {
-            ElMessage({
-              type: 'info',
-              message: '已取消删除'
+      const onEdit = (index: any, row: any) => {
+        console.log('row', row)
+        state.posted.userRow.userId = row.userId
+        state.posted.userRow.userName = row.userName
+        state.posted.userRow.userRole = row.userRole
+        state.posted.userRow.userDepartment = row.userDepartment
+        state.edit_visible = true
+      }
+      const useConfirmDelete = async (row: any) => {
+        ElMessageBox.confirm('此操作将删除该员工所有数据, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+            .then(async () => {
+              // 此处执行接口异步删除员工
+              const data = {
+                userId: row.userId,
+                accessToken: sessionStorage.getItem('accessToken')
+              }
+              const res = await Service.postAdminDeleteUser(data);
+              if (res.status === 0) {
+                ElMessage({
+                  type: 'success',
+                  message: '删除成功'
+                })
+                fetchData()
+              } else {
+                ElMessage({
+                  type: 'error',
+                  message: '删除失败'
+                })
+              }
             })
-          })
-    }
-    const onDelete = (index: any, row: any) => {
-      console.log(index, row)
-      useConfirmDelete(row)
-    }
-    onMounted(() => {
+            .catch(() => {
+              ElMessage({
+                type: 'info',
+                message: '已取消删除'
+              })
+            })
+      }
+      const onDelete = (index: any, row: any) => {
+        console.log(index, row)
+        useConfirmDelete(row)
+      }
+      // 使用 watch 监视 searchKeyword 的变化
+      watch(() => state.searchKeyword, (newVal) => {
+        if (newVal !== '') {
+          onSearch()
+        } else {
+          state.is_search = false
+        }
+      })
       //初始调用
-      fetchData()
-      getSelectionRows()
-      displayData()
-    })
-    return {
-      ...toRefs(state),
-      total,
-      displayData,
-      getSelectionRows,
-      onCurrentChange,
-      onSizeChange,
-      onCreate,
-      onCreateSuccess,
-      onEditSuccess,
-      onEdit,
-      onDelete,
-      onSearch,
-      fetchData
+      onMounted(() => {
+        fetchData()
+        getSelectionRows()
+        displayData()
+      })
+      return {
+        ...toRefs(state),
+        total,
+        displayData,
+        getSelectionRows,
+        onCurrentChange,
+        onSizeChange,
+        onCreate,
+        onCreateSuccess,
+        onEditSuccess,
+        onEdit,
+        onDelete,
+        onSearch,
+        fetchData
+      }
     }
-  }
 })
 </script>
 <style lang="stylus" scoped></style>

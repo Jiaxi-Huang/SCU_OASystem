@@ -5,14 +5,14 @@
         <span>
           <div class="card-header">
             <el-form label-position="left" inline class="info-table">
-              <el-form-item label="名称">
+              <el-form-item label="用户名">
                 <span v-if="row && row.userName">{{ row.userName }}</span>
               </el-form-item>
             </el-form>
           </div>
         </span>
       </template>
-      <el-transfer v-model="menu.form" v-loading="menu.loading" :data="menu.data" :titles="['菜单', '已授权']"> </el-transfer>
+      <el-transfer v-model="menu.form" v-loading="menu.loading" :data="menu.data" :titles="['菜单','已授权']"> </el-transfer>
     </el-card>
     <br />
     <el-row class="btns">
@@ -24,6 +24,7 @@
 import { computed, defineComponent, onMounted, watchEffect, reactive, toRef, toRefs } from 'vue'
 import { useStore } from '@/store'
 import Service from './api/index'
+import {ElMessage} from "element-plus";
 
 interface stateTypes {
   url: String
@@ -42,7 +43,7 @@ export default defineComponent({
   props: {
     currentRow: {
       type: Object,
-      default: () => ({ userName:'',userDepartment:'',userRole: ''})
+      default: () => ({ userId:null,userName:'',userDepartment:'',userRole: ''})
     }
   },
   emits: ['success'],
@@ -98,15 +99,37 @@ export default defineComponent({
           })
         }
       }
+      console.log(state.menu)
     }
 
     /**
      * @description 保存当前角色授权菜单
      */
-    const saveData = () => {
-      console.log('form is ', state.menu.form)
-      //  省略接口：向后端接口传递已经授权菜单名称；  state.menu.form
-      emit('success')
+    const saveData = async() => {
+      const data = {
+        "authedRoutes":state.menu.form,
+        "userId":row.value.userId,
+        "accessToken":sessionStorage.getItem("accessToken")
+      }
+      console.log('form is ', data)
+      const res = await Service.postManagerUpdateMenu(data)
+      if(res.status === 0) {
+        ElMessage(
+            {
+              type: 'success',
+              message: res.message,
+            }
+        )
+        emit('success')
+      }
+      else{
+        ElMessage(
+            {
+              type: 'error',
+              message: res.message,
+            }
+        )
+      }
     }
     onMounted(() => {
       // 获取 auth Menu Info

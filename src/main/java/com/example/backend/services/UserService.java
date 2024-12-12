@@ -2,6 +2,7 @@ package com.example.backend.services;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.backend.entity.User;
+import com.example.backend.mapper.PermissionMapper;
 import com.example.backend.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,6 +15,8 @@ public class UserService extends ServiceImpl<UserMapper, User> {
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private PermissionMapper permissionMapper;
 
     public int login(String email, String password) {
         try {

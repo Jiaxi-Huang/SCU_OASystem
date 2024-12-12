@@ -1,9 +1,12 @@
 package com.example.backend.controllers;
 
 import com.example.backend.entity.User;
+import com.example.backend.entity.authedRoutes.AuthedRoutesRequest;
+import com.example.backend.entity.authedRoutes.AuthedRoutesResponse;
 import com.example.backend.entity.userInfo.adminUserInfoRequest;
 import com.example.backend.entity.userInfo.adminUserInfoResponse;
 import com.example.backend.services.AccessService;
+import com.example.backend.services.MenuService;
 import com.example.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +26,8 @@ public class Admin {
     private UserService userService;
     @Autowired
     private AccessService accessService;
+    @Autowired
+    private MenuService menuService;
     @PostMapping("/user/list")
     public ResponseEntity<adminUserInfoResponse> userList(@RequestBody adminUserInfoRequest request) {
         try {
@@ -162,6 +167,43 @@ public class Admin {
         }
         catch (Exception e) {
             adminUserInfoResponse response = new adminUserInfoResponse(
+                    2,
+                    "服务器内部错误",
+                    false,
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    @PostMapping("/menu/update")
+    public ResponseEntity<AuthedRoutesResponse> menuUpdate(@RequestBody AuthedRoutesRequest request) {
+        try {
+            String permissions = request.getAuthedRoutes().toString();
+            String accessToken = request.getAccessToken();
+            int userId = request.getUserId();
+            int adminId = accessService.getAuthenticatedId(accessToken);
+            int isSuccess = menuService.updateMenu(userId,adminId,permissions);
+            if (isSuccess > 0) {
+                AuthedRoutesResponse response = new AuthedRoutesResponse(
+                        0,
+                        "修改用户授权菜单成功",
+                        true,
+                        null
+                );
+                return ResponseEntity.status(HttpStatus.OK).body(response);
+            }
+            else{
+                AuthedRoutesResponse response = new AuthedRoutesResponse(
+                        1,
+                        "修改用户授权菜单失败",
+                        false,
+                        null
+                );
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+        }
+        catch (Exception e) {
+            AuthedRoutesResponse response = new AuthedRoutesResponse(
                     2,
                     "服务器内部错误",
                     false,

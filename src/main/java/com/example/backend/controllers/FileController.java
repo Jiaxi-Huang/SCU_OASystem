@@ -1,11 +1,9 @@
 package com.example.backend.controllers;
 
 import com.example.backend.entity.Files;
-import com.example.backend.entity.Folder;
 import com.example.backend.entity.ResponseBase;
 import com.example.backend.entity.User;
 import com.example.backend.entity.userInfo.adminUserInfoRequest;
-import com.example.backend.entity.userInfo.adminUserInfoResponse;
 import com.example.backend.mapper.UserMapper;
 import com.example.backend.services.AccessService;
 import com.example.backend.services.FileService;
@@ -19,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/file")
@@ -147,7 +144,7 @@ public class FileController {
 
         User userInfo = userMapper.findByUserId(user_id);
 
-        String uploadDir = "F:/upload/";  // 可以修改为你存储文件的目录
+        String uploadDir = "E:/upload/";  // 可以修改为你存储文件的目录
         String allFileName = file.getOriginalFilename();
         String filePath = uploadDir + allFileName;
 
