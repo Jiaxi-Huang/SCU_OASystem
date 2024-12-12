@@ -282,17 +282,17 @@
       @closed="service.closeUploadDlg"
   >
     <el-form>
-      <el-form-item label="所在目录：" >
-        <el-tree-select
-            v-model="file.current_folder_id"
-            :props="folder.defaultProps"
-            :default-expand-all="true"
-            :data="folder.data"
-            @current-change="service.changeUploadFolder"
-            node-key="id"
-            clearable
-            check-strictly />
-      </el-form-item>
+<!--      <el-form-item label="所在目录：" >-->
+<!--        <el-tree-select-->
+<!--            v-model="file.current_folder_id"-->
+<!--            :props="folder.defaultProps"-->
+<!--            :default-expand-all="true"-->
+<!--            :data="folder.data"-->
+<!--            @current-change="service.changeUploadFolder"-->
+<!--            node-key="id"-->
+<!--            clearable-->
+<!--            check-strictly />-->
+<!--      </el-form-item>-->
       <el-form-item label="上传文件：" >
         <el-upload
             ref="uploadRef"
@@ -300,7 +300,7 @@
             :auto-upload="false"
             :multiple="true"
             :headers="headers"
-            :data="Object.assign(additionalParams,{folder_id: file.current_folder_id})"
+            :data="Object.assign(additionalParams,{folder_id: folder.current_select_key})"
             :on-success="service.onUploadSuccess"
             :on-error="service.onUploadError"
             :before-upload="service.beforeUpload"
