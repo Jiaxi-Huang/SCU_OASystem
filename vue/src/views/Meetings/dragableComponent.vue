@@ -249,8 +249,8 @@
     </el-row>
     <el-row>
       <el-row :gutter="20">
-        <el-col :span="11"><el-button type="success" @click="onCreateMeeting()">创建会议</el-button></el-col>
-        <el-col :span="11"><el-button type="success" @click="onAddMeeting()">添加会议</el-button></el-col>
+        <el-col :span="11"><el-button type="success" @click="onCreateMeeting()" :icon="CirclePlus">创建会议</el-button></el-col>
+        <el-col :span="11"><el-button type="success" @click="onAddMeeting()" :icon="CirclePlus">添加会议</el-button></el-col>
       </el-row>
       <el-col :span="24">
         <div class="board">
@@ -399,7 +399,11 @@
                 {{ task.detailForm.mtin_title }}
               </el-form-item>
               <el-form-item label="会议内容&nbsp;&nbsp;" :label-width="formLabelWidth">
-                {{ task.detailForm.mtin_ctnt }}
+                <span style=" word-wrap: break-word;
+                              word-break: break-word;
+                              white-space: normal;">
+                 {{ task.detailForm.mtin_ctnt }}
+                </span>
               </el-form-item>
               <el-form-item label="会议开始时间&nbsp;&nbsp;" :label-width="formLabelWidth">
                 {{ task.detailForm.mtin_st }}
@@ -518,7 +522,11 @@
                 {{ task.detailForm_add.mtin_title }}
               </el-form-item>
               <el-form-item label="会议内容&nbsp;&nbsp;" :label-width="formLabelWidth">
-                {{ task.detailForm_add.mtin_ctnt }}
+                <span style=" word-wrap: break-word;
+                              word-break: break-word;
+                              white-space: normal;">
+                  {{ task.detailForm_add.mtin_ctnt }}
+                </span>
               </el-form-item>
               <el-form-item label="会议开始时间&nbsp;&nbsp;" :label-width="formLabelWidth">
                 {{ task.detailForm_add.mtin_st }}
@@ -557,7 +565,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, onUnmounted, reactive } from 'vue'
-import {Operation, Suitcase, ChatLineSquare, View, Delete, Edit} from '@element-plus/icons-vue'
+import {Operation, Suitcase, ChatLineSquare, View, Delete, Edit, CirclePlus} from '@element-plus/icons-vue'
 import Service from "@/views/Meetings/api/index";
 import {ElMessage} from "element-plus";
 import { useRouter } from 'vue-router'

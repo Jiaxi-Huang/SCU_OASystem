@@ -1,34 +1,32 @@
 <template>
-  <h3>个人文件管理</h3>
+  <div>
+    <h3>文件管理</h3>
+    <vuecmf-fileexplorer
+        root_path="个人文件管理"
+        :page_size="10"
+        list_show="list"
+        :tool_config="['new_folder','update_folder','move_folder','del_folder','upload','move_file','del_file','remark_file']"
+        upload_api="http://localhost:8080/api/file/upload"
 
-  <vuecmf-fileexplorer
-      root_path="个人文件管理"
-      :page_size="30"
-      list_show="list"
-      :tool_config="['new_folder','update_folder','move_folder','del_folder','upload','move_file','del_file','remark_file']"
-      upload_api="http://localhost:8080/api/file/upload"
+        @loadFolder="loadFolder"
+        @moveFolder="moveFolder"
+        @saveFolder="saveFolder"
+        @delFolder="delFolder"
+        @loadFile="loadFile"
+        @selectFile="selectFile"
+        @moveFile="moveFile"
+        @delFile="delFile"
+        @saveFile="saveFile"
+        @remarkFile="remarkFile"
 
-      :data="{user:'2'}"
+        @beforeUpload="beforeUpload"
+        @onUploadSuccess="onUploadSuccess"
+        @onUploadError="onUploadError"
+    >
+    </vuecmf-fileexplorer>
+  </div>
 
-      @loadFolder="loadFolder"
-      @moveFolder="moveFolder"
-      @saveFolder="saveFolder"
-      @delFolder="delFolder"
-      @loadFile="loadFile"
-      @selectFile="selectFile"
-      @moveFile="moveFile"
-      @delFile="delFile"
-      @saveFile="saveFile"
-      @remarkFile="remarkFile"
-      @upload="upload"
 
-      @beforeUpload="beforeUpload"
-      @onUploadSuccess="onUploadSuccess"
-      @onUploadError="onUploadError"
-
-  >
-  </vuecmf-fileexplorer>
-  <!--      这个data里的user没用，这里应该传token但还不知道怎么弄-->
 </template>
 
 <script lang="ts">
@@ -41,16 +39,23 @@ import Service from "@/views/File/api/index";
 export default defineComponent({
   name: 'App',
   setup(){
+
+
+
     //加载文件夹列表
     const loadFolder = (folderObj: AnyObject): void => {
+      console.log("loadFile exc")
       Service.loadFolder().then((res) => {
         if (res) {
+
           const data = res.data;
           if (data && Array.isArray(data)) {
-            let user=data[data.length-1];
+            let user={
+              userId:data[data.length-2],
+              department:data[data.length-1]
+            }
+            console.log(user)
             data.pop();
-            console.log(data);
-            console.log(user);
             //0是个人，1是部门，2是公司，文件夹id是0，-1，-2
             for(let i = 0;i <= 2;i++){
               //folderObj.total = data.length; // 更新文件夹的总数
@@ -64,8 +69,8 @@ export default defineComponent({
                 map[item.id] = {...item, children: []};
               });
               data.forEach(item => {
-                if(i===0&&((item.department===null)||(item.department===""))&&item.userId===user.userId){
-                  console.log("个人")
+                if(i===0&&((item.department===null)||(item.department===""))&&
+                    item.userId===user.userId&&item.isShared===0){
                   if (item.pid === -i) {
                     // 如果是根节点（pid为0），加入结果数组
                     folderObj.data[i].children.push(map[item.id]);
@@ -76,8 +81,7 @@ export default defineComponent({
                     // 否则将其添加到对应父节点的 children 数组中
                   }
                 }
-                if(i===1&&item.department===user.department){
-                  console.log("部门")
+                if(i===1&&item.department===user.department&&item.isShared===0){
                   if (item.pid === -i) {
                     // 如果是根节点（pid为0），加入结果数组
                     folderObj.data[i].children.push(map[item.id]);
@@ -88,8 +92,8 @@ export default defineComponent({
                     // 否则将其添加到对应父节点的 children 数组中
                   }
                 }
-                if(i===2&&((item.department===null)||(item.department===""))){
-                  console.log("公司")
+                if(i===2&&((item.department===null)||(item.department===""))
+                    &&item.isShared===1){
                   if (item.pid === -i) {
                     // 如果是根节点（pid为0），加入结果数组
                     folderObj.data[i].children.push(map[item.id]);
@@ -107,19 +111,36 @@ export default defineComponent({
                 console.log("进入查询")
                 folderObj.data[i].children=[];
                 data.forEach(item => {
-                  if(item.title === folderObj.keywords){
-                    //folderObj.data[0].id=-3;
-                    //folderObj.data[0].title="找到了";
+                  if(item.title === folderObj.keywords&&i===0
+                      &&((item.department===null)||(item.department===""))
+                      &&item.userId===user.userId
+                      &&item.isShared===0){
+                    folderObj.data[i].id=-i-3;
+                    //folderObj.data[i].title="找到了";
+                    folderObj.data[i].children.push(map[item.id]);
+                    is_exist=1;
+                  }
+                  if(item.title === folderObj.keywords&&i===1
+                      &&item.department===user.department
+                      &&item.isShared===0){
+                    folderObj.data[i].id=-i-3;
+                    //folderObj.data[i].title="找到了";
+                    folderObj.data[i].children.push(map[item.id]);
+                    is_exist=1;
+                  }
+                  if(item.title === folderObj.keywords&&i===2
+                      &&((item.department===null)||(item.department===""))
+                      &&item.isShared===1){
+                    folderObj.data[i].id=-i-3;
+                    //folderObj.data[i].title="找到了";
                     folderObj.data[i].children.push(map[item.id]);
                     is_exist=1;
                   }
                   if(!is_exist){
-                    //folderObj.data[0].id=-3;
-                    //folderObj.data[0].title="没找到";
+                    folderObj.data[i].id=i-3;
+                    //folderObj.data[i].title="没找到";
                   }
                 });
-                console.log(JSON.stringify(folderObj, null, 2));
-                console.log(folderObj.is_new);
               }
             }
 
@@ -139,37 +160,73 @@ export default defineComponent({
     }
 
 
-
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      const seconds = date.getSeconds().toString().padStart(2, '0');
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
 
 
     //加载文件列表
     const loadFile = (folderObj: AnyObject): void => {
-      console.log("getPersonalFiles exc")
-      let dir_id=folderObj.filter.dir_id
+      console.log("loadFile exc")
+      let dir_id=0
+      if(folderObj.filter.dir_id!=null){
+        dir_id = folderObj.filter.dir_id
+      }
+      console.log("dir_id "+dir_id)
       Service.loadFile(dir_id).then((res) => {
         if (res) {
           // 处理返回的结果
           const data = res.data;
-          console.log(data);
-          let folderType=data[data.length-2];
-          let user=data[data.length-1];
-          console.log(folderType)
-          console.log(user)
+          let folderType=data[data.length-3];
+          let user={
+            userId:data[data.length-2],
+            department:data[data.length-1]
+          }
+          data.pop()
           data.pop()
           data.pop()
           if (data && Array.isArray(data)) {
             folderObj.data=[];
-
-
-            if(folderType==0){
+            let tmp = []
+            console.log(folderObj.keywords)
+            console.log(folderObj.current_page)
+            console.log(folderObj.page_size)
+            if(folderType===0){
               //个人
               //folderObj.total = data.length;
-              console.log(folderObj.keywords)
-              if(folderObj.keywords){
-                //keywords是搜索的关键词，这部分是搜索，else是文件加载，后面同理
-                for (let i = 0; i < data.length; i++) {
-                  if(folderObj.keywords === data[i].fileName)
-                    folderObj.data.push({
+              console.log(folderObj.filter.dir_id)
+              for (let i = 0; i < data.length; i++) {
+                if(data[i].dirId === dir_id
+                    &&data[i].userId===user.userId
+                    &&((data[i].department==="")||(data[i].department===null))
+                    &&data[i].isShared===0
+                ){
+                  if(folderObj.keywords){
+                    //keywords是搜索的关键词，这部分是搜索，else是文件加载，后面同理
+                    //有问题
+                    if(folderObj.keywords === data[i].fileName){
+                      tmp.push({
+                        "id": data[i].id,
+                        "file_name": data[i].fileName,
+                        "ext": data[i].ext,
+                        "size": data[i].size,
+                        "dir_id": data[i].dirId,
+                        "url": data[i].url,
+                        "remark": data[i].remark,
+                        "create_time": formatDate(data[i].createTime),
+                        "update_time": formatDate(data[i].updateTime),
+                        "user_name": data[i].userName,
+                      })
+                    }
+                  }else{
+                    tmp.push({
                       "id": data[i].id,
                       "file_name": data[i].fileName,
                       "ext": data[i].ext,
@@ -177,41 +234,42 @@ export default defineComponent({
                       "dir_id": data[i].dirId,
                       "url": data[i].url,
                       "remark": data[i].remark,
-                      "create_time": data[i].createTime,
-                      "update_time": data[i].updateTime,
-                    })
-                }
-              }else{
-                console.log(folderObj.filter.dir_id)
-                for (let i = 0; i < data.length; i++) {
-                  if(data[i].dirId === folderObj.filter.dir_id
-                      &&data[i].userId===user.userId
-                      &&((data[i].department==="")||(data[i].department===null))
-                  ){
-                    folderObj.data.push({
-                      "id": data[i].id,
-                      "file_name": data[i].fileName,
-                      "ext": data[i].ext,
-                      "size": data[i].size,
-                      "dir_id": data[i].dirId,
-                      "url": data[i].url,
-                      "remark": data[i].remark,
-                      "create_time": data[i].createTime,
-                      "update_time": data[i].updateTime,
+                      "create_time": formatDate(data[i].createTime),
+                      "update_time": formatDate(data[i].updateTime),
+                      "user_name": data[i].userName,
                     })
                   }
                 }
               }
             }
-
             if(folderType===-1){
               //部门
               //folderObj.total = data.length;
-              console.log(folderObj.keywords)
-              if(folderObj.keywords){
-                for (let i = 0; i < data.length; i++) {
-                  if(folderObj.keywords === data[i].fileName)
-                    folderObj.data.push({
+              console.log(folderObj.filter.dir_id)
+              for (let i = 0; i < data.length; i++) {
+                if(data[i].dirId === folderObj.filter.dir_id
+                    &&data[i].department===user.department
+                    &&data[i].isShared===0
+                ){
+                  if(folderObj.keywords){
+                    //keywords是搜索的关键词，这部分是搜索，else是文件加载，后面同理
+                    //有问题
+                    if(folderObj.keywords === data[i].fileName){
+                      tmp.push({
+                        "id": data[i].id,
+                        "file_name": data[i].fileName,
+                        "ext": data[i].ext,
+                        "size": data[i].size,
+                        "dir_id": data[i].dirId,
+                        "url": data[i].url,
+                        "remark": data[i].remark,
+                        "create_time": formatDate(data[i].createTime),
+                        "update_time": formatDate(data[i].updateTime),
+                        "user_name": data[i].userName,
+                      })
+                    }
+                  }else{
+                    tmp.push({
                       "id": data[i].id,
                       "file_name": data[i].fileName,
                       "ext": data[i].ext,
@@ -219,40 +277,41 @@ export default defineComponent({
                       "dir_id": data[i].dirId,
                       "url": data[i].url,
                       "remark": data[i].remark,
-                      "create_time": data[i].createTime,
-                      "update_time": data[i].updateTime,
-                    })
-                }
-              }else{
-                console.log(folderObj.filter.dir_id)
-                for (let i = 0; i < data.length; i++) {
-                  if(data[i].dirId === folderObj.filter.dir_id
-                      &&data[i].department===user.department
-                  ){
-                    folderObj.data.push({
-                      "id": data[i].id,
-                      "file_name": data[i].fileName,
-                      "ext": data[i].ext,
-                      "size": data[i].size,
-                      "dir_id": data[i].dirId,
-                      "url": data[i].url,
-                      "remark": data[i].remark,
-                      "create_time": data[i].createTime,
-                      "update_time": data[i].updateTime,
+                      "create_time": formatDate(data[i].createTime),
+                      "update_time": formatDate(data[i].updateTime),
+                      "user_name": data[i].userName,
                     })
                   }
                 }
               }
             }
-
             if(folderType===-2){
               //公司
-              //folderObj.total = data.length;
-              console.log(folderObj.keywords)
-              if(folderObj.keywords){
-                for (let i = 0; i < data.length; i++) {
-                  if(folderObj.keywords === data[i].fileName)
-                    folderObj.data.push({
+              console.log(folderObj.filter.dir_id)
+              for (let i = 0; i < data.length; i++) {
+                if(data[i].dirId === folderObj.filter.dir_id
+                    &&((data[i].department==="")||(data[i].department===null))
+                    &&data[i].isShared===1
+                ){
+                  if(folderObj.keywords){
+                    //keywords是搜索的关键词，这部分是搜索，else是文件加载，后面同理
+                    //有问题
+                    if(folderObj.keywords === data[i].fileName){
+                      tmp.push({
+                        "id": data[i].id,
+                        "file_name": data[i].fileName,
+                        "ext": data[i].ext,
+                        "size": data[i].size,
+                        "dir_id": data[i].dirId,
+                        "url": data[i].url,
+                        "remark": data[i].remark,
+                        "create_time": formatDate(data[i].createTime),
+                        "update_time": formatDate(data[i].updateTime),
+                        "user_name": data[i].userName,
+                      })
+                    }
+                  }else{
+                    tmp.push({
                       "id": data[i].id,
                       "file_name": data[i].fileName,
                       "ext": data[i].ext,
@@ -260,34 +319,36 @@ export default defineComponent({
                       "dir_id": data[i].dirId,
                       "url": data[i].url,
                       "remark": data[i].remark,
-                      "create_time": data[i].createTime,
-                      "update_time": data[i].updateTime,
-                    })
-                }
-              }else{
-                console.log(folderObj.filter.dir_id)
-                for (let i = 0; i < data.length; i++) {
-                  if(data[i].dirId === folderObj.filter.dir_id
-                      &&((data[i].department==="")||(data[i].department===null))
-                  ){
-                    folderObj.data.push({
-                      "id": data[i].id,
-                      "file_name": data[i].fileName,
-                      "ext": data[i].ext,
-                      "size": data[i].size,
-                      "dir_id": data[i].dirId,
-                      "url": data[i].url,
-                      "remark": data[i].remark,
-                      "create_time": data[i].createTime,
-                      "update_time": data[i].updateTime,
+                      "create_time": formatDate(data[i].createTime),
+                      "update_time": formatDate(data[i].updateTime),
+                      "user_name": data[i].userName,
                     })
                   }
                 }
               }
             }
+            console.log(tmp)
+
+            for (let i = (folderObj.current_page-1)*folderObj.page_size;
+                 i < tmp.length&&i < folderObj.current_page*folderObj.page_size; i++) {
+              folderObj.data.push({
+                "id": tmp[i].id,
+                "file_name": tmp[i].file_name,
+                "ext": tmp[i].ext,
+                "size": tmp[i].size,
+                "dir_id": tmp[i].dir_id,
+                "url": tmp[i].url,
+                "remark": tmp[i].remark,
+                "create_time": formatDate(tmp[i].create_time),
+                "update_time": formatDate(tmp[i].update_time),
+                "user_name": tmp[i].user_name,
+              })
+            }
+            console.log("page_size:"+folderObj.page_size)
+            folderObj.total=tmp.length;
           }
         } else {
-          console.log("getPersonalTodoList RES MISS");
+          console.log("FileLoader RES MISS");
         }
       }).catch(err => {
         ElMessage({
@@ -307,6 +368,7 @@ export default defineComponent({
           Service.createFolder(folderData).then((res) => {
             if (res) {
               // console.log(res)
+              folderData.loadFolder();
             } else {
             }
           });
@@ -322,6 +384,7 @@ export default defineComponent({
           Service.modifyFolder(folderData).then((res) => {
             if (res) {
               // console.log(res)
+              folderData.loadFolder();
             } else {
             }
           });
@@ -333,6 +396,7 @@ export default defineComponent({
         }
       }
       console.log(folderData)
+
     }
 
     //移动文件夹
@@ -343,6 +407,7 @@ export default defineComponent({
         Service.moveFolder(data).then((res) => {
           if (res) {
             // console.log(res)
+            data.loadFolder()
           } else {
           }
         });
@@ -352,7 +417,7 @@ export default defineComponent({
           message: err.message
         })
       }
-      data.loadFolder()
+
 
     }
 
@@ -363,6 +428,7 @@ export default defineComponent({
         Service.delFolder(folderData).then((res) => {
           if (res) {
             // console.log(res)
+            folderData.loadFolder();
           } else {
           }
         });
@@ -389,6 +455,7 @@ export default defineComponent({
       try {
         Service.moveFile(data).then((res) => {
           if (res) {
+            data.loadFile()
             // console.log(res)
           } else {
           }
@@ -400,7 +467,7 @@ export default defineComponent({
         })
       }
 
-      data.loadFile()
+
     }
 
     //删除文件
@@ -411,6 +478,7 @@ export default defineComponent({
       try {
         Service.delFile(data).then((res) => {
           if (res) {
+            data.loadFile()
             // console.log(res)
           } else {
           }
@@ -421,12 +489,25 @@ export default defineComponent({
           message: err.message
         })
       }
-      data.loadFile()
+
     }
 
     //保存文件
     const saveFile = (data:AnyObject):void => {
       console.log(data)
+      try {
+        Service.modifyFile(data).then((res) => {
+          if (res) {
+            // console.log(res)
+          } else {
+          }
+        });
+      } catch (err) {
+        ElMessage({
+          type: 'warning',
+          message: err.message
+        })
+      }
     }
 
     //备注文件
@@ -436,6 +517,7 @@ export default defineComponent({
       try {
         Service.remarkFile(data).then((res) => {
           if (res) {
+            data.loadFile()
             // console.log(res)
           } else {
           }
@@ -467,22 +549,22 @@ export default defineComponent({
       console.log('error = ', data)
     }
 
-    const upload =(data:AnyObject):void=>{
-      try {
-        Service.uploadFile(data).then((res) => {
-          if (res) {
-            // console.log(res)
-          } else {
-          }
-        });
-      } catch (err) {
-        ElMessage({
-          type: 'warning',
-          message: err.message
-        })
-      }
-      console.log(data)
-    }
+    // const upload =(data:AnyObject):void=>{
+    //   try {
+    //     Service.uploadFile(data).then((res) => {
+    //       if (res) {
+    //         // console.log(res)
+    //       } else {
+    //       }
+    //     });
+    //   } catch (err) {
+    //     ElMessage({
+    //       type: 'warning',
+    //       message: err.message
+    //     })
+    //   }
+    //   console.log(data)
+    // }
     return {
       loadFolder,
       saveFolder,
@@ -494,7 +576,6 @@ export default defineComponent({
       delFile,
       saveFile,
       remarkFile,
-      upload,
 
       beforeUpload,
       onUploadSuccess,

@@ -19,11 +19,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/file")
 public class FileController {
-    int userId1;
 
     @Autowired
     private FileService fileService;
@@ -39,22 +39,24 @@ public class FileController {
     @Autowired
     private FolderController folderController;
 
-
     @PostMapping("/loadFile")
     public ResponseBase loadFile(@RequestBody adminUserInfoRequest request,@RequestParam String dir_id) {
         ResponseBase res = new ResponseBase();
         try {
             String accessToken = request.getAccessToken();
             int userId = accessService.getAuthenticatedId(accessToken);
-            userId1=userId;
             List<Files> records = fileService.getFile();
             User userInfo = userMapper.findByUserId(userId);
             int FolderType =folderController.judgeFolder(Integer.parseInt(dir_id));
             for (Files record : records) {
+                User fileUser=userMapper.findByUserId(record.getUserId());
+                record.setUserName(fileUser.getUsername());
                 res.pushData(record);
             }
             res.pushData(FolderType);
-            res.pushData(userInfo);
+            res.pushData(userInfo.getUserId());
+            res.pushData(userInfo.getDepartment());
+            System.out.println(userInfo.getUsername());
 
         }
         catch (Exception e) {
@@ -67,22 +69,55 @@ public class FileController {
     @PostMapping("/moveFile")
     public ResponseEntity<ResponseBase> moveFile(@RequestBody Files record) {
         ResponseBase response = new ResponseBase();
-        record.getDirId();
-        int res_code = fileService.moveFile(record);
+        String accessToken = record.getAcsTkn();
+        int userId = accessService.getAuthenticatedId(accessToken);
+        User userInfo = userMapper.findByUserId(userId);
+        System.out.println("moveFile beforeDirId"+record.getBeforeDirId());
+        int res_code = fileService.moveFile(userInfo,record);
+        if (res_code==0) {
+            response.setStatus(-1);
+        }
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/delFile")
     public ResponseEntity<ResponseBase> delFile(@RequestBody Files record) {
         ResponseBase response = new ResponseBase();
-        int res_code = fileService.delFolder(record);
+        String accessToken = record.getAcsTkn();
+        int userId = accessService.getAuthenticatedId(accessToken);
+        User userInfo = userMapper.findByUserId(userId);
+        int res_code = fileService.delFile(userInfo,record);
+        if (res_code==0) {
+            response.setStatus(-1);
+        }
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/remarkFile")
     public ResponseEntity<ResponseBase> remarkFile(@RequestBody Files record) {
         ResponseBase response = new ResponseBase();
-        int res_code = fileService.remarkFile(record);
+        String accessToken = record.getAcsTkn();
+        int userId = accessService.getAuthenticatedId(accessToken);
+        User userInfo = userMapper.findByUserId(userId);
+        int res_code = fileService.remarkFile(userInfo,record);
+        if (res_code==0) {
+            response.setStatus(-1);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PostMapping("/modifyFile")
+    public ResponseEntity<ResponseBase> modifyFile(@RequestBody Files record) {
+        ResponseBase response = new ResponseBase();
+        String accessToken = record.getAcsTkn();
+        int userId = accessService.getAuthenticatedId(accessToken);
+        User userInfo = userMapper.findByUserId(userId);
+        int res_code = fileService.modifyFile(userInfo,record);
+        if (res_code==0) {
+            response.setStatus(-1);
+        }
+
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -92,7 +127,7 @@ public class FileController {
         ResponseBase response = new ResponseBase();
         System.out.println(record);
         System.out.println(record.getFileName());
-        int res_code = fileService.uploadFile(record);
+        int res_code = fileService.uploadFile(null,record);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }//写错的
 
@@ -101,12 +136,17 @@ public class FileController {
     public ResponseEntity<ResponseBase> uploadFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam("folder_id") String folderId,  // 接收 folder_id
-            @RequestParam("user") int user
+            @RequestParam("accessToken") String accessToken
             ) {  // 获取 accessToken) {        // 接收 user
+
         ResponseBase response = new ResponseBase();
+        int user_id = accessService.getAuthenticatedId(accessToken);
+        System.out.println("new userid "+user_id);
         // 定义文件保存路径
        // System.out.println("upload folder"+accessToken);
-        user=userId1;
+
+        User userInfo = userMapper.findByUserId(user_id);
+
         String uploadDir = "F:/upload/";  // 可以修改为你存储文件的目录
         String allFileName = file.getOriginalFilename();
         String filePath = uploadDir + allFileName;
@@ -131,23 +171,21 @@ public class FileController {
             System.out.println(fileName);
             System.out.println(ext);
             record.setUrl(fileUrl);
-            record.setUserId(user);
+            record.setUserId(user_id);
             record.setDirId(Integer.valueOf(folderId));
             record.setExt(ext);
             record.setFileName(fileName);
             record.setSize(String.valueOf(file.getSize()));
+            record.setDepartment(userInfo.getDepartment());
             System.out.println(file.getSize());
             System.out.println(record);
-            int fileType = folderController.judgeFolder(record.getDirId());
-            int res_code;
-            if(fileType==0||fileType==-2){
-                 res_code = fileService.uploadFile(record);
-            }
-            if (fileType==-1){
-               // record.setDepartment();
-                res_code = fileService.uploadFile(record);
-            }
 
+            int res_code=0;
+            res_code = fileService.uploadFile(userInfo,record);
+            if(res_code==0) {
+                response.setStatus(-1);
+                System.out.println("无权限");
+            }
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (IOException e) {
             response.setMessage("上传失败");

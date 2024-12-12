@@ -194,6 +194,32 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
     ]
   },
   {
+    path: '/MyCalender',
+    component: layout,
+    redirect: '/MyCalender/index',
+    meta: {
+      title: {
+        '/zh-CN': '日程管理',
+        '/en-US': 'MyCalender'
+      },
+      icon: 'ic ic-workbench'
+    },
+    children: [
+      {
+        path: '/MyCalender/index',
+        name: 'MyCalender',
+        component: () => import(/* webpackChunkName: "personalCenter" */ '@/views/MyCalendar/index.vue'),
+        meta: {
+          title: {
+            '/zh-CN': '我的日程',
+            '/en-US': 'MyCalendar'
+          },
+          icon: 'ic ic-workbench'
+        }
+      }
+    ]
+  },
+  {
     path: '/copy',
     component: layout,
     redirect: '/copy/copyText',

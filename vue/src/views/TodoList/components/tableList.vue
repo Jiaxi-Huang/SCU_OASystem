@@ -2,7 +2,7 @@
   <div class="table-container">
     <el-form :inline="true" :model="formInline" class="form-inline">
       <el-form-item>
-        <el-button type="primary" @click="onAddTodo">添加待办事项</el-button>
+        <el-button type="primary" @click="onAddTodo" :icon="CirclePlus">添加待办事项</el-button>
       </el-form-item>
     </el-form>
     <el-table ref="filterTableRef" class="table-list" row-key="todo_id" :data="paginatedData" style="width: 100%"
@@ -166,9 +166,15 @@ import { useRouter } from 'vue-router'
 import permission from '@/directive/permission'
 import Service from '../api/index'
 import {ElMessage} from "element-plus";
+import {CirclePlus} from "@element-plus/icons-vue";
 
 export default defineComponent({
   name: 'todoTableList',
+  computed: {
+    CirclePlus() {
+      return CirclePlus
+    }
+  },
   directives: {
     permission
   },
