@@ -115,7 +115,7 @@
       <el-col :span="24">
         <el-card>
           <el-row>
-            <el-col :span="18">
+            <el-col :span="24">
               <FullCalendar class="demo-app-calendar" :options="calendarOptions">
                 <template #eventContent="arg">
                   <b>{{ arg.timeText }}</b>
@@ -259,6 +259,12 @@ const calendarOptions = reactive({
     center: 'title',
     right: 'dayGridMonth,timeGridWeek,timeGridDay'
   },
+  buttonText: {
+    today: '当前',
+    month: '月视图',
+    week: '周视图',
+    day: '日视图'
+  },
   droppable: true,
   drop(info: DropArg) {
     if (checked.value) {
@@ -268,11 +274,17 @@ const calendarOptions = reactive({
     }
   },
   initialView: 'dayGridMonth',
+  handleWindowResize: true,
+  locale: 'zh-cn',
   editable: true,
   selectable: true,
   selectMirror: true,
-  dayMaxEvents: true,
+  dayMaxEvents: 6,
   weekends: true,
+  eventStartEditable: false,
+  moreLinkContent: "+ 更多",
+  expandRows: true,
+  nowIndicator: true,
   select: handleDateSelect,
   eventClick: handleEventClick,
   eventsSet: handleEvents,
@@ -316,6 +328,7 @@ const getMyTodoSchedule = () => {
           record.title = record.todo_title
           record.start = record.todo_crt.replace(' ', 'T')
           record.end = record.todo_ddl.replace(' ', 'T') + ":00"
+          record.color = record.todo_fin == "已完成"? "#C4D6DB":"#5A9D60"
           // record.rendering = true
           INITIAL_EVENTS.push(record)
         }
