@@ -56,7 +56,7 @@ export default class Service {
 
         file_table_ref: ref(),
         file: {
-            table_height: 'calc(80VH - 80px)',        //列表表格高度
+            table_height: 'calc(70VH - 80px)',        //列表表格高度
             page_layout: "total, prev, pager, next", //分页条展示形式
             current_page: 1, //当前页码数
             page_size: 30,   //每页显示条数
@@ -295,6 +295,7 @@ export default class Service {
             }
         })
 
+
         this.config.folder.move_folder_dlg = false
     }
 
@@ -388,6 +389,7 @@ export default class Service {
      * @param size 每页显示的条数
      */
     handleSizeChange = (size:number):void => {
+        console.log("handleSizeChange "+size)
         this.config.file.page_size = size
         this.searchFile()
     }
@@ -511,12 +513,16 @@ export default class Service {
      */
     moveFile = ():void => {
         const file_id:Array<number> = []
+        const file_before_dir_id=this.config.file.select_files[0].dir_id
         this.config.file.select_files.forEach((item:AnyObject)=>{
             file_id.push(item.id)
+
         })
+
 
         this.emit('moveFile', {
             select_file_id: file_id,
+            select_file_before_dir_id:file_before_dir_id,
             target_pid: this.config.file.move_pid,
             loadFile: () => {
                 this.emit('loadFile', this.config.file)
@@ -546,12 +552,14 @@ export default class Service {
      */
     remarkFile = ():void => {
         const file_id:Array<number> = []
+        const beforeDirId=this.config.file.select_files[0].dir_id
         this.config.file.select_files.forEach((item:AnyObject)=>{
             file_id.push(item.id)
         })
 
         this.emit('remarkFile', {
             select_file_id: file_id,
+            select_file_before_dir_id:beforeDirId,
             remark_content: this.config.file.remark_content,
             loadFile: () => {
                 this.emit('loadFile', this.config.file)
@@ -579,12 +587,14 @@ export default class Service {
             }
         ).then(() => {
             const file_id:Array<number> = []
+            const beforeDirId=this.config.file.select_files[0].dir_id
             this.config.file.select_files.forEach((item:AnyObject)=>{
                 file_id.push(item.id)
             })
 
             this.emit('delFile', {
                 select_file_id: file_id,
+                select_file_before_dir_id:beforeDirId,
                 loadFile: () => {
                     this.emit('loadFile', this.config.file)
                 }
@@ -617,7 +627,11 @@ export default class Service {
      * @param uploadFiles
      */
     onUploadSuccess = (response: AnyObject, uploadFile: UploadFile, uploadFiles: UploadFiles):void => {
-        this.emit('onUploadSuccess',{response:response, uploadFile: uploadFile, uploadFiles: uploadFiles, uploadInstance: this.config.file.uploadInstance})
+        if(response.status===-1){
+            ElMessage.error('您的权限不够，无法在公司共享文件夹上传文件')
+        }else{
+            this.emit('onUploadSuccess',{response:response, uploadFile: uploadFile, uploadFiles: uploadFiles, uploadInstance: this.config.file.uploadInstance})
+        }
     }
 
     /**
