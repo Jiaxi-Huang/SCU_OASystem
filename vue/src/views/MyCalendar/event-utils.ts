@@ -34,7 +34,7 @@ class Service {
     }).then((res) => {
       if (res.status === 0) {
         console.log("postGetTodoList success")
-        console.log(res)
+        // console.log(res)
         return res
       }
       return null

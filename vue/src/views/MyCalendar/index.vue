@@ -115,7 +115,7 @@
       <el-col :span="24">
         <el-card>
           <el-row>
-            <el-col :span="18">
+            <el-col :span="24">
               <FullCalendar class="demo-app-calendar" :options="calendarOptions">
                 <template #eventContent="arg">
                   <b>{{ arg.timeText }}</b>
@@ -128,6 +128,81 @@
       </el-col>
     </el-row>
   </div>
+
+  <el-dialog v-model="state.detailFormVisible" title="待办事项详情">
+    <el-form :model="state.form">
+      <el-form-item label="标题&nbsp;&nbsp;" :label-width="formLabelWidth">
+        {{ state.form.todo_title }}
+      </el-form-item>
+      <el-form-item label="内容&nbsp;&nbsp;" :label-width="formLabelWidth">
+        {{ state.form.todo_ctnt }}
+      </el-form-item>
+      <el-form-item label="截止日期&nbsp;&nbsp;" :label-width="formLabelWidth">
+        {{ state.form.todo_ddl }}
+      </el-form-item>
+      <el-form-item label="状态&nbsp;&nbsp;" :label-width="formLabelWidth">
+        {{ state.form.todo_fin }}
+      </el-form-item>
+      <el-form-item label="创建日期&nbsp;&nbsp;" :label-width="formLabelWidth">
+        {{ state.form.todo_crt }}
+      </el-form-item>
+      <el-form-item label="添加者ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+        {{ state.form.adder_id }}
+      </el-form-item>
+      <el-form-item label="待办事項ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+        {{ state.form.todo_id }}
+      </el-form-item>
+      <el-form-item label="从属用戶ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+        {{state.form.user_id }}
+      </el-form-item>
+    </el-form>
+    <div slot="footer" class="dialog-footer">
+      <el-button type="primary" @click="state.detailFormVisible = false">确 定</el-button>
+    </div>
+  </el-dialog>
+
+  <el-dialog v-model="state.MeetingDetailFormVisible" title="会议详情">
+    <el-form :model="state.form">
+      <el-form-item label="会议标题&nbsp;&nbsp;" :label-width="formLabelWidth">
+        {{ state.form.mtin_title }}
+      </el-form-item>
+      <el-form-item label="会议内容&nbsp;&nbsp;" :label-width="formLabelWidth">
+                <span style=" word-wrap: break-word;
+                              word-break: break-word;
+                              white-space: normal;">
+                 {{ state.form.mtin_ctnt }}
+                </span>
+      </el-form-item>
+      <el-form-item label="会议开始时间&nbsp;&nbsp;" :label-width="formLabelWidth">
+        {{ state.form.mtin_st }}
+      </el-form-item>
+      <el-form-item label="会议长度&nbsp;&nbsp;" :label-width="formLabelWidth">
+        {{ state.form.mtin_len }}
+      </el-form-item>
+      <el-form-item label="会议地点&nbsp;&nbsp;" :label-width="formLabelWidth">
+        {{ state.form.mtin_loc }}
+      </el-form-item>
+      <el-form-item label="会议主持人ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+        {{ state.form.mtin_host }}
+      </el-form-item>
+      <el-form-item label="会议ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+        {{ state.form.mtin_id }}
+      </el-form-item>
+      <el-form-item label="会议状态&nbsp;&nbsp;" :label-width="formLabelWidth">
+        {{ state.form.mtin_fin }}
+      </el-form-item>
+      <el-form-item label="会议创建时间&nbsp;&nbsp;" :label-width="formLabelWidth">
+        {{ state.form.mtin_crt }}
+      </el-form-item>
+      <el-form-item label="会议添加者ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+        {{ state.form.adder_id }}
+      </el-form-item>
+    </el-form>
+    <div slot="footer" class="dialog-footer">
+      <el-button type="primary" @click="state.MeetingDetailFormVisible = false">确 定</el-button>
+    </div>
+  </el-dialog>
+
 </template>
 
 <script setup lang="ts">
@@ -166,6 +241,13 @@ const form = reactive({
   title: '',
   className: 'bg-success'
 })
+
+const state = reactive({
+  detailFormVisible: false,
+  MeetingDetailFormVisible: false,
+  form: {},
+})
+
 const rules = reactive({
   title: [
     {
@@ -183,18 +265,14 @@ const rules = reactive({
   ]
 })
 
-const INITIAL_EVENTS = reactive<EventInput[]>([
-  // {
-  //   id: createEventId(),
-  //   title: '全天安排',
-  //   start: ,
-  // },
-  // {
-  //   id: createEventId(),
-  //   title: '算法专训',
-  //   start: `${todayStr}T12:00:00`,
-  // },
-]);
+let colorPointer = 0
+const COLORS = ["#60cb9b", "#60acce", "#f3bf3f"]
+const colorGetter = () => {
+  return COLORS[(colorPointer++)%3]
+}
+
+
+const INITIAL_EVENTS = reactive<EventInput[]>([]);
 
 /**
  * @description 选中某天处理事件
@@ -221,25 +299,16 @@ const handleDateSelect = (selectInfo: DateSelectArg) => {
  * @description 选中当前任务事件
  */
 const handleEventClick = (clickInfo: EventClickArg) => {
-  ElMessageBox.confirm('确定删除当前任务吗？', '温馨提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  })
-    .then(() => {
-      clickInfo.event.remove()
-
-      ElMessage({
-        type: 'success',
-        message: '删除成功'
-      })
-    })
-    .catch(() => {
-      ElMessage({
-        type: 'info',
-        message: '已取消删除'
-      })
-    })
+  const id = clickInfo.event._def.publicId
+  const props = clickInfo.event._def.extendedProps
+  if (id.split("_")[0] == 'todo') {
+    console.log("This is a todo")
+    state.detailFormVisible = true
+  } else {
+    console.log("This is a meeting")
+    state.MeetingDetailFormVisible = true
+  }
+  state.form = props
 }
 /**
  * @description 选中当前事件
@@ -259,6 +328,12 @@ const calendarOptions = reactive({
     center: 'title',
     right: 'dayGridMonth,timeGridWeek,timeGridDay'
   },
+  buttonText: {
+    today: '当前',
+    month: '月视图',
+    week: '周视图',
+    day: '日视图'
+  },
   droppable: true,
   drop(info: DropArg) {
     if (checked.value) {
@@ -268,12 +343,19 @@ const calendarOptions = reactive({
     }
   },
   initialView: 'dayGridMonth',
+  handleWindowResize: true,
+  locale: 'zh-cn',
   editable: true,
   selectable: true,
   selectMirror: true,
-  dayMaxEvents: true,
+  dayMaxEvents: 6,
   weekends: true,
-  select: handleDateSelect,
+  eventStartEditable: false,
+  moreLinkContent: "+ 更多",
+  slotEventOverlap:false,
+  defaultEventMinutes: 20,
+  expandRows: true,
+  // select: handleDateSelect,
   eventClick: handleEventClick,
   eventsSet: handleEvents,
   events: INITIAL_EVENTS,
@@ -291,8 +373,33 @@ const handleWeekendsToggle = () => {
 
 const getMyMeetingSchedule = () => {
   try {
-    Service.getMySchedule().then((res) => {
+    Service.getMyMeetingSchedule().then((res) => {
       if (res) {
+        const finished = res.data[2];
+        const today = res.data[1];
+        const scheduled = res.data[0];
+        for (const record of finished) {
+          record.id = "mt_" + record.mtin_id
+          record.title = record.mtin_title
+          record.start = record.mtin_st.replace(' ', 'T') + ":00"
+          record.color = "#C4D6DB"
+          INITIAL_EVENTS.push(record)
+        }
+        for (const record of today) {
+          record.id = "mt_" + record.mtin_id
+          record.title = record.mtin_title
+          record.start = record.mtin_st.replace(' ', 'T') + ":00"
+          record.color = "#e6687d"
+          INITIAL_EVENTS.push(record)
+        }
+        for (const record of scheduled) {
+          record.id = "mt_" + record.mtin_id
+          record.title = record.mtin_title
+          record.start = record.mtin_st.replace(' ', 'T') + ":00"
+          record.color = "#60cb9b"
+          INITIAL_EVENTS.push(record)
+        }
+        // console.log(INITIAL_EVENTS)
         console.log('getMyMeetingSchedule success!')
       } else {
         console.log('getMyMeetingSchedule error!')
@@ -316,10 +423,11 @@ const getMyTodoSchedule = () => {
           record.title = record.todo_title
           record.start = record.todo_crt.replace(' ', 'T')
           record.end = record.todo_ddl.replace(' ', 'T') + ":00"
+          record.color = record.todo_fin == "已完成"? "#C4D6DB":colorGetter()
           // record.rendering = true
           INITIAL_EVENTS.push(record)
         }
-        console.log(INITIAL_EVENTS)
+        // console.log(INITIAL_EVENTS)
         console.log('getMyTodoSchedule success!')
       } else {
         console.log('getMyTodoSchedule error!')
@@ -334,7 +442,8 @@ const getMyTodoSchedule = () => {
 }
 
 onMounted(() => {
-  // getMyMeetingSchedule()
+  getMyMeetingSchedule()
   getMyTodoSchedule()
+
 })
 </script>

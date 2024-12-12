@@ -141,22 +141,35 @@ public class FileController {
         System.out.println("new userid "+user_id);
         // 定义文件保存路径
        // System.out.println("upload folder"+accessToken);
-
         User userInfo = userMapper.findByUserId(user_id);
+        String uploadDir = System.getProperty("user.dir") + "/uploads/";  // 相对于项目根目录的路径
+        File uploadDirectory = new File(uploadDir);
+        System.out.println("Absolute path: " + uploadDirectory.getAbsolutePath());
+        System.out.println("Can write: " + uploadDirectory.canWrite());
+        if (!uploadDirectory.exists()) {
+            uploadDirectory.mkdirs(); // 确保上传目录存在
+        }
 
-        String uploadDir = "E:/upload/";  // 可以修改为你存储文件的目录
         String allFileName = file.getOriginalFilename();
         String filePath = uploadDir + allFileName;
-
+        System.out.println("11111");
         try {
             // 保存文件到服务器
+            System.out.println("111222211");
+            System.out.println("File path: " + filePath);
+            System.out.println("All file name: " + allFileName);
+
             File targetFile = new File(filePath);
             file.transferTo(targetFile);
-
+            System.out.println("11111");
             // 生成文件的 URL
-            String fileUrl = "http://localhost:8080/" + allFileName;  // 根据你实际的 URL 配置修改
+//            String fileUrl = "http://localhost:8080/" + allFileName;  // 根据你实际的 URL 配置修改
+//            System.out.println(fileUrl);
+//            response.pushData(fileUrl);
+            String fileUrl = "http://localhost:8080/" + allFileName;  // 相对路径的 URL
             System.out.println(fileUrl);
             response.pushData(fileUrl);
+
             Files record = new Files();
 
             record.setFilePath(filePath);
@@ -185,14 +198,11 @@ public class FileController {
             }
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (IOException e) {
+            e.printStackTrace();  // 打印详细错误信息
             response.setMessage("上传失败");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
-
-
-
 }
 
 
