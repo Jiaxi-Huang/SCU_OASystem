@@ -4,9 +4,17 @@
       <el-form-item>
         <el-button type="primary" @click="onAddTodo" :icon="CirclePlus">添加待办事项</el-button>
       </el-form-item>
+      <el-form-item>
+        <el-popconfirm confirm-button-text="确定" cancel-button-text="取消"  icon-color="red" title="确定删除该条记录吗？" @confirm="onDeleteMulti">
+          <template #reference>
+            <el-button type="danger" :icon="Delete">批量删除待办事项</el-button>
+          </template>
+        </el-popconfirm>
+      </el-form-item>
     </el-form>
     <el-table ref="filterTableRef" class="table-list" row-key="todo_id" :data="paginatedData" style="width: 100%"
-              @filter-change="handleFilterChange">
+              @filter-change="handleFilterChange" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="55" align="center"></el-table-column>
       <el-table-column
         prop="todo_ddl"
         label="截止日期"
@@ -166,11 +174,14 @@ import { useRouter } from 'vue-router'
 import permission from '@/directive/permission'
 import Service from '../api/index'
 import {ElMessage} from "element-plus";
-import {CirclePlus} from "@element-plus/icons-vue";
+import {CirclePlus, Delete} from "@element-plus/icons-vue";
 
 export default defineComponent({
   name: 'todoTableList',
   computed: {
+    Delete() {
+      return Delete
+    },
     CirclePlus() {
       return CirclePlus
     }
@@ -217,6 +228,7 @@ export default defineComponent({
         todo_fin: [] // 筛选的状态，可以是 '已完成' 或 '未完成'
       },
 
+      selectionRows: [] as { todo_id: number }[],
 
     })
     const formInline = reactive({
@@ -256,6 +268,10 @@ export default defineComponent({
       }
     }
 
+    const handleSelectionChange = (selection:any[]) => {
+      state.selectionRows = selection.map(item => item.todo_id)
+      console.log("SelectionRows",state.selectionRows)
+    }
 
     const getPersonalTodoList = () => {
       // console.log("getPersonalTodoList exc")
@@ -369,6 +385,7 @@ export default defineComponent({
         Service.deleteTodo(record).then((res) => {
           if (res) {
             // console.log(res)
+            getPersonalTodoList()
           } else {
           }
         });
@@ -389,6 +406,26 @@ export default defineComponent({
     const handleCurrentChange = (val: number) => {
       state.currentPage = val;
       updatePaginatedData();  // 更新分页数据
+    }
+
+    const onDeleteMulti = () => {
+      try {
+        Service.deleteMulti(state.selectionRows).then((res) => {
+          if (res) {
+            getPersonalTodoList()
+            ElMessage({
+              type: 'success',
+              message: " 成功删除"
+            })
+          }
+        });
+      } catch (err) {
+        ElMessage({
+          type: 'warning',
+          message: err.message
+        })
+      }
+
     }
 
     const onSubmit = () => {
@@ -423,7 +460,6 @@ export default defineComponent({
       clearFilter,
       formatter,
       filterTag,
-      // filterStatus,
       handleFilterChange,
       filterHandler,
       modifyPop,
@@ -431,6 +467,8 @@ export default defineComponent({
       watchSearch,
       page_size_get_set,
       filterPresetTest,
+      handleSelectionChange,
+      onDeleteMulti,
     }
   }
 })

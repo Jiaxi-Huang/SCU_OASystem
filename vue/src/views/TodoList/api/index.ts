@@ -60,6 +60,14 @@ class Service {
     })
   }
 
+  static deleteMulti(selectionRows: []) {
+    let res = null;
+    for (let todo_id of selectionRows) {
+      res = this.deleteTodo({todo_id: todo_id})
+    }
+    return res
+  }
+
   static addTodo(record:any) {
     record.todo_fin = '未完成'
     record.acsTkn = sessionStorage.getItem('accessToken')
