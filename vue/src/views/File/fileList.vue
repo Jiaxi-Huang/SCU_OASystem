@@ -1,31 +1,31 @@
 <template>
-  <h3>文件管理</h3>
+  <div>
+    <h3>文件管理</h3>
+    <vuecmf-fileexplorer
+        root_path="个人文件管理"
+        :page_size="10"
+        list_show="list"
+        :tool_config="['new_folder','update_folder','move_folder','del_folder','upload','move_file','del_file','remark_file']"
+        upload_api="http://localhost:8080/api/file/upload"
 
-  <vuecmf-fileexplorer
-      root_path="个人文件管理"
-      :page_size="10"
-      list_show="list"
-      :tool_config="['new_folder','update_folder','move_folder','del_folder','upload','move_file','del_file','remark_file']"
-      upload_api="http://localhost:8080/api/file/upload"
+        @loadFolder="loadFolder"
+        @moveFolder="moveFolder"
+        @saveFolder="saveFolder"
+        @delFolder="delFolder"
+        @loadFile="loadFile"
+        @selectFile="selectFile"
+        @moveFile="moveFile"
+        @delFile="delFile"
+        @saveFile="saveFile"
+        @remarkFile="remarkFile"
 
-      @loadFolder="loadFolder"
-      @moveFolder="moveFolder"
-      @saveFolder="saveFolder"
-      @delFolder="delFolder"
-      @loadFile="loadFile"
-      @selectFile="selectFile"
-      @moveFile="moveFile"
-      @delFile="delFile"
-      @saveFile="saveFile"
-      @remarkFile="remarkFile"
-      @upload="upload"
+        @beforeUpload="beforeUpload"
+        @onUploadSuccess="onUploadSuccess"
+        @onUploadError="onUploadError"
+    >
+    </vuecmf-fileexplorer>
+  </div>
 
-      @beforeUpload="beforeUpload"
-      @onUploadSuccess="onUploadSuccess"
-      @onUploadError="onUploadError"
-
-  >
-  </vuecmf-fileexplorer>
 
 </template>
 
@@ -549,22 +549,22 @@ export default defineComponent({
       console.log('error = ', data)
     }
 
-    const upload =(data:AnyObject):void=>{
-      try {
-        Service.uploadFile(data).then((res) => {
-          if (res) {
-            // console.log(res)
-          } else {
-          }
-        });
-      } catch (err) {
-        ElMessage({
-          type: 'warning',
-          message: err.message
-        })
-      }
-      console.log(data)
-    }
+    // const upload =(data:AnyObject):void=>{
+    //   try {
+    //     Service.uploadFile(data).then((res) => {
+    //       if (res) {
+    //         // console.log(res)
+    //       } else {
+    //       }
+    //     });
+    //   } catch (err) {
+    //     ElMessage({
+    //       type: 'warning',
+    //       message: err.message
+    //     })
+    //   }
+    //   console.log(data)
+    // }
     return {
       loadFolder,
       saveFolder,
@@ -576,7 +576,6 @@ export default defineComponent({
       delFile,
       saveFile,
       remarkFile,
-      upload,
 
       beforeUpload,
       onUploadSuccess,

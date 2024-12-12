@@ -293,7 +293,6 @@
             clearable
             check-strictly />
       </el-form-item>
-      <!--            :http-request="service.handleHttpRequest"-->
       <el-form-item label="上传文件：" >
         <el-upload
             ref="uploadRef"
@@ -301,8 +300,7 @@
             :auto-upload="false"
             :multiple="true"
             :headers="headers"
-            :data="Object.assign(additionalParams,{folder_id: file.current_folder_id//上传时附带的额外参数
-               })"
+            :data="Object.assign(additionalParams,{folder_id: file.current_folder_id})"
             :on-success="service.onUploadSuccess"
             :on-error="service.onUploadError"
             :before-upload="service.beforeUpload"
@@ -359,7 +357,7 @@
 import Service from './Service'
 import {defineEmits, toRefs, ref, reactive} from "vue"
 import {ElTable, UploadInstance} from "element-plus";
-const emit = defineEmits(['loadFolder','saveFolder','moveFolder','delFolder','loadFile','uploadFile','saveFile','moveFile','delFile','selectFile', 'onUploadSuccess', 'onUploadError','beforeUpload', 'onPreview', 'onRemove','onProgress','onChange', 'onExceed','remarkFile','upload'])
+const emit = defineEmits(['loadFolder','saveFolder','moveFolder','delFolder','loadFile','uploadFile','saveFile','moveFile','delFile','selectFile', 'onUploadSuccess', 'onUploadError','beforeUpload', 'onPreview', 'onRemove','onProgress','onChange', 'onExceed','remarkFile'])
 // 获取 accessToken
 
 const settingForm = reactive({
