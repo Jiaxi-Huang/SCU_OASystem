@@ -8,6 +8,7 @@ import com.example.backend.entity.todoList.TodoRecordWithTk;
 import com.example.backend.entity.ResponseBase;
 import com.example.backend.entity.userInfo.adminUserInfoRequest;
 import com.example.backend.services.AccessService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,9 +16,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.backend.services.TodoService;
 
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
 
 @RestController
 @RequestMapping("/api/todolist")
@@ -49,6 +54,61 @@ public class TodoListCon {
             res.setMessage(e.getMessage());
         }
         return res;
+    }
+
+    @PostMapping("/getPdf")
+    public void getPdf(HttpServletResponse response, @RequestBody adminUserInfoRequest request) {
+        try {
+            String accessToken = request.getAccessToken();
+            int userId = accessService.getAuthenticatedId(accessToken);
+            List<TodoRecord> records = my_service.getRecordsByUserId(userId);
+
+            Document document = new Document();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            PdfWriter.getInstance(document, baos);
+            document.open();
+
+            BaseFont bfChinese = BaseFont.createFont("STSong-Light","UniGB-UTF16-H",BaseFont.NOT_EMBEDDED);
+            Font font = new Font(bfChinese);
+            font.setColor(BaseColor.BLACK);
+            // 创建表格
+            PdfPTable table = new PdfPTable(5); // 5 列
+            table.setWidthPercentage(100); // 表格宽度占页面 100%
+
+            // 添加表头
+            String[] headers = {"ID", "待办事项名称", "待办事项内容", "待办事项截止日期", "待办事项创建时间"};
+            for (String header : headers) {
+                PdfPCell cell = new PdfPCell(new Paragraph(header, font));
+                cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                cell.setVerticalAlignment(PdfPCell.ALIGN_MIDDLE);
+                table.addCell(cell);
+            }
+
+            // 添加内容（根据 records 数据添加）
+            for (TodoRecord record : records) {
+                table.addCell(new Paragraph(Integer.toString(record.getTodo_id()), font));
+                table.addCell(new Paragraph(record.getTodo_title(), font));
+                table.addCell(new Paragraph(record.getTodo_ctnt(), font));
+                table.addCell(new Paragraph(record.getTodo_ddl(), font));
+                table.addCell(new Paragraph(record.getTodo_crt(), font));
+            }
+            // 将表格添加到文档
+            document.add(table);
+            document.close();
+
+            // 设置响应头
+            response.setContentType("application/pdf");
+            response.setHeader("Content-Disposition", "attachment;");
+
+            // 将 PDF 内容写入响应
+            response.getOutputStream().write(baos.toByteArray());
+            response.getOutputStream().flush();
+            response.getOutputStream().close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @PostMapping("/modifyRec")

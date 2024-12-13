@@ -92,6 +92,12 @@ export default function request(arr: IAxiosData) {
           config: {} //`config`是在请求的时候的一些配置信息
         }
          */
+        //GUO YUAN MODIFY START
+        if(response.request.responseType ===  'blob' || response.request.responseType ===  'arraybuffer'){
+          return resolve(response.data)
+        }
+        //GUO YUAN MODIFY END
+
         const responseStatus = `${response.status}`
         // 状态码2开头的处理逻辑
         if (responseStatus.charAt(0) === '2') {
@@ -103,16 +109,6 @@ export default function request(arr: IAxiosData) {
             reject(response.data)
             return
           }
-          // if (response.data.code === '401') {
-          //   Message({
-          //     type: 'error',
-          //     message: response.data.message
-          //   });
-          //   reject(response.data);
-          //   remove('token');
-          //   router.push('/login');
-          //   return;
-          // }
 
           resolve(response.data)
         } else {

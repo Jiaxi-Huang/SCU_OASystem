@@ -11,6 +11,12 @@
           </template>
         </el-popconfirm>
       </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="onDownload" :icon="Download">打印</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="onToExcel" :icon="Download">导出</el-button>
+      </el-form-item>
     </el-form>
     <el-table ref="filterTableRef" class="table-list" row-key="todo_id" :data="paginatedData" style="width: 100%"
               @filter-change="handleFilterChange" @selection-change="handleSelectionChange">
@@ -173,12 +179,15 @@ import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } fr
 import { useRouter } from 'vue-router'
 import permission from '@/directive/permission'
 import Service from '../api/index'
-import {ElMessage} from "element-plus";
-import {CirclePlus, Delete} from "@element-plus/icons-vue";
+import {ElMessage, ElMessageBox} from "element-plus";
+import {CirclePlus, Delete, Download} from "@element-plus/icons-vue";
 
 export default defineComponent({
   name: 'todoTableList',
   computed: {
+    Download() {
+      return Download
+    },
     Delete() {
       return Delete
     },
@@ -445,6 +454,36 @@ export default defineComponent({
       updatePaginatedData(); // 更新分页数据
     }
 
+    const onDownload = () => {
+      ElMessageBox.confirm('确定要打印为PDF吗', '温馨提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        // 确认后调用获取 PDF 的方法
+        Service.getPDF().then(() => {
+          ElMessage({
+            type: 'success',
+            message: 'PDF 文件正在下载...'
+          });
+        }).catch(() => {
+          ElMessage({
+            type: 'error',
+            message: '下载失败，请重试'
+          });
+        });
+      }).catch(() => {
+        ElMessage({
+          type: 'info',
+          message: '已取消'
+        });
+      });
+    }
+
+    const onToExcel = () => {
+
+    }
+
     return {
       formInline,
       total,
@@ -469,6 +508,8 @@ export default defineComponent({
       filterPresetTest,
       handleSelectionChange,
       onDeleteMulti,
+      onDownload,
+      onToExcel,
     }
   }
 })
