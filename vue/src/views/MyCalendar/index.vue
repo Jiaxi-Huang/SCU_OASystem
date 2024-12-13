@@ -377,21 +377,21 @@ const getMyMeetingSchedule = () => {
         const scheduled = res.data[0];
         for (const record of finished) {
           record.id = "mt_" + record.mtin_id
-          record.title = record.mtin_title
+          record.title = "会议：" + record.mtin_title
           record.start = record.mtin_st.replace(' ', 'T') + ":00"
           record.color = "#C4D6DB"
           INITIAL_EVENTS.push(record)
         }
         for (const record of today) {
           record.id = "mt_" + record.mtin_id
-          record.title = record.mtin_title
+          record.title = "会议：" + record.mtin_title
           record.start = record.mtin_st.replace(' ', 'T') + ":00"
           record.color = "#e6687d"
           INITIAL_EVENTS.push(record)
         }
         for (const record of scheduled) {
           record.id = "mt_" + record.mtin_id
-          record.title = record.mtin_title
+          record.title = "会议：" + record.mtin_title
           record.start = record.mtin_st.replace(' ', 'T') + ":00"
           record.color = "#60cb9b"
           INITIAL_EVENTS.push(record)
@@ -417,7 +417,7 @@ const getMyTodoSchedule = () => {
         const records = res.data;
         for (let record of records) {
           record.id = "todo_" + record.todo_id
-          record.title = record.todo_title
+          record.title = "待办：" + record.todo_title
           record.start = record.todo_crt.replace(' ', 'T')
           record.end = record.todo_ddl.replace(' ', 'T') + ":00"
           record.color = record.todo_fin == "已完成"? "#C4D6DB":colorGetter()
