@@ -33,7 +33,6 @@ class Service {
       data: data,
     }).then((res) => {
       if (res.status === 0) {
-        console.log("postGetTodoList success")
         console.log(res)
         return res
       }
@@ -50,7 +49,6 @@ class Service {
       data: data,
     }).then((res) => {
       if (res.status === 0) {
-        console.log("postGetTodoList success")
         return res
       }
       return null
