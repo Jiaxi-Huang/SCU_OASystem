@@ -1,102 +1,5 @@
-<style lang="stylus" scoped>
-
-.calendar-info{
-  color black
-  padding 0px 20px
-  background-color #fafbfe
-
-  .page-title-box{
-  box-sizing border-box
-  display flex
-  flex-direction row
-  justify-content space-between
-  align-items center
-  color #6c757d
-  .page-title{
-    font-size  18px
-    margin  0
-    line-height  85px
-    overflow  hidden
-    white-space: nowrap
-    text-overflow  ellipsis
-    color  inherit
-    font-weight 700
-  }
-  .page-title-right{
-    display flex
-    flex-direction row
-    justify-content space-around
-    align-items center
-  }
-}
-  .text-muted{
-    color #98a6ad
-  }
-  .text-left{
-    text-align left
-  }
-
-}
-:deep(.fc .fc-daygrid-day.fc-day-today){
-  background #f3f6f8
-}
-:deep(.fc .fc-button-primary){
-  background-color #409effab
-  border-color transparent
-}
-:deep(.fc .fc-button-primary:not(:disabled).fc-button-active){
-  background-color #409eff
-  border-color transparent
-}
-:deep(.fc .fc-daygrid-day-number){
-  float right
-  height 20px
-  width 20px
-  text-align center
-  line-height 20px
-  background-color #f1f3fa
-  border-radius 50%
-  margin 5px
-  font-size 11px
-  display: inline-table;
-}
-:deep(.bg-success){
-  background-color #0acf97!important
-}
-:deep(.bg-info) {
-  background-color: #39afd1!important;
-}
-:deep(.bg-danger) {
-  background-color: #fa5c7c!important;
-}
-:deep(.bg-dark) {
-  background-color: #313a46!important;
-}
-:deep(.bg-warning) {
-  background-color: #ffbc00!important;
-}
-:deep(.external-events){
-  cursor move
-  margin 10px 0
-  padding 8px 10px
-  color #fff
-  text-align left
-  width 258.25px
-  overflow hidden
-  text-overflow ellipsis
-  white-space nowrap
-  .list-circle{
-  width 14px
-  height 14px
-  border-radius 50%
-  background-color white
-  display inline-block
-  margin-right 10px
-}
-}
-</style>
-
 <template>
+  <div>
   <div class="calendar-info">
     <el-row style="margin: 15px">
       <el-col :span="24" class="page-title-box">
@@ -202,7 +105,7 @@
       <el-button type="primary" @click="state.MeetingDetailFormVisible = false">确 定</el-button>
     </div>
   </el-dialog>
-
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -447,3 +350,100 @@ onMounted(() => {
 
 })
 </script>
+<style lang="stylus" scoped>
+
+.calendar-info{
+  color black
+  padding 0px 20px
+  background-color #fafbfe
+
+  .page-title-box{
+    box-sizing border-box
+    display flex
+    flex-direction row
+    justify-content space-between
+    align-items center
+    color #6c757d
+    .page-title{
+      font-size  18px
+      margin  0
+      line-height  85px
+      overflow  hidden
+      white-space: nowrap
+      text-overflow  ellipsis
+      color  inherit
+      font-weight 700
+    }
+    .page-title-right{
+      display flex
+      flex-direction row
+      justify-content space-around
+      align-items center
+    }
+  }
+  .text-muted{
+    color #98a6ad
+  }
+  .text-left{
+    text-align left
+  }
+
+}
+:deep(.fc .fc-daygrid-day.fc-day-today){
+  background #f3f6f8
+}
+:deep(.fc .fc-button-primary){
+  background-color #409effab
+  border-color transparent
+}
+:deep(.fc .fc-button-primary:not(:disabled).fc-button-active){
+  background-color #409eff
+  border-color transparent
+}
+:deep(.fc .fc-daygrid-day-number){
+  float right
+  height 20px
+  width 20px
+  text-align center
+  line-height 20px
+  background-color #f1f3fa
+  border-radius 50%
+  margin 5px
+  font-size 11px
+  display: inline-table;
+}
+:deep(.bg-success){
+  background-color #0acf97!important
+}
+:deep(.bg-info) {
+  background-color: #39afd1!important;
+}
+:deep(.bg-danger) {
+  background-color: #fa5c7c!important;
+}
+:deep(.bg-dark) {
+  background-color: #313a46!important;
+}
+:deep(.bg-warning) {
+  background-color: #ffbc00!important;
+}
+:deep(.external-events){
+  cursor move
+  margin 10px 0
+  padding 8px 10px
+  color #fff
+  text-align left
+  width 258.25px
+  overflow hidden
+  text-overflow ellipsis
+  white-space nowrap
+  .list-circle{
+    width 14px
+    height 14px
+    border-radius 50%
+    background-color white
+    display inline-block
+    margin-right 10px
+  }
+}
+</style>
