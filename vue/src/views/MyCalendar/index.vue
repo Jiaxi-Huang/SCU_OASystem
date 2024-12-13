@@ -127,82 +127,80 @@
         </el-card>
       </el-col>
     </el-row>
-  </div>
 
-  <el-dialog v-model="state.detailFormVisible" title="待办事项详情">
-    <el-form :model="state.form">
-      <el-form-item label="标题&nbsp;&nbsp;" :label-width="formLabelWidth">
-        {{ state.form.todo_title }}
-      </el-form-item>
-      <el-form-item label="内容&nbsp;&nbsp;" :label-width="formLabelWidth">
-        {{ state.form.todo_ctnt }}
-      </el-form-item>
-      <el-form-item label="截止日期&nbsp;&nbsp;" :label-width="formLabelWidth">
-        {{ state.form.todo_ddl }}
-      </el-form-item>
-      <el-form-item label="状态&nbsp;&nbsp;" :label-width="formLabelWidth">
-        {{ state.form.todo_fin }}
-      </el-form-item>
-      <el-form-item label="创建日期&nbsp;&nbsp;" :label-width="formLabelWidth">
-        {{ state.form.todo_crt }}
-      </el-form-item>
-      <el-form-item label="添加者ID&nbsp;&nbsp;" :label-width="formLabelWidth">
-        {{ state.form.adder_id }}
-      </el-form-item>
-      <el-form-item label="待办事項ID&nbsp;&nbsp;" :label-width="formLabelWidth">
-        {{ state.form.todo_id }}
-      </el-form-item>
-      <el-form-item label="从属用戶ID&nbsp;&nbsp;" :label-width="formLabelWidth">
-        {{state.form.user_id }}
-      </el-form-item>
-    </el-form>
-    <div slot="footer" class="dialog-footer">
-      <el-button type="primary" @click="state.detailFormVisible = false">确 定</el-button>
-    </div>
-  </el-dialog>
-
-  <el-dialog v-model="state.MeetingDetailFormVisible" title="会议详情">
-    <el-form :model="state.form">
-      <el-form-item label="会议标题&nbsp;&nbsp;" :label-width="formLabelWidth">
-        {{ state.form.mtin_title }}
-      </el-form-item>
-      <el-form-item label="会议内容&nbsp;&nbsp;" :label-width="formLabelWidth">
+    <el-dialog v-model="state.MeetingDetailFormVisible" title="会议详情">
+      <el-form :model="state.form">
+        <el-form-item label="会议标题&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{ state.form.mtin_title }}
+        </el-form-item>
+        <el-form-item label="会议内容&nbsp;&nbsp;" :label-width="formLabelWidth">
                 <span style=" word-wrap: break-word;
                               word-break: break-word;
                               white-space: normal;">
                  {{ state.form.mtin_ctnt }}
                 </span>
-      </el-form-item>
-      <el-form-item label="会议开始时间&nbsp;&nbsp;" :label-width="formLabelWidth">
-        {{ state.form.mtin_st }}
-      </el-form-item>
-      <el-form-item label="会议长度&nbsp;&nbsp;" :label-width="formLabelWidth">
-        {{ state.form.mtin_len }}
-      </el-form-item>
-      <el-form-item label="会议地点&nbsp;&nbsp;" :label-width="formLabelWidth">
-        {{ state.form.mtin_loc }}
-      </el-form-item>
-      <el-form-item label="会议主持人ID&nbsp;&nbsp;" :label-width="formLabelWidth">
-        {{ state.form.mtin_host }}
-      </el-form-item>
-      <el-form-item label="会议ID&nbsp;&nbsp;" :label-width="formLabelWidth">
-        {{ state.form.mtin_id }}
-      </el-form-item>
-      <el-form-item label="会议状态&nbsp;&nbsp;" :label-width="formLabelWidth">
-        {{ state.form.mtin_fin }}
-      </el-form-item>
-      <el-form-item label="会议创建时间&nbsp;&nbsp;" :label-width="formLabelWidth">
-        {{ state.form.mtin_crt }}
-      </el-form-item>
-      <el-form-item label="会议添加者ID&nbsp;&nbsp;" :label-width="formLabelWidth">
-        {{ state.form.adder_id }}
-      </el-form-item>
-    </el-form>
-    <div slot="footer" class="dialog-footer">
-      <el-button type="primary" @click="state.MeetingDetailFormVisible = false">确 定</el-button>
-    </div>
-  </el-dialog>
-
+        </el-form-item>
+        <el-form-item label="会议开始时间&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{ state.form.mtin_st }}
+        </el-form-item>
+        <el-form-item label="会议长度&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{ state.form.mtin_len }}
+        </el-form-item>
+        <el-form-item label="会议地点&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{ state.form.mtin_loc }}
+        </el-form-item>
+        <el-form-item label="会议主持人ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{ state.form.mtin_host }}
+        </el-form-item>
+        <el-form-item label="会议ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{ state.form.mtin_id }}
+        </el-form-item>
+        <el-form-item label="会议状态&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{ state.form.mtin_fin }}
+        </el-form-item>
+        <el-form-item label="会议创建时间&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{ state.form.mtin_crt }}
+        </el-form-item>
+        <el-form-item label="会议添加者ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{ state.form.adder_id }}
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="state.MeetingDetailFormVisible = false">确 定</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog v-model="state.detailFormVisible" title="待办事项详情">
+      <el-form :model="state.form">
+        <el-form-item label="标题&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{ state.form.todo_title }}
+        </el-form-item>
+        <el-form-item label="内容&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{ state.form.todo_ctnt }}
+        </el-form-item>
+        <el-form-item label="截止日期&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{ state.form.todo_ddl }}
+        </el-form-item>
+        <el-form-item label="状态&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{ state.form.todo_fin }}
+        </el-form-item>
+        <el-form-item label="创建日期&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{ state.form.todo_crt }}
+        </el-form-item>
+        <el-form-item label="添加者ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{ state.form.adder_id }}
+        </el-form-item>
+        <el-form-item label="待办事項ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{ state.form.todo_id }}
+        </el-form-item>
+        <el-form-item label="从属用戶ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+          {{state.form.user_id }}
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="state.detailFormVisible = false">确 定</el-button>
+      </div>
+    </el-dialog>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -233,7 +231,6 @@ let currentEvents: EventApi[]
 const pickDate = ref('')
 const checked = ref(false)
 const togglechecked = ref(false)
-const dialogFormVisible = ref(false)
 const formLabelWidth = ref(120)
 const ruleFormRef = ref<FormInstance>()
 
