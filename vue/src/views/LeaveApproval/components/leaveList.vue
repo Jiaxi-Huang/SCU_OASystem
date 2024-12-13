@@ -1,4 +1,5 @@
 <template>
+  <div>
     <div class="table-container">
       <el-form :inline="true" :model="formInline" class="form-inline">
         <el-form-item>
@@ -116,6 +117,7 @@
       </el-pagination>
   
     </div>
+  </div>
   </template>
   <script lang="ts">
   import { computed, defineComponent, onMounted, reactive, ref, toRefs } from 'vue'
