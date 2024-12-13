@@ -8,7 +8,9 @@ import com.example.backend.entity.todoList.TodoRecordWithTk;
 import com.example.backend.entity.ResponseBase;
 import com.example.backend.entity.userInfo.adminUserInfoRequest;
 import com.example.backend.services.AccessService;
+import com.itextpdf.text.Font;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +25,9 @@ import java.util.List;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 
 @RestController
 @RequestMapping("/api/todolist")
@@ -108,6 +113,47 @@ public class TodoListCon {
         }
         catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @PostMapping("/getExcel")
+    public void getExcel(HttpServletResponse response, @RequestBody adminUserInfoRequest request) {
+        try {
+            String accessToken = request.getAccessToken();
+            int userId = accessService.getAuthenticatedId(accessToken);
+            List<TodoRecord> records = my_service.getRecordsByUserId(userId);
+
+            // Create an Excel Workbook
+            Workbook workbook = new HSSFWorkbook();
+            Sheet sheet = workbook.createSheet("待办事项");
+
+            // Create header row
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("待办事项ID");
+            headerRow.createCell(1).setCellValue("待办事项标题");
+            headerRow.createCell(2).setCellValue("待办事项内容");
+            headerRow.createCell(3).setCellValue("截止日期");
+
+            // Fill data into rows
+            int rowNum = 1;
+            for (TodoRecord record : records) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(record.getTodo_id());
+                row.createCell(1).setCellValue(record.getTodo_title());
+                row.createCell(2).setCellValue(record.getTodo_ctnt());
+                row.createCell(3).setCellValue(record.getTodo_ddl());
+            }
+
+            // Set response headers for file download
+            response.setContentType("application/vnd.ms-excel");
+            response.setHeader("Content-Disposition", "attachment;");
+
+            // Write the workbook to the response output stream
+            workbook.write(response.getOutputStream());
+            workbook.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 

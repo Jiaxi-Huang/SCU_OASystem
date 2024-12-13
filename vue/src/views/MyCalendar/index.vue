@@ -340,6 +340,7 @@ const calendarOptions = reactive({
   initialView: 'dayGridMonth',
   handleWindowResize: true,
   locale: 'zh-cn',
+  timeZone: 'Asia/Shanghai',
   editable: true,
   selectable: true,
   selectMirror: true,
@@ -348,7 +349,6 @@ const calendarOptions = reactive({
   eventStartEditable: false,
   moreLinkContent: "+ 更多",
   slotEventOverlap:false,
-  defaultEventMinutes: 30,
   expandRows: true,
   // select: handleDateSelect,
   eventClick: handleEventClick,
@@ -378,6 +378,7 @@ const getMyMeetingSchedule = () => {
           record.id = "mt_" + record.mtin_id;
           record.title = "会议：" + record.mtin_title;
           record.start = record.mtin_st.replace(' ', 'T') + ":00";
+          record.end = record.mtin_st.replace(' ', 'T') + ":01";
           record.color = "#C4D6DB";
           INITIAL_EVENTS.push(record);
         });
@@ -385,6 +386,7 @@ const getMyMeetingSchedule = () => {
           record.id = "mt_" + record.mtin_id;
           record.title = "会议：" + record.mtin_title;
           record.start = record.mtin_st.replace(' ', 'T') + ":00";
+          record.end = record.mtin_st.replace(' ', 'T') + ":01";
           record.color = "#E6687D";
           INITIAL_EVENTS.push(record);
         });
@@ -392,11 +394,10 @@ const getMyMeetingSchedule = () => {
           record.id = "mt_" + record.mtin_id;
           record.title = "会议：" + record.mtin_title;
           record.start = record.mtin_st.replace(' ', 'T') + ":00";
+          record.end = record.mtin_st.replace(' ', 'T') + ":01";
           record.color = "#60cb9f";
-          console.log(record); // 添加这行
           INITIAL_EVENTS.push(record);
         });
-        // console.log(INITIAL_EVENTS)
         console.log('getMyMeetingSchedule success!')
       } else {
         console.log('getMyMeetingSchedule error!')
