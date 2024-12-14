@@ -185,4 +185,28 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         }
         return -1;
     }
+    public int loginByWechat(String openid){
+        try{
+            User user = userMapper.findByOpenid(openid);
+            if(user!=null){
+                return 1;
+            }
+            else{
+                return 0;//后续会调用微信用户绑定程序
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return -1;
+        }
+    }
+    public int bindByWechat(String openid,String phone){
+        try{
+            return userMapper.bindOpenidByPhone(openid,phone);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return -1;
+        }
+    }
 }
