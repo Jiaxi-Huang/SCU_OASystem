@@ -9,7 +9,6 @@ resetPassword: `/api/auth/user/reset-password`,
 permissionRoutes: '/api/auth/permission/routes',
 userInfo: '/api/auth/user/userInfo'
 }
-
 class Service {
   /**
    * @description POST 用户登录接口

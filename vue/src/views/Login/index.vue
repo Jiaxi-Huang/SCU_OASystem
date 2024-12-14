@@ -15,14 +15,30 @@
         </div>
       </div>
       <div class="login-right">
-        <Login v-if="!showReset" @toResetPwd="handleResetPwd"></Login>
-        <ForgetPassword v-else :show-reset="showReset" @toLogin="handleToLogin"></ForgetPassword>
+        <div class="login-box">
+        <div class="login-options" >
+          <el-button type='primary' @click="selectLoginType('account')">账号登录</el-button>
+          <el-button type='primary' @click="selectLoginType('qr')">二维码登录</el-button>
+        </div>
+        <div class="login-content">
+          <div v-if="loginType === 'qr'">
+            <span>请使用微信扫描二维码登录</span><br>
+            <qrcode-vue :value="value" :size="size" level="H" />
+            <div id="wechat-login"></div>
+          </div>
+          <div v-else-if="loginType === 'account'">
+            <Login v-if="!showReset" @toResetPwd="handleResetPwd"></Login>
+            <ForgetPassword v-else :show-reset="showReset" @toLogin="handleToLogin"></ForgetPassword>
+          </div>
+        </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import QrcodeVue from 'qrcode.vue'
+import { defineComponent, onMounted, ref } from 'vue'
 import viteLogo from '@/assets/logo-vite.svg'
 import vueLogo from '@/assets/logo.png'
 import working from '@/assets/woking.gif'
@@ -32,11 +48,23 @@ import ForgetPassword from './components/forgetPassword.vue'
 export default defineComponent({
   name: 'Index',
   components: {
+    QrcodeVue,
     Login,
     ForgetPassword
   },
+  data() {
+    return {
+      value: 'http://localhost:8080/api/auth/wechat/login',
+      size: 100,
+    }
+  },
   setup() {
+
+    const loginType = ref('account')
     const showReset = ref(false)
+    const selectLoginType= (type: 'account'|'qr') => {
+      loginType.value = type
+    }
     const handleResetPwd = () => {
       // 展示重置密码框
       showReset.value = true
@@ -46,6 +74,8 @@ export default defineComponent({
       showReset.value = false
     }
     return {
+      loginType,
+      selectLoginType,
       showReset,
       handleResetPwd,
       handleToLogin,
@@ -116,6 +146,23 @@ export default defineComponent({
             padding:30px;
 
         }
+      .login-box { /* 带阴影的盒子样式 */
+        width: 100%;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: white;
+
+        .login-options {
+          margin-bottom: 20px; /* 选项与内容之间的间距 */
+        }
+
+        .login-content {
+          .account-form {
+            margin-top: 20px; /* 账号表单与其他内容之间的间距 */
+          }
+        }
+      }
     }
 
 }

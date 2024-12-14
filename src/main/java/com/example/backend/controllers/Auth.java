@@ -1,10 +1,12 @@
 package com.example.backend.controllers;
 
+import cn.hutool.json.JSONObject;
 import com.example.backend.entity.User;
 import com.example.backend.entity.authedRoutes.AuthedRoutesRequest;
 import com.example.backend.entity.authedRoutes.AuthedRoutesResponse;
 import com.example.backend.entity.captcha.CaptchaRequest;
 import com.example.backend.entity.captcha.CaptchaResponse;
+import com.example.backend.entity.login.BindRequest;
 import com.example.backend.entity.login.LoginRequest;
 import com.example.backend.entity.login.LoginResponse;
 import com.example.backend.entity.register.RegisterRequest;
@@ -16,6 +18,7 @@ import com.example.backend.entity.userInfo.userInfoResponse;
 import com.example.backend.services.AccessService;
 import com.example.backend.services.CaptchaService;
 import com.example.backend.services.UserService;
+import com.example.backend.services.utils.DecryptUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -349,5 +352,40 @@ public class Auth {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
+    @PostMapping("/wechat/login")
+    public ResponseEntity<LoginResponse> loginWechat(@RequestBody LoginRequest request) {
+        try {
+            String openid = request.getOpenid();
+            int isSuccess = userService.loginByWechat(openid);
+            if (isSuccess > 0) {
+                return ResponseEntity.ok(new LoginResponse(0, "登录成功", true, accessService.generateAccessToken(32)));
+            } else {
+                return ResponseEntity.ok(new LoginResponse(1, "登录失败（请先绑定已注册账号对应的邮箱）", false, null));
+            }
+        }
+        catch(Exception e){
+            return ResponseEntity.ok(new LoginResponse(2, "服务器内部错误", false, null));
+        }
+    }
+    @PostMapping("/wechat/bind")
+    public ResponseEntity<LoginResponse> bindWechat(@RequestBody BindRequest request) {
+        try {
+            String openid = request.getOpenid();
+            String sessionKey = request.getSessionKey();
+            String encryptedData = request.getEncryptedData();
+            String iv = request.getIv();
+            JSONObject decryptedData = DecryptUtil.decrypt(sessionKey, encryptedData, iv);
+            String phone = decryptedData.getStr("phoneNumber");
+            int isSuccess = userService.bindByWechat(openid,phone);
+            if (isSuccess > 0) {
+                return ResponseEntity.ok(new LoginResponse(0, "绑定成功", true, accessService.generateAccessToken(32)));
+            } else {
+                return ResponseEntity.ok(new LoginResponse(1, "绑定失败", false, null));
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            return ResponseEntity.ok(new LoginResponse(2, "服务器内部错误", false, null));
+        }
+    }
 }
