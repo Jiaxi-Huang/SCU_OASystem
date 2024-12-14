@@ -261,6 +261,24 @@
         <el-form-item>
           <el-button type="primary" @click="onToExcel()" :icon="Download">导出</el-button>
         </el-form-item>
+        <el-form-item label="按">
+          <el-select v-model="task.search_field" placeholder="无">
+            <el-option label="无" value="none"></el-option>
+            <el-option label="会议名称" value="mtin_title"></el-option>
+            <el-option label="会议内容" value="mtin_ctnt"></el-option>
+            <el-option label="会议ID" value="mtin_id"></el-option>
+            <el-option label="会议开始时间" value="mtin_st"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="task.search_key" placeholder="全局搜索"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onSearchSubmit">查询</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="getPersonalMeetingList" :icon="Refresh"></el-button>
+        </el-form-item>
       </el-form>
       <el-col :span="24">
         <div class="board">
@@ -575,7 +593,17 @@
 
 <script setup lang="ts">
 import { onMounted, ref, onUnmounted, reactive } from 'vue'
-import {Operation, Suitcase, ChatLineSquare, View, Delete, Edit, CirclePlus, Download} from '@element-plus/icons-vue'
+import {
+  Operation,
+  Suitcase,
+  ChatLineSquare,
+  View,
+  Delete,
+  Edit,
+  CirclePlus,
+  Download,
+  Refresh
+} from '@element-plus/icons-vue'
 import Service from "@/views/Meetings/api/index";
 import {ElMessage, ElMessageBox} from "element-plus";
 import { useRouter } from 'vue-router'
@@ -626,6 +654,9 @@ const task = reactive<taskType>({
   addFormVisible: false,
   search_mtin_id: 0,
   detailFormVisible_add: false,
+  search_field: "none",
+  search_key: "",
+
 })
 
 onMounted(() => {
@@ -827,5 +858,51 @@ const handleAdd = () => {
       message: err.message
     })
   }
+}
+
+const onSearchSubmit = () => {
+  const record = {
+    field: task.search_field,
+    key: task.search_key.toString().trim(),
+  }
+  if (record.field === "none") {
+    ElMessage({
+      type: 'warning',
+      message: "没有选择条件"
+    })
+    return
+  }
+  if (record.key === "") {
+    ElMessage({
+      type: 'warning',
+      message: "没有输入搜索内容"
+    })
+    return
+  }
+  try {
+    Service.searchBy(record).then((res) => {
+      // console.log(res)
+      if (res.status ===  0) {
+        ElMessage({
+          type: 'success',
+          message: "搜索结果已返回"
+        })
+        task.scheduled = res.data[0]
+        task.progressing = res.data[1]
+        task.passed = res.data[2]
+      } else if (res.status === 1) {
+        ElMessage({
+          type: 'warning',
+          message: "没有找到符合条件的会议"
+        })
+      }
+    });
+  } catch (err) {
+    ElMessage({
+      type: 'warning',
+      message: err.message
+    })
+  }
+
 }
 </script>

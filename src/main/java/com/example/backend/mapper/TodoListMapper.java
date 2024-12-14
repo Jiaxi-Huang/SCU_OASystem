@@ -1,6 +1,8 @@
 package com.example.backend.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.example.backend.entity.meeting.MeetingWithAdderId;
+import com.example.backend.entity.meeting.SelectorProviderGy;
 import com.example.backend.entity.todoList.TodoRecord;
 import org.apache.ibatis.annotations.*;
 
@@ -33,4 +35,7 @@ public interface TodoListMapper extends BaseMapper<TodoRecord> {
 
     @Select("SELECT * FROM usertodo WHERE user_id = #{user_id}")
     List<TodoRecord> getRecordsByUserId(int user_id);
+
+    @SelectProvider(type = SelectorProviderGy.class, method = "buildTodoSearchQuery")
+    List<TodoRecord> searchByFieldAndKeyPersonal(String field, String key, int user_id);
 }

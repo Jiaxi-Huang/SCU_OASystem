@@ -340,4 +340,24 @@ public class MeetingsCon {
         }
         return res;
     }
+
+    @PostMapping("/searchByFieldKey")
+    public ResponseBase searchByFieldKey(@RequestBody FieldKeyWithToken record) {
+        ResponseBase res;
+        String accessToken = record.getAccessToken();
+        int userId = accessService.getAuthenticatedId(accessToken);
+        res = meetingService.searchByAnything(record.getField(), record.getKey(), userId);
+        try {
+            if ((Integer)res.getData().get(3) == 0) {
+//                System.out.println("result set is empty");
+                res.setStatus(1);
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            res.setStatus(-1);
+            res.setMessage(e.getMessage());
+        }
+        return res;
+    }
 }

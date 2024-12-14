@@ -17,6 +17,24 @@
       <el-form-item>
         <el-button type="primary" @click="onToExcel" :icon="Download">导出</el-button>
       </el-form-item>
+      <el-form-item label="按" style="width: 180px">
+        <el-select v-model="search_field" placeholder="无" style="width: 180px">
+          <el-option label="无" value="none"></el-option>
+          <el-option label="待办事项名称" value="todo_title"></el-option>
+          <el-option label="待办事项内容" value="todo_ctnt"></el-option>
+          <el-option label="待办事项ID" value="todo_id"></el-option>
+          <el-option label="待办事项截止" value="todo_ddl"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-input v-model="search_key" placeholder="全局搜索"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="onSearchSubmit">查询</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="onRefresh" :icon="Refresh"></el-button>
+      </el-form-item>
     </el-form>
     <el-table ref="filterTableRef" class="table-list" row-key="todo_id" :data="paginatedData" style="width: 100%"
               @filter-change="handleFilterChange" @selection-change="handleSelectionChange">
@@ -180,11 +198,14 @@ import { useRouter } from 'vue-router'
 import permission from '@/directive/permission'
 import Service from '../api/index'
 import {ElMessage, ElMessageBox} from "element-plus";
-import {CirclePlus, Delete, Download} from "@element-plus/icons-vue";
+import {CirclePlus, Delete, Download, Refresh} from "@element-plus/icons-vue";
 
 export default defineComponent({
   name: 'todoTableList',
   computed: {
+    Refresh() {
+      return Refresh
+    },
     Download() {
       return Download
     },
@@ -239,6 +260,8 @@ export default defineComponent({
 
       selectionRows: [] as { todo_id: number }[],
 
+      search_field: "none",
+      search_key: "",
     })
     const formInline = reactive({
       user: '',
@@ -505,6 +528,56 @@ export default defineComponent({
         });
       });
     }
+    const onSearchSubmit = () => {
+      const record = {
+        field: state.search_field,
+        key: state.search_key.toString().trim(),
+      }
+      if (record.field === "none") {
+        ElMessage({
+          type: 'warning',
+          message: "没有选择条件"
+        })
+        return
+      }
+      if (record.key === "") {
+        ElMessage({
+          type: 'warning',
+          message: "没有输入搜索内容"
+        })
+        return
+      }
+      try {
+        Service.searchBy(record).then((res) => {
+          // console.log(res)
+          if (res.status ===  0) {
+            ElMessage({
+              type: 'success',
+              message: "搜索结果已返回"
+            })
+            const data = res.data
+            state.record_cnt = data.length
+            state.tableData = data
+            updatePaginatedData()  // 更新分页数据
+          } else if (res.status === 1) {
+            ElMessage({
+              type: 'warning',
+              message: "没有找到符合条件的待办事项"
+            })
+          }
+        });
+      } catch (err) {
+        ElMessage({
+          type: 'warning',
+          message: err.message
+        })
+      }
+
+    }
+
+    const onRefresh = () => {
+      getPersonalTodoList()
+    }
 
     return {
       formInline,
@@ -532,6 +605,8 @@ export default defineComponent({
       onDeleteMulti,
       onDownload,
       onToExcel,
+      onSearchSubmit,
+      onRefresh,
     }
   }
 })
