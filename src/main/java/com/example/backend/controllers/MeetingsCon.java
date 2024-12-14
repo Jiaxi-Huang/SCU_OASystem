@@ -140,8 +140,8 @@ public class MeetingsCon {
 
             var data = res.getData();
             List<MeetingWithAdderId> scheduled = (List<MeetingWithAdderId>) data.get(0);
-            List<MeetingWithAdderId> processing = (List<MeetingWithAdderId>) data.get(0);
-            List<MeetingWithAdderId> passed  = (List<MeetingWithAdderId>) data.get(0);
+            List<MeetingWithAdderId> processing = (List<MeetingWithAdderId>) data.get(1);
+            List<MeetingWithAdderId> passed  = (List<MeetingWithAdderId>) data.get(2);
 
             // 添加内容（根据 records 数据添加）
             for (MeetingWithAdderId record :scheduled) {
@@ -197,24 +197,53 @@ public class MeetingsCon {
 
             // Create an Excel Workbook
             Workbook workbook = new HSSFWorkbook();
-            Sheet sheet = workbook.createSheet("待办事项");
+            Sheet sheet = workbook.createSheet("我的会议");
 
             // Create header row
             Row headerRow = sheet.createRow(0);
-            headerRow.createCell(0).setCellValue("待办事项ID");
-            headerRow.createCell(1).setCellValue("待办事项标题");
-            headerRow.createCell(2).setCellValue("待办事项内容");
-            headerRow.createCell(3).setCellValue("截止日期");
+            headerRow.createCell(0).setCellValue("会议ID");
+            headerRow.createCell(1).setCellValue("会议名称");
+            headerRow.createCell(2).setCellValue("会议简介");
+            headerRow.createCell(3).setCellValue("会议时间");
+            headerRow.createCell(4).setCellValue("会议长度");
+            headerRow.createCell(5).setCellValue("会议状态");
 
+
+            ArrayList<Object> data = res.getData();
+            List<MeetingWithAdderId> scheduled = (List<MeetingWithAdderId>) data.get(0);
+            List<MeetingWithAdderId> processing = (List<MeetingWithAdderId>) data.get(1);
+            List<MeetingWithAdderId> passed  = (List<MeetingWithAdderId>) data.get(2);
             // Fill data into rows
             int rowNum = 1;
-//            for (TodoRecord record : records) {
-//                Row row = sheet.createRow(rowNum++);
-//                row.createCell(0).setCellValue(record.getTodo_id());
-//                row.createCell(1).setCellValue(record.getTodo_title());
-//                row.createCell(2).setCellValue(record.getTodo_ctnt());
-//                row.createCell(3).setCellValue(record.getTodo_ddl());
-//            }
+            for (MeetingWithAdderId record : scheduled) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(record.getMtin_id());
+                row.createCell(1).setCellValue(record.getMtin_title());
+                row.createCell(2).setCellValue(record.getMtin_ctnt());
+                row.createCell(3).setCellValue(record.getMtin_st());
+                row.createCell(4).setCellValue(record.getMtin_len());
+                row.createCell(5).setCellValue("已预订");
+            }
+
+            for (MeetingWithAdderId record : processing) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(record.getMtin_id());
+                row.createCell(1).setCellValue(record.getMtin_title());
+                row.createCell(2).setCellValue(record.getMtin_ctnt());
+                row.createCell(3).setCellValue(record.getMtin_st());
+                row.createCell(4).setCellValue(record.getMtin_len());
+                row.createCell(5).setCellValue("今天会议");
+            }
+
+            for (MeetingWithAdderId record : passed) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(record.getMtin_id());
+                row.createCell(1).setCellValue(record.getMtin_title());
+                row.createCell(2).setCellValue(record.getMtin_ctnt());
+                row.createCell(3).setCellValue(record.getMtin_st());
+                row.createCell(4).setCellValue(record.getMtin_len());
+                row.createCell(5).setCellValue("已过期");
+            }
 
             // Set response headers for file download
             response.setContentType("application/vnd.ms-excel");

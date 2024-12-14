@@ -77,7 +77,7 @@ class Service {
                     const url = window.URL.createObjectURL(res);
                     const link = document.createElement('a');
                     link.href = url;
-                    link.setAttribute('download', '待办事项_' + new Date().getTime() + '.xls'); // 设置下载文件名
+                    link.setAttribute('download', '我的会议_' + new Date().getTime() + '.xls'); // 设置下载文件名
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link); // 清理
@@ -86,7 +86,7 @@ class Service {
                 }
             }
         }).catch((err) => {
-            console.error('Error downloading PDF:', err);
+            console.error('Error downloading excel:', err);
             throw err; // 抛出错误，前端捕获并显示
         });
     }

@@ -100,7 +100,7 @@ class Service {
         }
       }
     }).catch((err) => {
-      console.error('Error downloading PDF:', err);
+      console.error('Error downloading excel:', err);
       throw err; // 抛出错误，前端捕获并显示
     });
   }

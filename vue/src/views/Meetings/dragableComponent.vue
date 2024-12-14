@@ -734,7 +734,7 @@ const onDownload = () => {
   ElMessageBox.confirm('确定要打印为PDF吗', '温馨提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
-    type: 'warning'
+    type: 'info'
   }).then(() => {
     // 确认后调用获取 PDF 的方法
     Service.getPDF().then(() => {
@@ -760,7 +760,7 @@ const onToExcel = () => {
   ElMessageBox.confirm('确定要导出为Excel吗', '温馨提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
-    type: 'warning'
+    type: 'info'
   }).then(() => {
     // 确认后调用获取 PDF 的方法
     Service.getExcel().then(() => {
