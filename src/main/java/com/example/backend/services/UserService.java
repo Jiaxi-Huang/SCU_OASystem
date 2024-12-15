@@ -124,6 +124,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         }
     }
     public List<User> adminUserInfo(int user_id){
+//        System.out.println("=================[userService/adminUserInfo]=====================");
         try {
             User user = userMapper.findByUserId(user_id);
             String role = user.getRole();

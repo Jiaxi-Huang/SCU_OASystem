@@ -9,15 +9,47 @@
               <el-divider></el-divider>
             </div>
             <el-form ref="activityForm" style="text-align: left" :model="sizeForm" label-width="80px" size="mini">
-              <el-form-item label="金额">
+              <el-form-item label="金额" :label-width="formLabelWidth">
                 <el-input v-model="sizeForm.amount"></el-input>
               </el-form-item>
+
               <el-form-item label="内容" :label-width="formLabelWidth">
                 <el-input v-model="sizeForm.description" autosize type="textarea"/>
               </el-form-item>
+              <el-form-item label="报送" :label-width="formLabelWidth">
+                <el-select
+                    v-model="sizeForm.notified_user"
+                    collapse-tags
+                    placeholder="选择要报送的用户"
+                    style="width: 240px"
+                >
+                  <el-option
+                      v-for="item in all_users"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                  />
+                </el-select>
+              </el-form-item>
+              <el-form-item label="抄送" :label-width="formLabelWidth">
+                <el-select
+                    v-model="sizeForm.cc_user"
+                    collapse-tags
+                    placeholder="选择要抄送的用户"
+                    style="width: 240px"
+                    multiple
+                >
+                  <el-option
+                      v-for="item in all_users"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                  />
+                </el-select>
+              </el-form-item>
               <el-form-item size="large">
                 <el-button type="primary" @click="submitForm">立即创建</el-button>
-                <el-button>取消</el-button>
+                <el-button @click="resetForm">取消</el-button>
               </el-form-item>
             </el-form>
           </el-card>
@@ -32,6 +64,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Edit, DeleteFilled, Check, ArrowLeft } from '@element-plus/icons-vue'
 import Service from "@/views/Reimbursement/api";
+import {valueOf} from "lodash";
 
 export default defineComponent({
   name: 'AdvanceForm',
@@ -41,38 +74,75 @@ export default defineComponent({
     Check,
     ArrowLeft
   },
+
   setup() {
     const router = useRouter()
 
     const sizeForm = reactive({
-      reimbursement_id: '',
-      user_id: '',
+      reimbursement_id: 0,
+      user_id: 0,
       amount: '',
       description: '',
       status: [],
       submitted_at: '',
+      cc_user: [],
+      notified_user: [],
     })
+
+    const all_users = ref([]);
 
     const activityForm = ref()
 
+    const getAllUsers = () => {
+      Service.getAllUsers()
+          .then((res) => {
+            const users = res.data[0] || [];
+            all_users.value = users.map((user) => ({
+              value: user.userId,
+              label: user.username || user.email,
+            }));
+            // console.log("all_users updated:", JSON.stringify(all_users));
+          })
+          .catch((err) => {
+            console.error("Failed to fetch users:", err);
+            all_users.value = [];
+          });
+    }
+
     onMounted(() => {
-      // eslint-disable-next-line no-console
-      console.log('show sizeFormRef.value', activityForm.value)
+      getAllUsers();
     })
     // methods
     const submitForm = () => {
       activityForm.value.validate((valid: any): boolean => {
         if (valid) {
           const currentDateTime = new Date();
+          function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从 0 开始，+1
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+          }
+
+          const formattedDate = formatDate(currentDateTime);
+
           let record = {
-            user_id: localStorage.getItem('user_id'),
+            accessToken: sessionStorage.getItem('accessToken'),
             amount: sizeForm.amount,
             description: sizeForm.description,
-            status: '未完成',
-            submitted_at: currentDateTime,
+            status: '未审核',
+            submitted_at: formattedDate,
+            review_user_id: sizeForm.notified_user,
           }
+          console.log("Submission form:", JSON.stringify(record))
           try {
             Service.addReimbursement(record).then((res) => {
+              sizeForm.reimbursement_id = res.data.reimbursement_id
+              console.log("Reimbursement ID:", sizeForm.reimbursement_id)
             });
             ElMessage({
               type: 'success',
@@ -83,6 +153,27 @@ export default defineComponent({
               type: 'warning',
               message: err.message
             })
+            let notify_record = {
+              notified_user_id: sizeForm.notified_user,
+              request_type: 'reimbursement',
+              request_id: sizeForm.reimbursement_id,
+              submitted_at: currentDateTime,
+            }
+            try {
+              Service.addNotification(notify_record).then((res) => {
+              });
+              ElMessage({
+                type: 'success',
+                message: '提交成功'
+              })
+            } catch (err) {
+              ElMessage({
+                type: 'warning',
+                message: err.message
+              })
+              console.log('submit error')
+              return false
+            }
             console.log('submit error')
             return false
           }
@@ -92,12 +183,14 @@ export default defineComponent({
           sizeForm.description = ''
           sizeForm.status = []
           sizeForm.submitted_at = ''
+          sizeForm.notified_user = []
           return true
         }
         console.log('submit error')
         return false
       })
     }
+
     const resetForm = () => {
       activityForm.value.resetFields()
     }
@@ -154,6 +247,7 @@ export default defineComponent({
       handleDelete,
       handleBack,
       sizeForm,
+      all_users,
       activityForm,
       submitForm,
       resetForm,
@@ -192,8 +286,15 @@ export default defineComponent({
     width:100%;
   }
 
-   .el-row {
-       margin-bottom: 20px;
-     }
+  .el-row {
+    margin-bottom: 20px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  .el-col {
+    padding: 0 10px;
+  }
+
 }
 </style>

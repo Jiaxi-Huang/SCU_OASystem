@@ -190,9 +190,9 @@ export default defineComponent({
     const total = 1
 
     onMounted(() => {
-      // eslint-disable-next-line no-console
       getReimbursementList()
       filterReimbursementStatus()
+      updatePaginatedData()
     })
     // methods
     const resetDateFilter = () => {

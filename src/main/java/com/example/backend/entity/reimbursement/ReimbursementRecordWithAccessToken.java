@@ -14,15 +14,17 @@ public class ReimbursementRecordWithAccessToken {
     private String description;
     private String status;
     private String submitted_at;
+    private int review_user_id;
     private String accessToken;
 
-    public ReimbursementRecordWithAccessToken(int reimbursement_id, int user_id, BigDecimal amount, String description, String status, String submitted_at, String accessToken) {
+    public ReimbursementRecordWithAccessToken(int reimbursement_id, int user_id, BigDecimal amount, String description, String status, String submitted_at, int review_user_id, String accessToken) {
         this.reimbursement_id = reimbursement_id;
         this.user_id = user_id;
         this.amount = amount;
         this.description = description;
         this.status = status;
         this.submitted_at = submitted_at;
+        this.review_user_id = review_user_id;
         this.accessToken = accessToken;
     }
 }
