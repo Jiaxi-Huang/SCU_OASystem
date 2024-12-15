@@ -16,12 +16,16 @@ public interface UserMapper extends BaseMapper<User>{
     User findByUserId(int user_id);
     @Select("SELECT * FROM user_infos LEFT JOIN user_avatar ON user_infos.user_id=user_avatar.user_id WHERE email = #{email}")
     User findByEmail(String email);
+    @Select("SELECT * FROM user_infos WHERE wechat_user_id=#{openid}")
+    User findByOpenid(String openid);
 
     @Insert("INSERT INTO user_infos (email, password, role) VALUES(#{email}, #{password}, #{role})")
     //@Options(useGeneratedKeys = true, keyProperty = "user_id")
     int insertUser(String email, String password, String role);
     @Insert("INSERT INTO user_infos (username, password, department, role) VALUES(#{username}, #{password}, #{department}, #{role})")
     int adminInsertUser(String username, String password, String department, String role);
+    @Update("UPDATE user_infos SET wechat_user_id=#{openid} WHERE phone=#{phone}")
+    int bindOpenidByPhone(String openid,String phone);
     @Update("UPDATE user_infos SET password = #{password} WHERE email = #{email}")
     int updatePassword(String email, String password);
     @Update("UPDATE user_infos SET username = #{username},phone = #{phone},intro= #{intro} WHERE user_id = #{user_id}")

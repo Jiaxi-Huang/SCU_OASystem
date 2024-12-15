@@ -57,6 +57,40 @@ public class MeetingService extends ServiceImpl<MeetingMapper, MeetingWithAdderI
         return response;
     }
 
+    public ResponseBase searchByAnything(String field, String key, int user_id) {
+        ResponseBase response = new ResponseBase();
+        List<MeetingWithAdderId> meetings = meetingMapper.searchByFieldAndKeyPersonal(field, key, user_id);;
+        List<MeetingWithAdderId> scheduled = new ArrayList<>();
+        List<MeetingWithAdderId> processing = new ArrayList<>();
+        List<MeetingWithAdderId> passed  = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        int cnt = 0;
+        for (MeetingWithAdderId meeting : meetings) {
+            ++cnt;
+            try {
+                LocalDate mt_dt = LocalDateTime.parse(meeting.getMtin_st().trim(), formatter).toLocalDate();
+                if (mt_dt.isAfter(today)) {
+                    scheduled.add(meeting);
+                } else if (mt_dt.isBefore(today)) {
+                    passed.add(meeting);
+                } else {
+                    processing.add(meeting);
+                }
+
+            } catch (Exception e) {
+                System.err.println("Failed to parse date for meeting: " + meeting.getMtin_st());
+                response.setStatus(-1);
+                e.printStackTrace();
+            }
+        }
+        response.pushData(scheduled);
+        response.pushData(processing);
+        response.pushData(passed);
+        response.pushData(cnt);
+        return response;
+    }
+
     public ResponseBase updateMeeting(int user_id, MeeetingWithTk meeting) {
         ResponseBase response = new ResponseBase();
 //        System.out.println(meeting.getMtin_title());

@@ -5,6 +5,7 @@ import com.example.backend.entity.meeting.Meeting;
 import com.example.backend.entity.meeting.MeetingWithAdderId;
 import org.apache.ibatis.annotations.*;
 
+import com.example.backend.entity.meeting.SelectorProviderGy;
 import java.util.List;
 
 
@@ -47,4 +48,9 @@ public interface MeetingMapper extends BaseMapper<MeetingWithAdderId> {
     @Select("SELECT mtin_id, mtin_title, mtin_ctnt, mtin_st, " +
             "mtin_fin, mtin_len, mtin_host, mtin_loc, mtin_crt from meetings where mtin_id = #{mtin_id}")
     Meeting searchByMtinId(int mtin_id);
+
+
+    @SelectProvider(type = SelectorProviderGy.class, method = "buildMeetingSearchQuery")
+    List<MeetingWithAdderId> searchByFieldAndKeyPersonal(String field, String key, int user_id);
+
 }

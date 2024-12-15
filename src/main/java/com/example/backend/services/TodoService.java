@@ -1,14 +1,18 @@
 package com.example.backend.services;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.backend.entity.ResponseBase;
+import com.example.backend.entity.meeting.MeetingWithAdderId;
 import com.example.backend.entity.todoList.TodoRecord;
 import com.example.backend.entity.todoList.TodoRecordWithTk;
 import com.example.backend.mapper.TodoListMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,6 +27,10 @@ public class TodoService extends ServiceImpl<TodoListMapper, TodoRecord> {
 
     public List<TodoRecord> getRecordsByUserId(int user_id) {
         return  todoListMapper.getRecordsByUserId(user_id);
+    }
+
+    public List<TodoRecord> searchByAnything(String field, String key, int user_id) {
+        return todoListMapper.searchByFieldAndKeyPersonal(field, key, user_id);
     }
 
     public int updateTodoRecord(TodoRecord record) {

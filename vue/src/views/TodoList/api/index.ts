@@ -8,6 +8,7 @@ const todolistApi = {
   deleteTodo: '/api/todolist/deleteTodo',
   getPDF: '/api/todolist/getPdf',
   getExcel: '/api/todolist/getExcel',
+  searchBy: '/api/todolist/searchByFieldKey',
 }
 
 
@@ -25,6 +26,24 @@ class Service {
     }).then((res) => {
       if (res.status === 0) {
         console.log("postGetTodoList success")
+        return res
+      }
+      return null
+    })
+  }
+
+  static searchBy(record: any) {
+    record.accessToken = sessionStorage.getItem('accessToken')
+    return request({
+      url: todolistApi.localHost + todolistApi.searchBy,
+      method: 'POST',
+      json: true,
+      data: record,
+    }).then((res) => {
+      console.log("searchBy return")
+      // console.log(res)
+      if (res.status === 0 || res.status === 1) {
+        console.log("searchBy success")
         return res
       }
       return null
@@ -100,7 +119,7 @@ class Service {
         }
       }
     }).catch((err) => {
-      console.error('Error downloading PDF:', err);
+      console.error('Error downloading excel:', err);
       throw err; // 抛出错误，前端捕获并显示
     });
   }
