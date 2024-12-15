@@ -96,6 +96,7 @@ public class Auth {
             //获取邮箱
             String email = request.getEmail();
             User userInfo = userService.userInfo(email);
+            String avatar = userService.userInfoAvatar(email);
             if (userInfo!=null) {
                 userInfoResponse.Data userInfoResponseData = new userInfoResponse.Data();
                 userInfoResponseData.setRoleName(userInfo.getRole());
@@ -103,7 +104,7 @@ public class Auth {
                 userInfoResponseData.setUserIntro(userInfo.getIntro());
                 userInfoResponseData.setUserPhone(userInfo.getPhone());
                 userInfoResponseData.setUserDepartment(userInfo.getDepartment());
-                userInfoResponseData.setUserAvatar(userInfo.getAvatar());
+                userInfoResponseData.setUserAvatar(avatar);
                 userInfoResponse response = new userInfoResponse(
                         0,
                         "获取职位信息成功",

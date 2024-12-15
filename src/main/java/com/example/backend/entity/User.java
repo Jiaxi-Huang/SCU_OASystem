@@ -15,7 +15,6 @@ public class User {
     private String department;
     private String username;
     private String intro;
-    private String avatar;
 
     // Getters and Setters
     public int getUserId() {
@@ -78,9 +77,6 @@ public class User {
     public void setIntro(String intro) {
         this.intro = intro;
     }
-    public String getAvatar() {return avatar;}
-
-    public void setAvatar(String avatar) {this.avatar = avatar;}
 
 }
 
