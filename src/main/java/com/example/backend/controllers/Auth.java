@@ -19,7 +19,10 @@ import com.example.backend.services.AccessService;
 import com.example.backend.services.CaptchaService;
 import com.example.backend.services.UserService;
 import com.example.backend.services.utils.DecryptUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,7 +37,7 @@ import java.util.Random;
 @RestController
 @RequestMapping("/api/auth")
 public class Auth {
-
+    private static final Logger logger = LogManager.getLogger(Example.class);
     @Autowired
     private UserService userService;
     @Autowired
@@ -99,6 +102,7 @@ public class Auth {
             String avatar = userService.userInfoAvatar(email);
             if (userInfo!=null) {
                 userInfoResponse.Data userInfoResponseData = new userInfoResponse.Data();
+                userInfoResponseData.setUserEmail(userInfo.getEmail());
                 userInfoResponseData.setRoleName(userInfo.getRole());
                 userInfoResponseData.setUserName(userInfo.getUsername());
                 userInfoResponseData.setUserIntro(userInfo.getIntro());
@@ -142,7 +146,7 @@ public class Auth {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
                             "/dashboard", "/guide", "/menu","/dragable", "/calendar", "/menu", "/upload", "/personal",
-                            "/copy","/zip", "/excel", "/table", "/projectboard","/qrcode","/cropper", "/editor",
+                            "/copy","/zip", "/excel", "/table", "/projectboard","/qrcode","/cropper", "/editor","/log",
                             "/role","/worker","/leaveApproval","/reimbursement","/todoList", "/meetings","/file","/MyCalender"
                     );
                     data.setAuthedRoutes(authedRoutes);

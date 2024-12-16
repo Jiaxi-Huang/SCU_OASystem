@@ -15,6 +15,14 @@ CREATE TABLE user_avatar (
     avatar VARCHAR(511) NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user_infos(user_id)
 );
+CREATE TABLE user_logs  (
+  id int PRIMARY KEY AUTO_INCREMENT,
+  user_id int,
+  date varchar(255) ,
+  content varchar(255),
+  FOREIGN KEY (user_id) REFERENCES user_infos(`user_id`)
+);
+
 -- 创建部门信息表
 CREATE TABLE department_infos (
     department_id INT PRIMARY KEY AUTO_INCREMENT,

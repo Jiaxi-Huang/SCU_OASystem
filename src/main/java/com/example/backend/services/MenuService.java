@@ -1,5 +1,6 @@
 package com.example.backend.services;
 
+import com.example.backend.annotation.LogOperation;
 import com.example.backend.mapper.PermissionMapper;
 import com.example.backend.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ public class MenuService {
      *
      * @description:更新用户授权时
      */
+    @LogOperation("修改用户权限")
     public int updateMenu(int userId,int adminId,String permissions){
         try{
             String role = userMapper.findByUserId(adminId).getRole();
@@ -35,6 +37,7 @@ public class MenuService {
      *
      * @description:新建用户时使用
      */
+    @LogOperation("初始化用户权限")
     public int insertMenu(int userId,String permissions){
         try{
                 return permissionMapper.insertPermission(userId, permissions);

@@ -1,6 +1,7 @@
 package com.example.backend.services;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.backend.annotation.LogOperationWithId;
 import com.example.backend.entity.Avatar;
 import com.example.backend.mapper.UploadMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ public class UploadService extends ServiceImpl<UploadMapper, Avatar> {
 
     @Autowired
     private UploadMapper uploadMapper;
+    @LogOperationWithId(value="用户修改头像",idParamIndex=0)
     public int uploadPersonalAvatar(int user_id,String url) {
         try {
             Avatar avatar = uploadMapper.findAvatarByUserId(user_id);

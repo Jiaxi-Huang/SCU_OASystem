@@ -1,5 +1,6 @@
 package com.example.backend.services;
 
+import com.example.backend.annotation.LogOperation;
 import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ public class CaptchaService {
      * @param content 内容
      * @return 是否成功
      */
+    @LogOperation("发送验证码")
     @SneakyThrows(Exception.class)
     public boolean sendEmail(String to, String subject, String content,int captcha) {
         try {
@@ -49,6 +51,7 @@ public class CaptchaService {
             return false;
         }
     }
+    @LogOperation("校验验证码")
     public int verifyCaptcha(String email, int captcha) {
         // 从 Redis 中获取验证码
         Integer storedCaptcha = redisTemplate.opsForValue().get(email);
