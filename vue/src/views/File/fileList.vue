@@ -3,7 +3,7 @@
     <h3>文件管理</h3>
     <vuecmf-fileexplorer
         root_path="个人文件管理"
-        :page_size="10"
+        :page_size="7"
         list_show="list"
         :tool_config="['new_folder','update_folder','move_folder','del_folder','upload','move_file','del_file','remark_file']"
         upload_api="http://localhost:8080/api/file/upload"
@@ -22,6 +22,7 @@
         @beforeUpload="beforeUpload"
         @onUploadSuccess="onUploadSuccess"
         @onUploadError="onUploadError"
+        @judgeFileType="judgeFileType"
     >
     </vuecmf-fileexplorer>
   </div>
@@ -549,6 +550,24 @@ export default defineComponent({
       console.log('error = ', data)
     }
 
+    const judgeFileType = (data:AnyObject):void => {
+      console.log("judgeFileType"+data)
+      try {
+        Service.judgeFileType(data).then((res) => {
+          if (res) {
+            return res
+          } else {
+          }
+        });
+      } catch (err) {
+        ElMessage({
+          type: 'warning',
+          message: err.message
+        })
+      }
+
+    }
+
     // const upload =(data:AnyObject):void=>{
     //   try {
     //     Service.uploadFile(data).then((res) => {
@@ -579,8 +598,8 @@ export default defineComponent({
 
       beforeUpload,
       onUploadSuccess,
-      onUploadError
-
+      onUploadError,
+      judgeFileType
     }
   }
 });

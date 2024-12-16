@@ -38,6 +38,7 @@ public class FolderController {
         //0是个人，-1是部门，-2是公司
     }
 
+
     public void folderBFS(String department, int isShared, int folderId,int userId) {
         // 获取所有文件夹和文件数据
         List<Folder> folderList = folderService.getFolder();

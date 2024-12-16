@@ -7,6 +7,7 @@ import com.example.backend.entity.userInfo.adminUserInfoRequest;
 import com.example.backend.mapper.UserMapper;
 import com.example.backend.services.AccessService;
 import com.example.backend.services.FileService;
+import com.example.backend.services.FolderService;
 import com.example.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,10 @@ public class FileController {
 
     @Autowired
     private FolderController folderController;
+
+    @Autowired
+    private FolderService folderService;
+
 
     @PostMapping("/loadFile")
     public ResponseBase loadFile(@RequestBody adminUserInfoRequest request,@RequestParam String dir_id) {
@@ -117,7 +122,13 @@ public class FileController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-
+    @PostMapping("/judgeFileType")
+    public ResponseEntity<ResponseBase> judgeFileType(@RequestBody Files record) {
+        ResponseBase response = new ResponseBase();
+        int res_code = folderService.judgeFolder(record.getDirId());
+        response.pushData(res_code);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
     @PostMapping("/uploadFile")
     public ResponseEntity<ResponseBase> uploadFile(@RequestBody Files record) {

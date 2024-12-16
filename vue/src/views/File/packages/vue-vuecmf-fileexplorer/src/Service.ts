@@ -57,9 +57,9 @@ export default class Service {
         file_table_ref: ref(),
         file: {
             table_height: 'calc(70VH - 80px)',        //列表表格高度
-            page_layout: "total, prev, pager, next", //分页条展示形式
+            page_layout: "total, sizes,prev, pager, next", //分页条展示形式
             current_page: 1, //当前页码数
-            page_size: 30,   //每页显示条数
+            page_size: 10,   //每页显示条数
             total: 0, //总条数
             path: '/', //当前文件夹路径
             keywords: ref(''), //文件搜索关键词
@@ -97,7 +97,7 @@ export default class Service {
         //加载文件列表
         this.emit('loadFile', this.config.file)
 
-        //this.emit('mySearchFile', this.config.file.keywords)
+
 
         this.config.tool = [
             { name: 'new_folder', label: '创建文件夹', icon:'bi bi-folder-plus', event: this.openNewFolder, visible: true },
@@ -353,8 +353,10 @@ export default class Service {
         this.config.file.filter = { dir_id: nodeData.id }
         this.searchFile()
 
+        let fileType=this.judgeFileType()
+        console.log("fileType"+fileType)
         //获取当前层级路径
-        this.config.file.path = '/' + this.config.folder.root_path
+        this.config.file.path = '/' + this.config.folder.data[1].title
         if(nodeObj.level > 1){
             this.config.file.path = '/' + this.config.folder.root_path +  '/' + this.getFolderPath(nodeData.title, nodeObj)
         }
@@ -379,6 +381,9 @@ export default class Service {
         this.emit('loadFolder',this.config.folder)
         this.emit('loadFile', this.config.file)
     }
+    judgeFileType = ():bigint => {
+        this.emit('judgeFileType', this.config.folder.current_select_key)
+    }
 
 
 
@@ -388,11 +393,16 @@ export default class Service {
      * 每页显示条数修改
      * @param size 每页显示的条数
      */
-    handleSizeChange = (size:number):void => {
-        console.log("handleSizeChange "+size)
-        this.config.file.page_size = size
-        this.searchFile()
-    }
+        // 直接修改嵌套对象的属性可能会出现问题
+    handleSizeChange = (size: number): void => {
+        console.log("handleSizeChange " + size);
+        this.config.file = {
+            ...this.config.file,  // 创建一个新的对象，保持其他属性不变
+            page_size: size,      // 修改 page_size 属性
+        };
+        this.searchFile();
+    };
+
 
     /**
      * 当前页修改

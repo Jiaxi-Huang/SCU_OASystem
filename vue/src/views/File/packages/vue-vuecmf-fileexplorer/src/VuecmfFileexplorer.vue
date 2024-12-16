@@ -357,7 +357,7 @@
 import Service from './Service'
 import {defineEmits, toRefs, ref, reactive} from "vue"
 import {ElTable, UploadInstance} from "element-plus";
-const emit = defineEmits(['loadFolder','saveFolder','moveFolder','delFolder','loadFile','uploadFile','saveFile','moveFile','delFile','selectFile', 'onUploadSuccess', 'onUploadError','beforeUpload', 'onPreview', 'onRemove','onProgress','onChange', 'onExceed','remarkFile'])
+const emit = defineEmits(['loadFolder','saveFolder','moveFolder','delFolder','loadFile','uploadFile','saveFile','moveFile','delFile','selectFile', 'onUploadSuccess', 'onUploadError','beforeUpload', 'onPreview', 'onRemove','onProgress','onChange', 'onExceed','remarkFile','judgeFileType'])
 // 获取 accessToken
 
 const settingForm = reactive({
@@ -553,6 +553,7 @@ export default defineComponent({
     justify-content: center;
     margin: 10px auto;
   }
+
 
 }
 
