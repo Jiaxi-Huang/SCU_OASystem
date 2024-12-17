@@ -109,7 +109,7 @@
                 :data="file.data"
                 :default-sort="{ prop: file.order_field.value, order: file.order_sort.value === 'desc' ? 'descending': 'ascending' }"
                 style="width: 100%"
-                :height="file.table_height"
+
                 size="large"
                 @selection-change="service.tableSelectionChange"
                 @sort-change="service.fileSortChange"
@@ -144,21 +144,23 @@
                   <el-link :href="scope.row.url" type="primary"  target="_blank">查看</el-link>
                 </template>
               </el-table-column>
+
             </el-table>
+            <div class="pagination">
+              <el-pagination
+                  @size-change="service.handleSizeChange"
+                  @current-change="service.handleCurrentChange"
+                  :current-page="file.current_page"
+                  :page-sizes="[5,10,20,30,40,50,100,200,300,500]"
+                  :page-size="file.page_size"
+                  :layout="file.page_layout"
+                  :pager-count="5"
+                  :total="file.total">
+              </el-pagination>
+            </div>
           </template>
 
-          <div class="pagination">
-            <el-pagination
-                @size-change="service.handleSizeChange"
-                @current-change="service.handleCurrentChange"
-                :current-page="file.current_page"
-                :page-sizes="[5,10,20,30,40,50,100,200,300,500]"
-                :page-size="file.page_size"
-                :layout="file.page_layout"
-                :pager-count="5"
-                :total="file.total">
-            </el-pagination>
-          </div>
+
 
         </el-main>
       </el-container>
@@ -380,7 +382,7 @@ const props = defineProps({
   //每页显示条数
   page_size: {
     type: Number,
-    default: 30,
+    default: 10,
   },
   //文件列表展示方式
   list_show: {

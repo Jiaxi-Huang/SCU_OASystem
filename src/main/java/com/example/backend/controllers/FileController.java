@@ -18,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
 @RestController
 @RequestMapping("/api/file")
 public class FileController {
@@ -124,8 +123,10 @@ public class FileController {
     }
     @PostMapping("/judgeFileType")
     public ResponseEntity<ResponseBase> judgeFileType(@RequestBody Files record) {
+        System.out.println("judgeFileType进入");
         ResponseBase response = new ResponseBase();
-        int res_code = folderService.judgeFolder(record.getDirId());
+        int res_code = folderService.judgeFolder(record.getId());
+        System.out.println("judgeFileType进入："+res_code);
         response.pushData(res_code);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

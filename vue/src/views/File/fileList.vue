@@ -57,6 +57,7 @@ export default defineComponent({
             }
             console.log(user)
             data.pop();
+            data.pop();
             //0是个人，1是部门，2是公司，文件夹id是0，-1，-2
             for(let i = 0;i <= 2;i++){
               //folderObj.total = data.length; // 更新文件夹的总数
@@ -109,36 +110,43 @@ export default defineComponent({
               let is_exist=0;
               if(folderObj.keywords){
                 //这部分是搜索还没做
+                folderObj.searchData[i].children=[];
                 console.log("进入查询")
+                folderObj.searchData[i].children=folderObj.data[i].children;
+                console.log(folderObj.searchData)
                 folderObj.data[i].children=[];
-                data.forEach(item => {
-                  if(item.title === folderObj.keywords&&i===0
+                let FolderArr = data.filter((record) =>
+                    record.title.toLowerCase().includes(folderObj.keywords.toLowerCase())
+                );
+                console.log(FolderArr)
+                FolderArr.forEach(item => {
+                  if(i===0
                       &&((item.department===null)||(item.department===""))
                       &&item.userId===user.userId
                       &&item.isShared===0){
-                    folderObj.data[i].id=-i-3;
+                    //folderObj.data[i].id=-i-3;
                     //folderObj.data[i].title="找到了";
                     folderObj.data[i].children.push(map[item.id]);
                     is_exist=1;
                   }
-                  if(item.title === folderObj.keywords&&i===1
+                  if(i===1
                       &&item.department===user.department
                       &&item.isShared===0){
-                    folderObj.data[i].id=-i-3;
+                    //folderObj.data[i].id=-i-3;
                     //folderObj.data[i].title="找到了";
                     folderObj.data[i].children.push(map[item.id]);
                     is_exist=1;
                   }
-                  if(item.title === folderObj.keywords&&i===2
+                  if(i===2
                       &&((item.department===null)||(item.department===""))
                       &&item.isShared===1){
-                    folderObj.data[i].id=-i-3;
+                    //folderObj.data[i].id=-i-3;
                     //folderObj.data[i].title="找到了";
                     folderObj.data[i].children.push(map[item.id]);
                     is_exist=1;
                   }
                   if(!is_exist){
-                    folderObj.data[i].id=i-3;
+                    //folderObj.data[i].id=-i-3;
                     //folderObj.data[i].title="没找到";
                   }
                 });
@@ -184,7 +192,7 @@ export default defineComponent({
       Service.loadFile(dir_id).then((res) => {
         if (res) {
           // 处理返回的结果
-          const data = res.data;
+          let data = res.data;
           let folderType=data[data.length-3];
           let user={
             userId:data[data.length-2],
@@ -203,30 +211,41 @@ export default defineComponent({
               //个人
               //folderObj.total = data.length;
               console.log(folderObj.filter.dir_id)
-              for (let i = 0; i < data.length; i++) {
-                if(data[i].dirId === dir_id
-                    &&data[i].userId===user.userId
-                    &&((data[i].department==="")||(data[i].department===null))
-                    &&data[i].isShared===0
-                ){
-                  if(folderObj.keywords){
-                    //keywords是搜索的关键词，这部分是搜索，else是文件加载，后面同理
-                    //有问题
-                    if(folderObj.keywords === data[i].fileName){
-                      tmp.push({
-                        "id": data[i].id,
-                        "file_name": data[i].fileName,
-                        "ext": data[i].ext,
-                        "size": data[i].size,
-                        "dir_id": data[i].dirId,
-                        "url": data[i].url,
-                        "remark": data[i].remark,
-                        "create_time": formatDate(data[i].createTime),
-                        "update_time": formatDate(data[i].updateTime),
-                        "user_name": data[i].userName,
-                      })
-                    }
-                  }else{
+              if(folderObj.keywords){
+                //keywords是搜索的关键词，这部分是搜索，else是文件加载，后面同理
+                // if(folderObj.keywords === data[i].fileName){
+                data=data.filter((record) =>
+                    record.fileName.toLowerCase().includes(folderObj.keywords.toLowerCase()));
+                // 忽略大小写
+                console.log(data);
+                for(let i=0;i<data.length;i++){
+                  if(data[i].dirId === dir_id
+                      &&data[i].userId===user.userId
+                      &&((data[i].department==="")||(data[i].department===null))
+                      &&data[i].isShared===0
+                  ){
+                    tmp.push({
+                      "id": data[i].id,
+                      "file_name": data[i].fileName,
+                      "ext": data[i].ext,
+                      "size": data[i].size,
+                      "dir_id": data[i].dirId,
+                      "url": data[i].url,
+                      "remark": data[i].remark,
+                      "create_time": formatDate(data[i].createTime),
+                      "update_time": formatDate(data[i].updateTime),
+                      "user_name": data[i].userName,
+                    })
+                  }
+                }
+              }
+              else{
+                for (let i = 0; i < data.length; i++) {
+                  if(data[i].dirId === dir_id
+                      &&data[i].userId===user.userId
+                      &&((data[i].department==="")||(data[i].department===null))
+                      &&data[i].isShared===0
+                  ){
                     tmp.push({
                       "id": data[i].id,
                       "file_name": data[i].fileName,
@@ -243,33 +262,44 @@ export default defineComponent({
                 }
               }
             }
+
             if(folderType===-1){
-              //部门
+              //个人
               //folderObj.total = data.length;
               console.log(folderObj.filter.dir_id)
-              for (let i = 0; i < data.length; i++) {
-                if(data[i].dirId === folderObj.filter.dir_id
-                    &&data[i].department===user.department
-                    &&data[i].isShared===0
-                ){
-                  if(folderObj.keywords){
-                    //keywords是搜索的关键词，这部分是搜索，else是文件加载，后面同理
-                    //有问题
-                    if(folderObj.keywords === data[i].fileName){
-                      tmp.push({
-                        "id": data[i].id,
-                        "file_name": data[i].fileName,
-                        "ext": data[i].ext,
-                        "size": data[i].size,
-                        "dir_id": data[i].dirId,
-                        "url": data[i].url,
-                        "remark": data[i].remark,
-                        "create_time": formatDate(data[i].createTime),
-                        "update_time": formatDate(data[i].updateTime),
-                        "user_name": data[i].userName,
-                      })
-                    }
-                  }else{
+              if(folderObj.keywords){
+                //keywords是搜索的关键词，这部分是搜索，else是文件加载，后面同理
+                // if(folderObj.keywords === data[i].fileName){
+                data=data.filter((record) =>
+                    record.fileName.toLowerCase().includes(folderObj.keywords.toLowerCase()));
+                // 忽略大小写
+                console.log(data);
+                for(let i=0;i<data.length;i++){
+                  if(data[i].dirId === folderObj.filter.dir_id
+                      &&data[i].department===user.department
+                      &&data[i].isShared===0
+                  ){
+                    tmp.push({
+                      "id": data[i].id,
+                      "file_name": data[i].fileName,
+                      "ext": data[i].ext,
+                      "size": data[i].size,
+                      "dir_id": data[i].dirId,
+                      "url": data[i].url,
+                      "remark": data[i].remark,
+                      "create_time": formatDate(data[i].createTime),
+                      "update_time": formatDate(data[i].updateTime),
+                      "user_name": data[i].userName,
+                    })
+                  }
+                }
+              }
+              else{
+                for (let i = 0; i < data.length; i++) {
+                  if(data[i].dirId === folderObj.filter.dir_id
+                      &&data[i].department===user.department
+                      &&data[i].isShared===0
+                  ){
                     tmp.push({
                       "id": data[i].id,
                       "file_name": data[i].fileName,
@@ -286,32 +316,44 @@ export default defineComponent({
                 }
               }
             }
+
             if(folderType===-2){
-              //公司
+              //个人
+              //folderObj.total = data.length;
               console.log(folderObj.filter.dir_id)
-              for (let i = 0; i < data.length; i++) {
-                if(data[i].dirId === folderObj.filter.dir_id
-                    &&((data[i].department==="")||(data[i].department===null))
-                    &&data[i].isShared===1
-                ){
-                  if(folderObj.keywords){
-                    //keywords是搜索的关键词，这部分是搜索，else是文件加载，后面同理
-                    //有问题
-                    if(folderObj.keywords === data[i].fileName){
-                      tmp.push({
-                        "id": data[i].id,
-                        "file_name": data[i].fileName,
-                        "ext": data[i].ext,
-                        "size": data[i].size,
-                        "dir_id": data[i].dirId,
-                        "url": data[i].url,
-                        "remark": data[i].remark,
-                        "create_time": formatDate(data[i].createTime),
-                        "update_time": formatDate(data[i].updateTime),
-                        "user_name": data[i].userName,
-                      })
-                    }
-                  }else{
+              if(folderObj.keywords){
+                //keywords是搜索的关键词，这部分是搜索，else是文件加载，后面同理
+                // if(folderObj.keywords === data[i].fileName){
+                data=data.filter((record) =>
+                    record.fileName.toLowerCase().includes(folderObj.keywords.toLowerCase()));
+                // 忽略大小写
+                console.log(data);
+                for(let i=0;i<data.length;i++){
+                  if(data[i].dirId === folderObj.filter.dir_id
+                      &&((data[i].department==="")||(data[i].department===null))
+                      &&data[i].isShared===1
+                  ){
+                    tmp.push({
+                      "id": data[i].id,
+                      "file_name": data[i].fileName,
+                      "ext": data[i].ext,
+                      "size": data[i].size,
+                      "dir_id": data[i].dirId,
+                      "url": data[i].url,
+                      "remark": data[i].remark,
+                      "create_time": formatDate(data[i].createTime),
+                      "update_time": formatDate(data[i].updateTime),
+                      "user_name": data[i].userName,
+                    })
+                  }
+                }
+              }
+              else{
+                for (let i = 0; i < data.length; i++) {
+                  if(data[i].dirId === folderObj.filter.dir_id
+                      &&((data[i].department==="")||(data[i].department===null))
+                      &&data[i].isShared===1
+                  ){
                     tmp.push({
                       "id": data[i].id,
                       "file_name": data[i].fileName,
@@ -328,6 +370,7 @@ export default defineComponent({
                 }
               }
             }
+            console.log(folderType)
             console.log(tmp)
 
             for (let i = (folderObj.current_page-1)*folderObj.page_size;

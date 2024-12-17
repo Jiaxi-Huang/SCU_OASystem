@@ -13,6 +13,15 @@ import {
 } from "element-plus";
 import ClipboardJS from "clipboard";
 
+
+import request from '@/utils/request'
+
+const fileApi = {
+    localHost:'http://localhost:8080',
+    judgeFileType:'/api/file/judgeFileType'
+}
+
+
 export default class Service {
     emit: EmitFn<EE[]>
 
@@ -32,6 +41,10 @@ export default class Service {
         folder: {
             root_path: ref('uploads'), //文件夹根目录
             data: ref<AnyObject>([{id: 0, title: '个人文件管理', children: ref<AnyObject>([])},
+                {id: -1, title: '部门文件管理', children: ref<AnyObject>([])},
+                {id: -2, title: '公司文件管理', children: ref<AnyObject>([])},
+            ]),  //文件夹列表数据
+            searchData: ref<AnyObject>([{id: 0, title: '个人文件管理', children: ref<AnyObject>([])},
                 {id: -1, title: '部门文件管理', children: ref<AnyObject>([])},
                 {id: -2, title: '公司文件管理', children: ref<AnyObject>([])},
             ]),  //文件夹列表数据
@@ -56,7 +69,7 @@ export default class Service {
 
         file_table_ref: ref(),
         file: {
-            table_height: 'calc(70VH - 80px)',        //列表表格高度
+            table_height: 'calc(80VH - 80px)',        //列表表格高度
             page_layout: "total, sizes,prev, pager, next", //分页条展示形式
             current_page: 1, //当前页码数
             page_size: 10,   //每页显示条数
@@ -340,6 +353,30 @@ export default class Service {
         this.emit('loadFolder', this.config.folder)
     }
 
+
+    static judgeFileType(id: any){
+        let record = {
+            id:id
+        }
+        return request({
+            url: fileApi.localHost + fileApi.judgeFileType,
+            method: 'POST',  // Sending POST request
+            json: true,  // Assuming you're sending JSON (otherwise remove this)
+            data: record,   // Send data in the body
+        }).then((res) => {
+            if (res.status === 0) {
+                console.log("judgeFileType success", res);
+                return res;  // Assuming the backend returns the fileType in res.data.fileType
+            } else {
+                console.error("judgeFileType error", res.status);
+                return null;  // If there's an error, return null
+            }
+        }).catch((error) => {
+            console.error("Error in judgeFileType:", error);
+            return null;  // Return null in case of an error
+        });
+    }
+
     /**
      * 选择文件夹时，重新加载右边文件列表
      * @param nodeData
@@ -352,13 +389,44 @@ export default class Service {
         //重载右边的文件列表
         this.config.file.filter = { dir_id: nodeData.id }
         this.searchFile()
-
-        let fileType=this.judgeFileType()
-        console.log("fileType"+fileType)
-        //获取当前层级路径
-        this.config.file.path = '/' + this.config.folder.data[1].title
-        if(nodeObj.level > 1){
-            this.config.file.path = '/' + this.config.folder.root_path +  '/' + this.getFolderPath(nodeData.title, nodeObj)
+        if(!this.config.folder.keywords){
+            try {
+                console.log(nodeData.id)
+                Service.judgeFileType(nodeData.id).then((res) => {
+                    if (res) {
+                        let fileType=res.data[0]
+                        this.config.file.path = '/' + this.config.folder.searchData[-fileType].title
+                        if(nodeObj.level > 1){
+                            this.config.file.path = '/' + this.config.folder.searchData[-fileType].title +  '/' + this.getFolderPath(nodeData.title, nodeObj)
+                        }
+                    } else {
+                    }
+                });
+            } catch (err) {
+                ElMessage({
+                    type: 'warning',
+                    message: err.message
+                })
+            }
+        }
+        else{
+            try {
+                Service.judgeFileType(nodeData.id).then((res) => {
+                    if (res) {
+                        let fileType=res.data[0]
+                        this.config.file.path = '/' + this.config.folder.searchData[-fileType].title
+                        if(nodeData.pid != -0&&nodeData.pid != -1&&nodeData.pid != -2){
+                            this.config.file.path = '/' + this.config.folder.searchData[-fileType].title +  '/' + this.getSearchFolderPath(nodeData.title, nodeData.pid)
+                        }
+                    } else {
+                    }
+                });
+            } catch (err) {
+                ElMessage({
+                    type: 'warning',
+                    message: err.message
+                })
+            }
         }
     }
 
@@ -368,9 +436,33 @@ export default class Service {
      * @param nodeObj
      */
     getFolderPath = (path:string, nodeObj: AnyObject):string => {
-        if(nodeObj.parent.data.id != 0&&nodeObj.parent.data.id && -1||nodeObj.parent.data.id && -2){
+        if(nodeObj.data.pid != 0&&nodeObj.data.pid != -1&&nodeObj.data.pid != -2){
             path = this.getFolderPath(nodeObj.parent.data.title + '/' +  path, nodeObj.parent)
         }
+        return path
+    }
+
+     searchById= (nodes:AnyObject, id: number):AnyObject => {
+        for (const node of nodes) {
+            if (node.id === id) {
+                return node;  // 找到匹配的节点，返回该节点
+            }
+            // 如果当前节点有子节点，则递归搜索子节点
+            if (node.children) {
+                const result = this.searchById(node.children, id);
+                if (result) {
+                    return result;  // 如果在子节点中找到匹配节点，返回
+                }
+            }
+        }
+        return null;  // 如果没有找到，返回 null
+    }
+
+    getSearchFolderPath = (path:string, pid: number):string => {
+        let item=this.searchById(this.config.folder.searchData,pid)
+        if(item.id != -0&&item.id != -1&&item.id != -2){
+                       path = this.getSearchFolderPath(item.title + '/' +  path, item.pid)
+                   }
         return path
     }
 
@@ -381,9 +473,7 @@ export default class Service {
         this.emit('loadFolder',this.config.folder)
         this.emit('loadFile', this.config.file)
     }
-    judgeFileType = ():bigint => {
-        this.emit('judgeFileType', this.config.folder.current_select_key)
-    }
+
 
 
 
