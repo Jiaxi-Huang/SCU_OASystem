@@ -51,6 +51,16 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         }
         return null; // 用户不存在
     }
+    public User wechatUserInfo(String openid){
+        try {
+            return userMapper.findByOpenid(openid);
+        } catch (Exception e) {
+            // 记录异常信息
+            e.printStackTrace();
+            // 可以选择返回一个特定的错误码或抛出自定义异常
+            return null; // 表示查询失败
+        }
+    }
     public String userInfoAvatar(String email) {
         try {
             return userMapper.findAvatarByEmail(email);
@@ -202,9 +212,9 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         return -1;
     }
     @LogOperationWithId(value="微信登录",idParamIndex=0)
-    public int loginByWechat(String openid){
+    public int loginByWechat(int user_id){
         try{
-            User user = userMapper.findByOpenid(openid);
+            User user = userMapper.findByUserId(user_id);
             if(user!=null){
                 return 1;
             }
@@ -218,13 +228,22 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         }
     }
     @LogOperationWithId(value="微信绑定",idParamIndex=0)
-    public int bindByWechat(String openid,String phone){
+    public int bindByWechat(int user_id,String openid){
         try{
-            return userMapper.bindOpenidByPhone(openid,phone);
+            return userMapper.bindWechatOpenid(user_id,openid);
         }
         catch (Exception e){
             e.printStackTrace();
             return -1;
         }
     }
+    public User preBindByWechat(String phone) {
+        try {
+            return userMapper.findByPhone(phone);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }

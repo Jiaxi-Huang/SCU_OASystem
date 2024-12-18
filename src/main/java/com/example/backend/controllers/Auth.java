@@ -361,7 +361,8 @@ public class Auth {
     public ResponseEntity<LoginResponse> loginWechat(@RequestBody LoginRequest request) {
         try {
             String openid = request.getOpenid();
-            int isSuccess = userService.loginByWechat(openid);
+            int user_id = userService.wechatUserInfo(openid).getUserId();
+            int isSuccess = userService.loginByWechat(user_id);
             if (isSuccess > 0) {
                 return ResponseEntity.ok(new LoginResponse(0, "登录成功", true, accessService.generateAccessToken(32)));
             } else {
@@ -381,7 +382,8 @@ public class Auth {
             String iv = request.getIv();
             JSONObject decryptedData = DecryptUtil.decrypt(sessionKey, encryptedData, iv);
             String phone = decryptedData.getStr("phoneNumber");
-            int isSuccess = userService.bindByWechat(openid,phone);
+            int user_id = userService.preBindByWechat(phone).getUserId();
+            int isSuccess = userService.bindByWechat(user_id,openid);
             if (isSuccess > 0) {
                 return ResponseEntity.ok(new LoginResponse(0, "绑定成功", true, accessService.generateAccessToken(32)));
             } else {
