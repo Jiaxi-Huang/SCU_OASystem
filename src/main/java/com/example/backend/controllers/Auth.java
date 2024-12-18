@@ -364,13 +364,20 @@ public class Auth {
             int user_id = userService.wechatUserInfo(openid).getUserId();
             int isSuccess = userService.loginByWechat(user_id);
             if (isSuccess > 0) {
-                return ResponseEntity.ok(new LoginResponse(0, "登录成功", true, accessService.generateAccessToken(32)));
+                String accessToken = accessService.generateAccessToken(32);
+                boolean isStored = accessService.storeAccessToken(user_id,accessToken);
+                if(isStored) {
+                    return ResponseEntity.status(HttpStatus.OK).body(new LoginResponse(0, "登录成功", true, accessToken));
+                }
+                else{
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LoginResponse(1, "Token生成错误", false, null));
+                }
             } else {
-                return ResponseEntity.ok(new LoginResponse(1, "登录失败（请先绑定已注册账号对应的邮箱）", false, null));
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LoginResponse(1, "登录失败（请先绑定已注册账号对应的邮箱）", false, null));
             }
         }
         catch(Exception e){
-            return ResponseEntity.ok(new LoginResponse(2, "服务器内部错误", false, null));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new LoginResponse(2, "服务器内部错误", false, null));
         }
     }
     @PostMapping("/wechat/bind")
@@ -385,14 +392,14 @@ public class Auth {
             int user_id = userService.preBindByWechat(phone).getUserId();
             int isSuccess = userService.bindByWechat(user_id,openid);
             if (isSuccess > 0) {
-                return ResponseEntity.ok(new LoginResponse(0, "绑定成功", true, accessService.generateAccessToken(32)));
+                return ResponseEntity.status(HttpStatus.OK).body(new LoginResponse(0, "绑定成功", true, accessService.generateAccessToken(32)));
             } else {
-                return ResponseEntity.ok(new LoginResponse(1, "绑定失败", false, null));
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LoginResponse(1, "绑定失败", false, null));
             }
         }
         catch(Exception e){
             e.printStackTrace();
-            return ResponseEntity.ok(new LoginResponse(2, "服务器内部错误", false, null));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new LoginResponse(2, "服务器内部错误", false, null));
         }
     }
 }
