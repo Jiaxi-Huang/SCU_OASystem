@@ -144,6 +144,9 @@ class Service {
             if(res.status === -1){
                 ElMessage.error('您的权限不够，无法删除文件夹')
             }
+            if(res.status === -2){
+                ElMessage.error('无法删除总文件夹')
+            }
             return null
         })
     }

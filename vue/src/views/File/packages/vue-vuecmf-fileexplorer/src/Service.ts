@@ -77,6 +77,9 @@ export default class Service {
             path: '/', //当前文件夹路径
             keywords: ref(''), //文件搜索关键词
             data: ref<AnyObject>(),  //文件列表数据
+            fileExtensions: ref<AnyObject>(),
+            isExt:false,
+            extFilter: ref([]), //文件列表过滤器
             filter: ref({}), //文件列表过滤器
             list_show: 'card', //文件列表展示方式 card = 缩略图，list = 列表
             select_files: ref(), //已选择的文件信息
@@ -797,6 +800,9 @@ export default class Service {
         this.emit('onExceed',{files:files, uploadFiles: uploadFiles, uploadInstance: this.config.file.uploadInstance})
     }
 
+
+
+
     /**
      * 格式化显示文件大小
      * @param size
@@ -822,6 +828,46 @@ export default class Service {
         this.config.file.order_sort = data.order == 'ascending' ? 'asc' : 'desc'
         this.searchFile()
     }
+
+
+    handleFilterChange = (filters: AnyObject): void => {
+        console.log("filters:", JSON.stringify(filters));
+        console.log("filters:", filters);
+
+        // 检查 filters 是否是一个空对象或所有数组都为空
+        let extValue = Object.keys(filters).reduce((acc, key) => {
+            const value = filters[key];
+            if (Array.isArray(value) && value.length > 0) {
+                acc = value; // 如果某个字段是非空数组，保存该值
+            }
+            return acc;
+        }, []); // 默认为空数组
+
+        // 如果 extValue 为空数组，则表示没有筛选条件
+        if (extValue.length === 0) {
+            this.config.file.isExt = false;
+            console.log("未进行筛选");
+        } else {
+            this.config.file.isExt = true;
+            this.config.file.extFilter = extValue; // 将筛选条件赋给 extFilter
+            console.log("筛选条件:", this.config.file.extFilter);
+        }
+
+        // 触发事件，发送筛选后的数据
+        this.emit('loadFile', this.config.file);
+    };
+
+
+
+
+
+    // filterStatus方法过滤文件扩展名
+    filterStatus = (value, row):AnyObject =>{
+        return row.ext === value;
+    }
+
+
+
 
     /**
      * 文件列表排序回调事件

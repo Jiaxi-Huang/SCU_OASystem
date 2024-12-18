@@ -107,6 +107,7 @@
             <el-table
                 ref="tableRef"
                 :data="file.data"
+                @filter-change="service.handleFilterChange"
                 :default-sort="{ prop: file.order_field.value, order: file.order_sort.value === 'desc' ? 'descending': 'ascending' }"
                 style="width: 100%"
 
@@ -132,7 +133,16 @@
               </el-table-column>
               <el-table-column prop="update_time" label="修改时间" sortable min-width="150" />
               <el-table-column prop="user_name" label="修改人" min-width="100" />
-              <el-table-column prop="ext" label="扩展名" sortable min-width="100" />
+              service.generateFileExtensions
+              <el-table-column
+                  prop="ext"
+                  label="文件类型"
+                  min-width="100"
+                  :filters="file.fileExtensions"
+                  :filter-method="service.filterStatus"
+                  filter-placement="bottom-end"
+              >
+              </el-table-column>
               <el-table-column prop="size" label="大小" sortable min-width="100" >
                 <template #default="scope">
                   {{ service.formatFileSize(scope.row.size) }}
@@ -359,6 +369,7 @@
 import Service from './Service'
 import {defineEmits, toRefs, ref, reactive} from "vue"
 import {ElTable, UploadInstance} from "element-plus";
+import {serve} from "esbuild";
 const emit = defineEmits(['loadFolder','saveFolder','moveFolder','delFolder','loadFile','uploadFile','saveFile','moveFile','delFile','selectFile', 'onUploadSuccess', 'onUploadError','beforeUpload', 'onPreview', 'onRemove','onProgress','onChange', 'onExceed','remarkFile','judgeFileType'])
 // 获取 accessToken
 
@@ -413,7 +424,6 @@ const props = defineProps({
   }
 
 })
-
 const {root_path, page_size, list_show, upload_api, tool_config} = toRefs(props)
 const uploadRef = ref<UploadInstance>()
 const tableRef = ref<InstanceType<typeof ElTable>>()

@@ -372,24 +372,68 @@ export default defineComponent({
             }
             console.log(folderType)
             console.log(tmp)
+            // 提取表格数据中的扩展名
+            const extensions = tmp.map((item: { ext: string }) => item.ext);
+            console.log(extensions);
 
-            for (let i = (folderObj.current_page-1)*folderObj.page_size;
-                 i < tmp.length&&i < folderObj.current_page*folderObj.page_size; i++) {
-              folderObj.data.push({
-                "id": tmp[i].id,
-                "file_name": tmp[i].file_name,
-                "ext": tmp[i].ext,
-                "size": tmp[i].size,
-                "dir_id": tmp[i].dir_id,
-                "url": tmp[i].url,
-                "remark": tmp[i].remark,
-                "create_time": formatDate(tmp[i].create_time),
-                "update_time": formatDate(tmp[i].update_time),
-                "user_name": tmp[i].user_name,
-              })
+// 去重并生成过滤器选项
+            const uniqueExtensions = [...new Set(extensions)];
+
+// 根据去重后的扩展名生成过滤器选项
+            folderObj.fileExtensions = uniqueExtensions.map((ext: string) => ({
+              text: `.${ext}`,
+              value: ext
+            }));
+
+
+            console.log(folderObj.extFilter)
+            let filteredData = tmp.filter(item => {
+              return folderObj.extFilter.includes(item.ext); // 根据扩展名进行筛选
+            });
+
+
+            console.log(filteredData);
+
+            if(folderObj.isExt){
+              for (let i = (folderObj.current_page-1)*folderObj.page_size;
+                   i < filteredData.length&&i < folderObj.current_page*folderObj.page_size; i++) {
+                folderObj.data.push({
+                  "id": filteredData[i].id,
+                  "file_name": filteredData[i].file_name,
+                  "ext": filteredData[i].ext,
+                  "size": filteredData[i].size,
+                  "dir_id": filteredData[i].dir_id,
+                  "url": filteredData[i].url,
+                  "remark": filteredData[i].remark,
+                  "create_time": formatDate(filteredData[i].create_time),
+                  "update_time": formatDate(filteredData[i].update_time),
+                  "user_name": filteredData[i].user_name,
+                })
+              }
+              folderObj.total=filteredData.length;
             }
-            console.log("page_size:"+folderObj.page_size)
-            folderObj.total=tmp.length;
+            else{
+              for (let i = (folderObj.current_page-1)*folderObj.page_size;
+                   i < tmp.length&&i < folderObj.current_page*folderObj.page_size; i++) {
+                folderObj.data.push({
+                  "id": tmp[i].id,
+                  "file_name": tmp[i].file_name,
+                  "ext": tmp[i].ext,
+                  "size": tmp[i].size,
+                  "dir_id": tmp[i].dir_id,
+                  "url": tmp[i].url,
+                  "remark": tmp[i].remark,
+                  "create_time": formatDate(tmp[i].create_time),
+                  "update_time": formatDate(tmp[i].update_time),
+                  "user_name": tmp[i].user_name,
+                })
+              }
+              console.log("page_size:"+folderObj.page_size)
+              folderObj.total=tmp.length;
+            }
+
+
+
           }
         } else {
           console.log("FileLoader RES MISS");

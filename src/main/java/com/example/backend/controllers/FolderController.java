@@ -161,9 +161,13 @@ public class FolderController {
         int userId = accessService.getAuthenticatedId(accessToken);
         System.out.println("moveFoleder"+userId);
         User userInfo = userMapper.findByUserId(userId);
-        int res_code = folderService.delFolder(userInfo,record);
-        if(res_code==0){
-            response.setStatus(-1);
+        if(record.getId()==0||record.getId()==-1||record.getId()==-2){
+            response.setStatus(-2);
+        }else{
+            int res_code = folderService.delFolder(userInfo,record);
+            if(res_code==0){
+                response.setStatus(-1);
+            }
         }
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

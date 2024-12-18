@@ -87,6 +87,7 @@ public class FileController {
         String accessToken = record.getAcsTkn();
         int userId = accessService.getAuthenticatedId(accessToken);
         User userInfo = userMapper.findByUserId(userId);
+
         int res_code = fileService.delFile(userInfo,record);
         if (res_code==0) {
             response.setStatus(-1);
