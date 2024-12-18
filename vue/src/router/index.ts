@@ -168,6 +168,32 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
     ]
   },
   {
+    path: '/weather',
+    component: layout,
+    redirect: '/weather/index',
+    meta: {
+      title: {
+        '/zh-CN': '天气',
+        '/en-US': 'Weather'
+      },
+      icon: 'ic ic-weather'
+    },
+    children: [
+        {
+          path: '/weather/index',
+          name: 'weather',
+          component: () => import('@/components/Weather/index.vue'),
+          meta: {
+            title: {
+              '/zh-CN': '天气',
+              '/en-US': 'Weather'
+            },
+            icon: 'ic ic-weather'
+          }
+        }
+        ]
+  },
+  {
     path: '/calendar',
     component: layout,
     redirect: '/calendar/index',

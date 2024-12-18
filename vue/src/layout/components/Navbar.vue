@@ -6,6 +6,8 @@
       <div class="right-menu">
         <search></search>
         <lang-switch></lang-switch>
+        <weather></weather>
+
         <div id="Message" class="right-menu-box">
           <el-tooltip placement="bottom" effect="light">
             <template #content>
@@ -73,26 +75,29 @@
 </template>
 
 
+
 <script lang="ts">
-import { defineComponent, computed, ref, onMounted, onBeforeUnmount } from 'vue'
-import { ElMessageBox } from 'element-plus'
-import { useRouter } from 'vue-router'
-import { useStore } from '@/store/index'
-import TodoService from '@/views/TodoList/api/index'
-import LeaveService from '@/views/LeaveApproval/api/index'
-import ReimbursementService from '@/views/Reimbursement/api/index'
-import MeetingService from '@/views/Meetings/api/index'  // 导入会议管理的 Service
-import { Todo } from '@/types/todo'
-import { LeaveApproval } from '@/types/leaveApproval'
-import { Reimbursement } from '@/types/reimbursement'
-import { Meeting } from '@/types/meeting'  // 导入会议类型
-import Hamburger from '@/components/Hamburger/Hamburger.vue'
-import Breadcrumb from '@/components/Breadcrumb/index.vue'
-import Search from '@/components/Search/index.vue'
-import LangSwitch from '@/components/LangSwitch/index.vue'
-import { toFullScreen, exitFullScreen } from '@/utils/screen'
-import { Message, FullScreen, BottomLeft } from '@element-plus/icons-vue'
-import { langConfig } from '@/utils/constant/config'
+import { defineComponent, computed, ref, onMounted, onBeforeUnmount } from 'vue';
+import { ElMessageBox } from 'element-plus';
+import { useRouter } from 'vue-router';
+import { useStore } from '@/store/index';
+import TodoService from '@/views/TodoList/api/index';
+import LeaveService from '@/views/LeaveApproval/api/index';
+import ReimbursementService from '@/views/Reimbursement/api/index';
+import MeetingService from '@/views/Meetings/api/index';
+import { Todo } from '@/types/todo';
+import { LeaveApproval } from '@/types/leaveApproval';
+import { Reimbursement } from '@/types/reimbursement';
+import { Meeting } from '@/types/meeting';
+import Hamburger from '@/components/Hamburger/Hamburger.vue';
+import Breadcrumb from '@/components/Breadcrumb/index.vue';
+import Search from '@/components/Search/index.vue';
+import LangSwitch from '@/components/LangSwitch/index.vue';
+import Weather from '@/components/Weather/index.vue';
+
+import { toFullScreen, exitFullScreen } from '@/utils/screen';
+import { Message, FullScreen, BottomLeft } from '@element-plus/icons-vue';
+import { langConfig } from '@/utils/constant/config';
 
 export default defineComponent({
   name: 'Navbar',
@@ -103,141 +108,133 @@ export default defineComponent({
     LangSwitch,
     Message,
     FullScreen,
-    BottomLeft
+    BottomLeft,
+    Weather
   },
   setup() {
-    const router = useRouter()
-    const store = useStore()
-    const opened = computed(() => store.getters['appModule/getSidebarState'])
-    const fullScreen = ref(false)
-    const messageNum = computed(() => store.getters['messageModule/getMessageNum'])
-    const lang = computed((): string => store.getters['settingsModule/getLangState'])
-    const nickname = computed(() => store.state.permissionModule.username)
-    const avatar = computed(() => store.state.permissionModule.avatar)
+    const router = useRouter();
+    const store = useStore();
+    const opened = computed(() => store.getters['appModule/getSidebarState']);
+    const fullScreen = ref(false);
+    const messageNum = computed(() => store.getters['messageModule/getMessageNum']);
+    const lang = computed((): string => store.getters['settingsModule/getLangState']);
+    const nickname = computed(() => store.state.permissionModule.username);
+    const avatar = computed(() => store.state.permissionModule.avatar);
 
-    const todos = ref<Todo[]>([])
-    const leaveApprovals = ref<LeaveApproval[]>([])
-    const reimbursements = ref<Reimbursement[]>([])
-    const meetings = ref<Meeting[]>([])  // 定义 meetings 变量
+    const todos = ref<Todo[]>([]);
+    const leaveApprovals = ref<LeaveApproval[]>([]);
+    const reimbursements = ref<Reimbursement[]>([]);
+    const meetings = ref<Meeting[]>([]);  // 定义 meetings 变量
 
-    const getAvatarUrl = (avatar: string|null) => {
-      if (avatar) {
-        return avatar
-      }
-      else{
-        return 'src/assets/avatar-default.jpg';
-      }
-    }
+    const getAvatarUrl = (avatar: string | null) => {
+      return avatar ? avatar : 'src/assets/avatar-default.jpg';
+    };
 
     const getTodos = async () => {
-      const response = await TodoService.postGetTodoList()
+      const response = await TodoService.postGetTodoList();
       if (response && response.data) {
-        todos.value = response.data
+        todos.value = response.data;
       }
-    }
+    };
 
     const getLeaveApprovals = async () => {
-      const response = await LeaveService.postGetLeaveApproval()
+      const response = await LeaveService.postGetLeaveApproval();
       if (response && response.data) {
-        leaveApprovals.value = response.data
+        leaveApprovals.value = response.data;
       }
-    }
+    };
 
     const getReimbursements = async () => {
-      const role = localStorage.getItem("role")
+      const role = localStorage.getItem("role");
       if (role === "admin") {
-        const response = await ReimbursementService.getAdminReimbursementList()
+        const response = await ReimbursementService.getAdminReimbursementList();
         if (response && response.data) {
-          reimbursements.value = response.data
+          reimbursements.value = response.data;
         }
-      }else{
-        const response = await ReimbursementService.getReimbursementList()
+      } else {
+        const response = await ReimbursementService.getReimbursementList();
         if (response && response.data) {
-          reimbursements.value = response.data
+          reimbursements.value = response.data;
         }
       }
-    }
+    };
 
     const getMeetings = async () => {
-      const response = await MeetingService.getPersonalMeetingList()
+      const response = await MeetingService.getPersonalMeetingList();
       if (response && response.data) {
-        meetings.value = response.data
+        meetings.value = response.data;
       }
-    }
-
+    };
 
     const checkDueTodos = (todos: Todo[]) => {
-      const now = new Date().getTime()
+      const now = new Date().getTime();
       todos.forEach((todo: Todo) => {
-        const dueTime = new Date(todo.todo_ddl).getTime()
+        const dueTime = new Date(todo.todo_ddl).getTime();
         if (dueTime - now <= 3600000 && todo.todo_fin !== '已完成') {
           ElMessageBox.alert(`待办事项 "${todo.todo_title}" 即将临期`, '提醒', {
             confirmButtonText: '确定',
             type: 'warning',
-          })
+          });
         }
-      })
-    }
+      });
+    };
 
     onMounted(() => {
-      getTodos()
-      getLeaveApprovals()
-      getReimbursements()
-      getMeetings()  // 获取会议数据
+      getTodos();
+      getLeaveApprovals();
+      getReimbursements();
+      getMeetings();
 
       const intervalId = setInterval(() => {
-        console.log("Checking todos at interval...")  // 打印定时器调用信息
+        console.log("Checking todos at interval...");
         getTodos().then(() => {
-          checkDueTodos(todos.value)
-        })
-      }, 600000)
+          checkDueTodos(todos.value);
+        });
+      }, 600000);
 
       onBeforeUnmount(() => {
-        clearInterval(intervalId)
-      })
-    })
+        clearInterval(intervalId);
+      });
+    });
 
     const toggleSideBar = () => {
-      store.dispatch('appModule/toggleSideBar')
-    }
+      store.dispatch('appModule/toggleSideBar');
+    };
 
     const toShowFullScreen = () => {
-      toFullScreen()
-      fullScreen.value = true
-    }
+      toFullScreen();
+      fullScreen.value = true;
+    };
 
     const toExitFullScreen = () => {
-      exitFullScreen()
-      fullScreen.value = false
-    }
+      exitFullScreen();
+      fullScreen.value = false;
+    };
 
     const navigateTo = (path: string, query?: Record<string, string>) => {
       if (path.includes('/todoList')) {
-        sessionStorage.setItem('showUncompleted', '1')
+        sessionStorage.setItem('showUncompleted', '1');
       } else if (path.includes('/leaveApproval')) {
-        sessionStorage.setItem('showPendingLeave', '1')
+        sessionStorage.setItem('showPendingLeave', '1');
       } else if (path.includes('/Reimbursement')) {
-        sessionStorage.setItem('showPendingReimbursement', '1')
+        sessionStorage.setItem('showPendingReimbursement', '1');
       } else if (path.includes('/meetings')) {
-        sessionStorage.setItem('showPendingMeetings', '1')
+        sessionStorage.setItem('showPendingMeetings', '1');
       }
-      router.push({ path, query })
-    }
-
+      router.push({ path, query });
+    };
 
     const logout = () => {
-      sessionStorage.removeItem('auth')
-      sessionStorage.removeItem('accessToken')
-      router.replace('/login')
-    }
+      sessionStorage.removeItem('auth');
+      sessionStorage.removeItem('accessToken');
+      router.replace('/login');
+    };
 
     return {
       getAvatarUrl,
       messageNum,
       toShowFullScreen,
       toExitFullScreen,
-      toFullScreen,
-      exitFullScreen,
       fullScreen,
       nickname,
       lang,
@@ -251,10 +248,11 @@ export default defineComponent({
       pendingReimbursement: computed(() => reimbursements.value.filter(reimbursement => reimbursement.status == '未审核' || reimbursement.status == '未通过')),
       pendingMeetings: computed(() => meetings.value.filter(meeting => meeting.mtin_fin === '未完成')),
       navigateTo
-    }
+    };
   }
-})
+});
 </script>
+
 
 <style lang="scss" scoped>
 :root {
