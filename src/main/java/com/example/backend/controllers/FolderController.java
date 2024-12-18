@@ -38,6 +38,7 @@ public class FolderController {
         //0是个人，-1是部门，-2是公司
     }
 
+
     public void folderBFS(String department, int isShared, int folderId,int userId) {
         // 获取所有文件夹和文件数据
         List<Folder> folderList = folderService.getFolder();
@@ -160,9 +161,13 @@ public class FolderController {
         int userId = accessService.getAuthenticatedId(accessToken);
         System.out.println("moveFoleder"+userId);
         User userInfo = userMapper.findByUserId(userId);
-        int res_code = folderService.delFolder(userInfo,record);
-        if(res_code==0){
-            response.setStatus(-1);
+        if(record.getId()==0||record.getId()==-1||record.getId()==-2){
+            response.setStatus(-2);
+        }else{
+            int res_code = folderService.delFolder(userInfo,record);
+            if(res_code==0){
+                response.setStatus(-1);
+            }
         }
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

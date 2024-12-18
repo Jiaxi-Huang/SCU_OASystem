@@ -56,8 +56,16 @@
 			<artifactId>spring-boot-starter-freemarker</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
@@ -91,8 +99,6 @@
 			<artifactId>hutool-all</artifactId>
 			<version>5.8.25</version>
 		</dependency>
-
-		<!-- 打印-->
 		<dependency>
 			<groupId>com.itextpdf</groupId>
 			<artifactId>itextpdf</artifactId>
@@ -103,9 +109,6 @@
 			<artifactId>itext-asian</artifactId>
 			<version>5.2.0</version>
 		</dependency>
-		<!-- 打印-->
-
-		<!-- excel工具 -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
@@ -116,7 +119,11 @@
 			<artifactId>poi-ooxml</artifactId>
 			<version>5.3.0</version>
 		</dependency>
-		<!-- excel工具 -->
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>1.70</version>
+		</dependency>
     </dependencies>
 
 	<build>

@@ -72,19 +72,24 @@ public class ReimbursementCon {
     @PostMapping("/addReimbursementRecord")
     public ResponseBase addReimbursementRecord(@RequestBody ReimbursementRecordWithAccessToken request) {
         ResponseBase res = new ResponseBase();
-        int res_code = -1;
         try {
+            int reimbursement_id;
             String accessToken = request.getAccessToken();
             int userId = accessService.getAuthenticatedId(accessToken);
             request.setUser_id(userId);
-            res_code = reimbursementService.addReimbursementRecord(request);
+            reimbursement_id = reimbursementService.addReimbursementRecord(request);
+            res.setStatus(200);
+            res.setMessage("Reimbursement record added successfully.");
+            res.pushData(reimbursement_id);
+            System.out.println("addRec reimbursement_id: " + reimbursement_id);
         } catch (Exception e) {
             res.setStatus(-1);
             res.setMessage(e.getMessage());
         }
-        System.out.println("addRec res_code: " + res_code);
+
         return res;
     }
+
 
     @PostMapping("/deleteReimbursementRecord")
     public ResponseBase deleteReimbursementRecord(@RequestBody ReimbursementRecord record) {

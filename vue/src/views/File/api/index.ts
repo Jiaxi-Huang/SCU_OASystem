@@ -13,7 +13,8 @@ const fileApi = {
     delFile:'/api/file/delFile',
     remarkFile:'/api/file/remarkFile',
     uploadFile:'/api/file/uploadFile',
-    modifyFile:'/api/file/modifyFile'
+    modifyFile:'/api/file/modifyFile',
+    judgeFileType:'/api/file/judgeFileType'
 }
 
 
@@ -143,6 +144,9 @@ class Service {
             if(res.status === -1){
                 ElMessage.error('您的权限不够，无法删除文件夹')
             }
+            if(res.status === -2){
+                ElMessage.error('无法删除总文件夹')
+            }
             return null
         })
     }
@@ -236,6 +240,25 @@ class Service {
             }
             if(res.status === -1){
                 ElMessage.error('您的权限不够，无法修改文件名称')
+            }
+            return null
+        })
+    }
+
+
+    static judgeFileType(Data:any) {
+        let record = {
+            dirId:Data
+        }
+        return request({
+            url: fileApi.localHost + fileApi.judgeFileType,
+            method: 'POST',
+            json: true,
+            data: record,
+        }).then((res) => {
+            if (res.status === 0) {
+                console.log(res.data[0])
+                return res.data[0]
             }
             return null
         })

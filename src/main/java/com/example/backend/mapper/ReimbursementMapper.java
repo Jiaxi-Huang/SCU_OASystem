@@ -22,10 +22,12 @@ public interface ReimbursementMapper extends BaseMapper<ReimbursementRecord> {
                          String status, String submitted_at);
 
 
-    @Insert("INSERT INTO reimbursement_requests (description, amount, status,submitted_at, user_id)" +
-            " VALUES(#{description}, #{amount}, #{status}, #{submitted_at}, #{user_id})")
-    int addReimbursementRecord(int user_id, int reimbursement_id, String description,
-                         BigDecimal amount, String status, String submitted_at);
+    @Insert("INSERT INTO reimbursement_requests (user_id, amount, description, status, submitted_at, review_user_id) " +
+            "VALUES (#{user_id}, #{amount}, #{description}, #{status}, #{submitted_at}, #{review_user_id})")
+    @Options(useGeneratedKeys = true, keyProperty = "reimbursement_id", keyColumn = "reimbursement_id")
+    int addReimbursementRecord(int user_id, BigDecimal amount, String description,
+                                String status, String submitted_at, int review_user_id);
+
 
     @Delete("DELETE from reimbursement_requests WHERE reimbursement_id = #{reimbursement_id}")
     int deleteReimbursementRecord(int reimbursement_id);

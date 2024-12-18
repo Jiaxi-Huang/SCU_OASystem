@@ -6,6 +6,8 @@ const reimbursementApi = {
   updateReimbursement: '/api/reimbursement/modifyReimbursementRecord',
   deleteReimbursement: '/api/reimbursement/deleteReimbursementRecord',
   addReimbursement: '/api/reimbursement/addReimbursementRecord',
+  addNotification: '/api/notification/addNotification',
+  getAllUsers: '/api/notification/getAllUsers',
   localHost:'http://localhost:8080',
 }
 
@@ -60,24 +62,50 @@ class Service {
   }
 
   static addReimbursement(record:any) {
-    record.acsTkn = sessionStorage.getItem('accessToken')
-    // console.log(record.acsTkn)
     return request({
       url: reimbursementApi.localHost + reimbursementApi.addReimbursement,
       method: 'POST',
       json: true,
       data: record,
     }).then((res) => {
+      console.log("res reimbursement_id: " + JSON.stringify(res.reimbursement_id))
       if (res.status === 200) {
         return res
       }
-      return null
+      return res.reimbursement_id
     })
   }
 
     static getAdminReimbursementList() {
       return request({
         url: reimbursementApi.localHost + reimbursementApi.getAdminReimbursementList,
+        method: 'POST',
+        json: true,
+      }).then((res) => {
+        if (res.status === 200) {
+          return res
+        }
+        return null
+      })
+    }
+
+    static addNotification(record:any) {
+      return request({
+        url: reimbursementApi.localHost + reimbursementApi.addNotification,
+        method: 'POST',
+        json: true,
+        data: record,
+      }).then((res) => {
+        if (res.status === 200) {
+          return res
+        }
+        return res.status
+      })
+    }
+
+    static getAllUsers() {
+      return request({
+        url: reimbursementApi.localHost + reimbursementApi.getAllUsers,
         method: 'POST',
         json: true,
       }).then((res) => {

@@ -13,6 +13,15 @@ import {
 } from "element-plus";
 import ClipboardJS from "clipboard";
 
+
+import request from '@/utils/request'
+
+const fileApi = {
+    localHost:'http://localhost:8080',
+    judgeFileType:'/api/file/judgeFileType'
+}
+
+
 export default class Service {
     emit: EmitFn<EE[]>
 
@@ -32,6 +41,10 @@ export default class Service {
         folder: {
             root_path: ref('uploads'), //文件夹根目录
             data: ref<AnyObject>([{id: 0, title: '个人文件管理', children: ref<AnyObject>([])},
+                {id: -1, title: '部门文件管理', children: ref<AnyObject>([])},
+                {id: -2, title: '公司文件管理', children: ref<AnyObject>([])},
+            ]),  //文件夹列表数据
+            searchData: ref<AnyObject>([{id: 0, title: '个人文件管理', children: ref<AnyObject>([])},
                 {id: -1, title: '部门文件管理', children: ref<AnyObject>([])},
                 {id: -2, title: '公司文件管理', children: ref<AnyObject>([])},
             ]),  //文件夹列表数据
@@ -56,14 +69,17 @@ export default class Service {
 
         file_table_ref: ref(),
         file: {
-            table_height: 'calc(70VH - 80px)',        //列表表格高度
-            page_layout: "total, prev, pager, next", //分页条展示形式
+            table_height: 'calc(80VH - 80px)',        //列表表格高度
+            page_layout: "total, sizes,prev, pager, next", //分页条展示形式
             current_page: 1, //当前页码数
-            page_size: 30,   //每页显示条数
+            page_size: 10,   //每页显示条数
             total: 0, //总条数
             path: '/', //当前文件夹路径
             keywords: ref(''), //文件搜索关键词
             data: ref<AnyObject>(),  //文件列表数据
+            fileExtensions: ref<AnyObject>(),
+            isExt:false,
+            extFilter: ref([]), //文件列表过滤器
             filter: ref({}), //文件列表过滤器
             list_show: 'card', //文件列表展示方式 card = 缩略图，list = 列表
             select_files: ref(), //已选择的文件信息
@@ -97,7 +113,7 @@ export default class Service {
         //加载文件列表
         this.emit('loadFile', this.config.file)
 
-        //this.emit('mySearchFile', this.config.file.keywords)
+
 
         this.config.tool = [
             { name: 'new_folder', label: '创建文件夹', icon:'bi bi-folder-plus', event: this.openNewFolder, visible: true },
@@ -340,6 +356,30 @@ export default class Service {
         this.emit('loadFolder', this.config.folder)
     }
 
+
+    static judgeFileType(id: any){
+        let record = {
+            id:id
+        }
+        return request({
+            url: fileApi.localHost + fileApi.judgeFileType,
+            method: 'POST',  // Sending POST request
+            json: true,  // Assuming you're sending JSON (otherwise remove this)
+            data: record,   // Send data in the body
+        }).then((res) => {
+            if (res.status === 0) {
+                console.log("judgeFileType success", res);
+                return res;  // Assuming the backend returns the fileType in res.data.fileType
+            } else {
+                console.error("judgeFileType error", res.status);
+                return null;  // If there's an error, return null
+            }
+        }).catch((error) => {
+            console.error("Error in judgeFileType:", error);
+            return null;  // Return null in case of an error
+        });
+    }
+
     /**
      * 选择文件夹时，重新加载右边文件列表
      * @param nodeData
@@ -352,11 +392,44 @@ export default class Service {
         //重载右边的文件列表
         this.config.file.filter = { dir_id: nodeData.id }
         this.searchFile()
-
-        //获取当前层级路径
-        this.config.file.path = '/' + this.config.folder.root_path
-        if(nodeObj.level > 1){
-            this.config.file.path = '/' + this.config.folder.root_path +  '/' + this.getFolderPath(nodeData.title, nodeObj)
+        if(!this.config.folder.keywords){
+            try {
+                console.log(nodeData.id)
+                Service.judgeFileType(nodeData.id).then((res) => {
+                    if (res) {
+                        let fileType=res.data[0]
+                        this.config.file.path = '/' + this.config.folder.searchData[-fileType].title
+                        if(nodeObj.level > 1){
+                            this.config.file.path = '/' + this.config.folder.searchData[-fileType].title +  '/' + this.getFolderPath(nodeData.title, nodeObj)
+                        }
+                    } else {
+                    }
+                });
+            } catch (err) {
+                ElMessage({
+                    type: 'warning',
+                    message: err.message
+                })
+            }
+        }
+        else{
+            try {
+                Service.judgeFileType(nodeData.id).then((res) => {
+                    if (res) {
+                        let fileType=res.data[0]
+                        this.config.file.path = '/' + this.config.folder.searchData[-fileType].title
+                        if(nodeData.pid != -0&&nodeData.pid != -1&&nodeData.pid != -2){
+                            this.config.file.path = '/' + this.config.folder.searchData[-fileType].title +  '/' + this.getSearchFolderPath(nodeData.title, nodeData.pid)
+                        }
+                    } else {
+                    }
+                });
+            } catch (err) {
+                ElMessage({
+                    type: 'warning',
+                    message: err.message
+                })
+            }
         }
     }
 
@@ -366,9 +439,33 @@ export default class Service {
      * @param nodeObj
      */
     getFolderPath = (path:string, nodeObj: AnyObject):string => {
-        if(nodeObj.parent.data.id != 0&&nodeObj.parent.data.id && -1||nodeObj.parent.data.id && -2){
+        if(nodeObj.data.pid != 0&&nodeObj.data.pid != -1&&nodeObj.data.pid != -2){
             path = this.getFolderPath(nodeObj.parent.data.title + '/' +  path, nodeObj.parent)
         }
+        return path
+    }
+
+     searchById= (nodes:AnyObject, id: number):AnyObject => {
+        for (const node of nodes) {
+            if (node.id === id) {
+                return node;  // 找到匹配的节点，返回该节点
+            }
+            // 如果当前节点有子节点，则递归搜索子节点
+            if (node.children) {
+                const result = this.searchById(node.children, id);
+                if (result) {
+                    return result;  // 如果在子节点中找到匹配节点，返回
+                }
+            }
+        }
+        return null;  // 如果没有找到，返回 null
+    }
+
+    getSearchFolderPath = (path:string, pid: number):string => {
+        let item=this.searchById(this.config.folder.searchData,pid)
+        if(item.id != -0&&item.id != -1&&item.id != -2){
+                       path = this.getSearchFolderPath(item.title + '/' +  path, item.pid)
+                   }
         return path
     }
 
@@ -384,15 +481,21 @@ export default class Service {
 
 
 
+
     /**
      * 每页显示条数修改
      * @param size 每页显示的条数
      */
-    handleSizeChange = (size:number):void => {
-        console.log("handleSizeChange "+size)
-        this.config.file.page_size = size
-        this.searchFile()
-    }
+        // 直接修改嵌套对象的属性可能会出现问题
+    handleSizeChange = (size: number): void => {
+        console.log("handleSizeChange " + size);
+        this.config.file = {
+            ...this.config.file,  // 创建一个新的对象，保持其他属性不变
+            page_size: size,      // 修改 page_size 属性
+        };
+        this.searchFile();
+    };
+
 
     /**
      * 当前页修改
@@ -697,6 +800,9 @@ export default class Service {
         this.emit('onExceed',{files:files, uploadFiles: uploadFiles, uploadInstance: this.config.file.uploadInstance})
     }
 
+
+
+
     /**
      * 格式化显示文件大小
      * @param size
@@ -722,6 +828,46 @@ export default class Service {
         this.config.file.order_sort = data.order == 'ascending' ? 'asc' : 'desc'
         this.searchFile()
     }
+
+
+    handleFilterChange = (filters: AnyObject): void => {
+        console.log("filters:", JSON.stringify(filters));
+        console.log("filters:", filters);
+
+        // 检查 filters 是否是一个空对象或所有数组都为空
+        let extValue = Object.keys(filters).reduce((acc, key) => {
+            const value = filters[key];
+            if (Array.isArray(value) && value.length > 0) {
+                acc = value; // 如果某个字段是非空数组，保存该值
+            }
+            return acc;
+        }, []); // 默认为空数组
+
+        // 如果 extValue 为空数组，则表示没有筛选条件
+        if (extValue.length === 0) {
+            this.config.file.isExt = false;
+            console.log("未进行筛选");
+        } else {
+            this.config.file.isExt = true;
+            this.config.file.extFilter = extValue; // 将筛选条件赋给 extFilter
+            console.log("筛选条件:", this.config.file.extFilter);
+        }
+
+        // 触发事件，发送筛选后的数据
+        this.emit('loadFile', this.config.file);
+    };
+
+
+
+
+
+    // filterStatus方法过滤文件扩展名
+    filterStatus = (value, row):AnyObject =>{
+        return row.ext === value;
+    }
+
+
+
 
     /**
      * 文件列表排序回调事件

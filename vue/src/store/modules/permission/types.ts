@@ -1,6 +1,7 @@
 import { RouteRecordRaw } from 'vue-router'
 
 export default interface permissionStateTypes {
+  email: String
   username: String
   role: String
   department: String

@@ -1,6 +1,7 @@
 package com.example.backend.services;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.backend.annotation.LogOperationWithId;
 import com.example.backend.entity.User;
 import com.example.backend.mapper.PermissionMapper;
 import com.example.backend.mapper.UserMapper;
@@ -50,6 +51,27 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         }
         return null; // 用户不存在
     }
+    public User wechatUserInfo(String openid){
+        try {
+            return userMapper.findByOpenid(openid);
+        } catch (Exception e) {
+            // 记录异常信息
+            e.printStackTrace();
+            // 可以选择返回一个特定的错误码或抛出自定义异常
+            return null; // 表示查询失败
+        }
+    }
+    public String userInfoAvatar(String email) {
+        try {
+            return userMapper.findAvatarByEmail(email);
+        } catch (Exception e) {
+            // 记录异常信息
+            e.printStackTrace();
+            // 可以选择返回一个特定的错误码或抛出自定义异常
+            return null; // 表示查询失败
+        }
+    }
+    @LogOperationWithId(value="基本信息设置",idParamIndex=3)//user_id是第四个参数
     //个人设置信息更改
     public int basicInfoSetting(String username,String phone,String intro,int user_id) {
     try {
@@ -65,7 +87,6 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         return -1; // 表示更改失败
         }
     }
-
     public int register(String email, String password) {
         try {
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -79,7 +100,6 @@ public class UserService extends ServiceImpl<UserMapper, User> {
             return -1; // 表示注册失败
         }
     }
-
     public int resetPassword(String email, String password) {
         try {
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -92,6 +112,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
             return -1; // 表示重置密码失败
         }
     }
+    @LogOperationWithId(value="重置密码",idParamIndex=0)
     public int resetPersonalPassword(int user_id,String old_password, String new_password) {
         try {
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -110,6 +131,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         }
         return 0; // 输入原来密码错误
     }
+    @LogOperationWithId(value="重置邮箱",idParamIndex=0)
     public int resetPersonalEmail(int user_id,String oldEmail, String newEmail) {
         try {
             if (userMapper.findByUserId(user_id) == null) {
@@ -123,6 +145,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
             return -1; // 表示重置密码失败
         }
     }
+    @LogOperationWithId(value="请求用户列表",idParamIndex=0)
     public List<User> adminUserInfo(int user_id){
         try {
             User user = userMapper.findByUserId(user_id);
@@ -140,6 +163,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
             return null;
         }
     }
+    @LogOperationWithId(value="添加用户",idParamIndex=3)
     public int adminUserAdd(String username,String department,String role,int adminId){
         try {
             User user = userMapper.findByUserId(adminId);
@@ -157,6 +181,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         }
         return -1;
     }
+    @LogOperationWithId(value="修改用户信息",idParamIndex=3)
     public int adminUserUpdate(String username,String department,String role,int adminId,int user_id){
         try {
             User user = userMapper.findByUserId(adminId);
@@ -171,6 +196,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         }
         return -1;
     }
+    @LogOperationWithId(value="删除用户",idParamIndex=0)
     public int adminUserDelete(int adminId,int user_id){
         try {
             User user = userMapper.findByUserId(adminId);
@@ -185,4 +211,39 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         }
         return -1;
     }
+    @LogOperationWithId(value="微信登录",idParamIndex=0)
+    public int loginByWechat(int user_id){
+        try{
+            User user = userMapper.findByUserId(user_id);
+            if(user!=null){
+                return 1;
+            }
+            else{
+                return 0;//后续会调用微信用户绑定程序
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return -1;
+        }
+    }
+    @LogOperationWithId(value="微信绑定",idParamIndex=0)
+    public int bindByWechat(int user_id,String openid){
+        try{
+            return userMapper.bindWechatOpenid(user_id,openid);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return -1;
+        }
+    }
+    public User preBindByWechat(String phone) {
+        try {
+            return userMapper.findByPhone(phone);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }

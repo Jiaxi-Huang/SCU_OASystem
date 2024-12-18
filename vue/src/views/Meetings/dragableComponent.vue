@@ -248,10 +248,38 @@
       </el-col>
     </el-row>
     <el-row>
-      <el-row :gutter="20">
-        <el-col :span="11"><el-button type="success" @click="onCreateMeeting()" :icon="CirclePlus">创建会议</el-button></el-col>
-        <el-col :span="11"><el-button type="success" @click="onAddMeeting()" :icon="CirclePlus">添加会议</el-button></el-col>
-      </el-row>
+      <el-form :inline="true" :model="formInline" class="form-inline">
+        <el-form-item>
+          <el-button type="success" @click="onCreateMeeting()" :icon="CirclePlus">创建会议</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="success" @click="onAddMeeting()" :icon="CirclePlus">添加会议</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onDownload()" :icon="Download">打印</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onToExcel()" :icon="Download">导出</el-button>
+        </el-form-item>
+        <el-form-item label="按">
+          <el-select v-model="task.search_field" placeholder="无">
+            <el-option label="无" value="none"></el-option>
+            <el-option label="会议名称" value="mtin_title"></el-option>
+            <el-option label="会议内容" value="mtin_ctnt"></el-option>
+            <el-option label="会议ID" value="mtin_id"></el-option>
+            <el-option label="会议开始时间" value="mtin_st"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="task.search_key" placeholder="全局搜索"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onSearchSubmit">查询</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="getPersonalMeetingList" :icon="Refresh"></el-button>
+        </el-form-item>
+      </el-form>
       <el-col :span="24">
         <div class="board">
 
@@ -565,9 +593,19 @@
 
 <script setup lang="ts">
 import { onMounted, ref, onUnmounted, reactive } from 'vue'
-import {Operation, Suitcase, ChatLineSquare, View, Delete, Edit, CirclePlus} from '@element-plus/icons-vue'
+import {
+  Operation,
+  Suitcase,
+  ChatLineSquare,
+  View,
+  Delete,
+  Edit,
+  CirclePlus,
+  Download,
+  Refresh
+} from '@element-plus/icons-vue'
 import Service from "@/views/Meetings/api/index";
-import {ElMessage} from "element-plus";
+import {ElMessage, ElMessageBox} from "element-plus";
 import { useRouter } from 'vue-router'
 import permission from '@/directive/permission'
 
@@ -616,6 +654,9 @@ const task = reactive<taskType>({
   addFormVisible: false,
   search_mtin_id: 0,
   detailFormVisible_add: false,
+  search_field: "none",
+  search_key: "",
+
 })
 
 onMounted(() => {
@@ -720,6 +761,58 @@ const onCreateMeeting = () => {
   router.replace('/meetings/addMeeting')
 }
 
+const onDownload = () => {
+  ElMessageBox.confirm('确定要打印为PDF吗', '温馨提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'info'
+  }).then(() => {
+    // 确认后调用获取 PDF 的方法
+    Service.getPDF().then(() => {
+      ElMessage({
+        type: 'success',
+        message: 'PDF 文件正在下载...'
+      });
+    }).catch(() => {
+      ElMessage({
+        type: 'error',
+        message: '下载失败，请重试'
+      });
+    });
+  }).catch(() => {
+    ElMessage({
+      type: 'info',
+      message: '已取消'
+    });
+  });
+}
+
+const onToExcel = () => {
+  ElMessageBox.confirm('确定要导出为Excel吗', '温馨提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'info'
+  }).then(() => {
+    // 确认后调用获取 PDF 的方法
+    Service.getExcel().then(() => {
+      ElMessage({
+        type: 'success',
+        message: 'Excel 文件正在下载...'
+      });
+    }).catch(() => {
+      ElMessage({
+        type: 'error',
+        message: '下载失败，请重试'
+      });
+    });
+  }).catch(() => {
+    ElMessage({
+      type: 'info',
+      message: '已取消'
+    });
+  });
+}
+
 const onAddMeeting = () => {
   task.addFormVisible = true
 }
@@ -765,5 +858,51 @@ const handleAdd = () => {
       message: err.message
     })
   }
+}
+
+const onSearchSubmit = () => {
+  const record = {
+    field: task.search_field,
+    key: task.search_key.toString().trim(),
+  }
+  if (record.field === "none") {
+    ElMessage({
+      type: 'warning',
+      message: "没有选择条件"
+    })
+    return
+  }
+  if (record.key === "") {
+    ElMessage({
+      type: 'warning',
+      message: "没有输入搜索内容"
+    })
+    return
+  }
+  try {
+    Service.searchBy(record).then((res) => {
+      // console.log(res)
+      if (res.status ===  0) {
+        ElMessage({
+          type: 'success',
+          message: "搜索结果已返回"
+        })
+        task.scheduled = res.data[0]
+        task.progressing = res.data[1]
+        task.passed = res.data[2]
+      } else if (res.status === 1) {
+        ElMessage({
+          type: 'warning',
+          message: "没有找到符合条件的会议"
+        })
+      }
+    });
+  } catch (err) {
+    ElMessage({
+      type: 'warning',
+      message: err.message
+    })
+  }
+
 }
 </script>

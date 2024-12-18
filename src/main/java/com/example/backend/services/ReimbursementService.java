@@ -32,10 +32,9 @@ public class ReimbursementService extends ServiceImpl<ReimbursementMapper, Reimb
     }
 
     public int addReimbursementRecord(ReimbursementRecordWithAccessToken record) {
-        int res_code = ReimbursementMapper.addReimbursementRecord(
-                record.getUser_id(), record.getReimbursement_id(), record.getDescription(), record.getAmount(),
-                record.getStatus(), record.getSubmitted_at());
-        return res_code;
+        return ReimbursementMapper.addReimbursementRecord(
+                record.getUser_id(), record.getAmount(), record.getDescription(),
+                record.getStatus(), record.getSubmitted_at(), record.getReview_user_id());
     }
 
 

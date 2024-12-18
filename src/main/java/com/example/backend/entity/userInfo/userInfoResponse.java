@@ -48,6 +48,7 @@ public class userInfoResponse {
 
     // 内部类 Data
     public static class Data {
+        private String userEmail;
         private String userName;
         private String roleName;
         private String userDepartment;
@@ -56,7 +57,13 @@ public class userInfoResponse {
         private String userAvatar;
         public Data() {
         }
+        public String getUserEmail() {
+            return userEmail;
+        }
 
+        public void setUserEmail(String userEmail) {
+            this.userEmail = userEmail;
+        }
         public String getUserPhone() {return userPhone;}
         public void setUserPhone(String userPhone) {
             this.userPhone = userPhone;

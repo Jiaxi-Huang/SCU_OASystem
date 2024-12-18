@@ -3,7 +3,7 @@
     <h3>文件管理</h3>
     <vuecmf-fileexplorer
         root_path="个人文件管理"
-        :page_size="10"
+        :page_size="7"
         list_show="list"
         :tool_config="['new_folder','update_folder','move_folder','del_folder','upload','move_file','del_file','remark_file']"
         upload_api="http://localhost:8080/api/file/upload"
@@ -22,6 +22,7 @@
         @beforeUpload="beforeUpload"
         @onUploadSuccess="onUploadSuccess"
         @onUploadError="onUploadError"
+        @judgeFileType="judgeFileType"
     >
     </vuecmf-fileexplorer>
   </div>
@@ -55,6 +56,7 @@ export default defineComponent({
               department:data[data.length-1]
             }
             console.log(user)
+            data.pop();
             data.pop();
             //0是个人，1是部门，2是公司，文件夹id是0，-1，-2
             for(let i = 0;i <= 2;i++){
@@ -108,36 +110,43 @@ export default defineComponent({
               let is_exist=0;
               if(folderObj.keywords){
                 //这部分是搜索还没做
+                folderObj.searchData[i].children=[];
                 console.log("进入查询")
+                folderObj.searchData[i].children=folderObj.data[i].children;
+                console.log(folderObj.searchData)
                 folderObj.data[i].children=[];
-                data.forEach(item => {
-                  if(item.title === folderObj.keywords&&i===0
+                let FolderArr = data.filter((record) =>
+                    record.title.toLowerCase().includes(folderObj.keywords.toLowerCase())
+                );
+                console.log(FolderArr)
+                FolderArr.forEach(item => {
+                  if(i===0
                       &&((item.department===null)||(item.department===""))
                       &&item.userId===user.userId
                       &&item.isShared===0){
-                    folderObj.data[i].id=-i-3;
+                    //folderObj.data[i].id=-i-3;
                     //folderObj.data[i].title="找到了";
                     folderObj.data[i].children.push(map[item.id]);
                     is_exist=1;
                   }
-                  if(item.title === folderObj.keywords&&i===1
+                  if(i===1
                       &&item.department===user.department
                       &&item.isShared===0){
-                    folderObj.data[i].id=-i-3;
+                    //folderObj.data[i].id=-i-3;
                     //folderObj.data[i].title="找到了";
                     folderObj.data[i].children.push(map[item.id]);
                     is_exist=1;
                   }
-                  if(item.title === folderObj.keywords&&i===2
+                  if(i===2
                       &&((item.department===null)||(item.department===""))
                       &&item.isShared===1){
-                    folderObj.data[i].id=-i-3;
+                    //folderObj.data[i].id=-i-3;
                     //folderObj.data[i].title="找到了";
                     folderObj.data[i].children.push(map[item.id]);
                     is_exist=1;
                   }
                   if(!is_exist){
-                    folderObj.data[i].id=i-3;
+                    //folderObj.data[i].id=-i-3;
                     //folderObj.data[i].title="没找到";
                   }
                 });
@@ -183,7 +192,7 @@ export default defineComponent({
       Service.loadFile(dir_id).then((res) => {
         if (res) {
           // 处理返回的结果
-          const data = res.data;
+          let data = res.data;
           let folderType=data[data.length-3];
           let user={
             userId:data[data.length-2],
@@ -202,30 +211,41 @@ export default defineComponent({
               //个人
               //folderObj.total = data.length;
               console.log(folderObj.filter.dir_id)
-              for (let i = 0; i < data.length; i++) {
-                if(data[i].dirId === dir_id
-                    &&data[i].userId===user.userId
-                    &&((data[i].department==="")||(data[i].department===null))
-                    &&data[i].isShared===0
-                ){
-                  if(folderObj.keywords){
-                    //keywords是搜索的关键词，这部分是搜索，else是文件加载，后面同理
-                    //有问题
-                    if(folderObj.keywords === data[i].fileName){
-                      tmp.push({
-                        "id": data[i].id,
-                        "file_name": data[i].fileName,
-                        "ext": data[i].ext,
-                        "size": data[i].size,
-                        "dir_id": data[i].dirId,
-                        "url": data[i].url,
-                        "remark": data[i].remark,
-                        "create_time": formatDate(data[i].createTime),
-                        "update_time": formatDate(data[i].updateTime),
-                        "user_name": data[i].userName,
-                      })
-                    }
-                  }else{
+              if(folderObj.keywords){
+                //keywords是搜索的关键词，这部分是搜索，else是文件加载，后面同理
+                // if(folderObj.keywords === data[i].fileName){
+                data=data.filter((record) =>
+                    record.fileName.toLowerCase().includes(folderObj.keywords.toLowerCase()));
+                // 忽略大小写
+                console.log(data);
+                for(let i=0;i<data.length;i++){
+                  if(data[i].dirId === dir_id
+                      &&data[i].userId===user.userId
+                      &&((data[i].department==="")||(data[i].department===null))
+                      &&data[i].isShared===0
+                  ){
+                    tmp.push({
+                      "id": data[i].id,
+                      "file_name": data[i].fileName,
+                      "ext": data[i].ext,
+                      "size": data[i].size,
+                      "dir_id": data[i].dirId,
+                      "url": data[i].url,
+                      "remark": data[i].remark,
+                      "create_time": formatDate(data[i].createTime),
+                      "update_time": formatDate(data[i].updateTime),
+                      "user_name": data[i].userName,
+                    })
+                  }
+                }
+              }
+              else{
+                for (let i = 0; i < data.length; i++) {
+                  if(data[i].dirId === dir_id
+                      &&data[i].userId===user.userId
+                      &&((data[i].department==="")||(data[i].department===null))
+                      &&data[i].isShared===0
+                  ){
                     tmp.push({
                       "id": data[i].id,
                       "file_name": data[i].fileName,
@@ -242,33 +262,44 @@ export default defineComponent({
                 }
               }
             }
+
             if(folderType===-1){
-              //部门
+              //个人
               //folderObj.total = data.length;
               console.log(folderObj.filter.dir_id)
-              for (let i = 0; i < data.length; i++) {
-                if(data[i].dirId === folderObj.filter.dir_id
-                    &&data[i].department===user.department
-                    &&data[i].isShared===0
-                ){
-                  if(folderObj.keywords){
-                    //keywords是搜索的关键词，这部分是搜索，else是文件加载，后面同理
-                    //有问题
-                    if(folderObj.keywords === data[i].fileName){
-                      tmp.push({
-                        "id": data[i].id,
-                        "file_name": data[i].fileName,
-                        "ext": data[i].ext,
-                        "size": data[i].size,
-                        "dir_id": data[i].dirId,
-                        "url": data[i].url,
-                        "remark": data[i].remark,
-                        "create_time": formatDate(data[i].createTime),
-                        "update_time": formatDate(data[i].updateTime),
-                        "user_name": data[i].userName,
-                      })
-                    }
-                  }else{
+              if(folderObj.keywords){
+                //keywords是搜索的关键词，这部分是搜索，else是文件加载，后面同理
+                // if(folderObj.keywords === data[i].fileName){
+                data=data.filter((record) =>
+                    record.fileName.toLowerCase().includes(folderObj.keywords.toLowerCase()));
+                // 忽略大小写
+                console.log(data);
+                for(let i=0;i<data.length;i++){
+                  if(data[i].dirId === folderObj.filter.dir_id
+                      &&data[i].department===user.department
+                      &&data[i].isShared===0
+                  ){
+                    tmp.push({
+                      "id": data[i].id,
+                      "file_name": data[i].fileName,
+                      "ext": data[i].ext,
+                      "size": data[i].size,
+                      "dir_id": data[i].dirId,
+                      "url": data[i].url,
+                      "remark": data[i].remark,
+                      "create_time": formatDate(data[i].createTime),
+                      "update_time": formatDate(data[i].updateTime),
+                      "user_name": data[i].userName,
+                    })
+                  }
+                }
+              }
+              else{
+                for (let i = 0; i < data.length; i++) {
+                  if(data[i].dirId === folderObj.filter.dir_id
+                      &&data[i].department===user.department
+                      &&data[i].isShared===0
+                  ){
                     tmp.push({
                       "id": data[i].id,
                       "file_name": data[i].fileName,
@@ -285,67 +316,124 @@ export default defineComponent({
                 }
               }
             }
-            if(folderType===-2){
-              //公司
-              console.log(folderObj.filter.dir_id)
-              for (let i = 0; i < data.length; i++) {
-                if(data[i].dirId === folderObj.filter.dir_id
-                    &&((data[i].department==="")||(data[i].department===null))
-                    &&data[i].isShared===1
-                ){
-                  if(folderObj.keywords){
-                    //keywords是搜索的关键词，这部分是搜索，else是文件加载，后面同理
-                    //有问题
-                    if(folderObj.keywords === data[i].fileName){
-                      tmp.push({
-                        "id": data[i].id,
-                        "file_name": data[i].fileName,
-                        "ext": data[i].ext,
-                        "size": data[i].size,
-                        "dir_id": data[i].dirId,
-                        "url": data[i].url,
-                        "remark": data[i].remark,
-                        "create_time": formatDate(data[i].createTime),
-                        "update_time": formatDate(data[i].updateTime),
-                        "user_name": data[i].userName,
-                      })
-                    }
-                  }else{
-                    tmp.push({
-                      "id": data[i].id,
-                      "file_name": data[i].fileName,
-                      "ext": data[i].ext,
-                      "size": data[i].size,
-                      "dir_id": data[i].dirId,
-                      "url": data[i].url,
-                      "remark": data[i].remark,
-                      "create_time": formatDate(data[i].createTime),
-                      "update_time": formatDate(data[i].updateTime),
-                      "user_name": data[i].userName,
-                    })
-                  }
-                }
-              }
-            }
-            console.log(tmp)
 
-            for (let i = (folderObj.current_page-1)*folderObj.page_size;
-                 i < tmp.length&&i < folderObj.current_page*folderObj.page_size; i++) {
-              folderObj.data.push({
-                "id": tmp[i].id,
-                "file_name": tmp[i].file_name,
-                "ext": tmp[i].ext,
-                "size": tmp[i].size,
-                "dir_id": tmp[i].dir_id,
-                "url": tmp[i].url,
-                "remark": tmp[i].remark,
-                "create_time": formatDate(tmp[i].create_time),
-                "update_time": formatDate(tmp[i].update_time),
-                "user_name": tmp[i].user_name,
-              })
+            if(folderType===-2){
+              //个人
+              //folderObj.total = data.length;
+              console.log(folderObj.filter.dir_id)
+              if(folderObj.keywords){
+                //keywords是搜索的关键词，这部分是搜索，else是文件加载，后面同理
+                // if(folderObj.keywords === data[i].fileName){
+                data=data.filter((record) =>
+                    record.fileName.toLowerCase().includes(folderObj.keywords.toLowerCase()));
+                // 忽略大小写
+                console.log(data);
+                for(let i=0;i<data.length;i++){
+                  if(data[i].dirId === folderObj.filter.dir_id
+                      &&((data[i].department==="")||(data[i].department===null))
+                      &&data[i].isShared===1
+                  ){
+                    tmp.push({
+                      "id": data[i].id,
+                      "file_name": data[i].fileName,
+                      "ext": data[i].ext,
+                      "size": data[i].size,
+                      "dir_id": data[i].dirId,
+                      "url": data[i].url,
+                      "remark": data[i].remark,
+                      "create_time": formatDate(data[i].createTime),
+                      "update_time": formatDate(data[i].updateTime),
+                      "user_name": data[i].userName,
+                    })
+                  }
+                }
+              }
+              else{
+                for (let i = 0; i < data.length; i++) {
+                  if(data[i].dirId === folderObj.filter.dir_id
+                      &&((data[i].department==="")||(data[i].department===null))
+                      &&data[i].isShared===1
+                  ){
+                    tmp.push({
+                      "id": data[i].id,
+                      "file_name": data[i].fileName,
+                      "ext": data[i].ext,
+                      "size": data[i].size,
+                      "dir_id": data[i].dirId,
+                      "url": data[i].url,
+                      "remark": data[i].remark,
+                      "create_time": formatDate(data[i].createTime),
+                      "update_time": formatDate(data[i].updateTime),
+                      "user_name": data[i].userName,
+                    })
+                  }
+                }
+              }
             }
-            console.log("page_size:"+folderObj.page_size)
-            folderObj.total=tmp.length;
+            console.log(folderType)
+            console.log(tmp)
+            // 提取表格数据中的扩展名
+            const extensions = tmp.map((item: { ext: string }) => item.ext);
+            console.log(extensions);
+
+// 去重并生成过滤器选项
+            const uniqueExtensions = [...new Set(extensions)];
+
+// 根据去重后的扩展名生成过滤器选项
+            folderObj.fileExtensions = uniqueExtensions.map((ext: string) => ({
+              text: `.${ext}`,
+              value: ext
+            }));
+
+
+            console.log(folderObj.extFilter)
+            let filteredData = tmp.filter(item => {
+              return folderObj.extFilter.includes(item.ext); // 根据扩展名进行筛选
+            });
+
+
+            console.log(filteredData);
+
+            if(folderObj.isExt){
+              for (let i = (folderObj.current_page-1)*folderObj.page_size;
+                   i < filteredData.length&&i < folderObj.current_page*folderObj.page_size; i++) {
+                folderObj.data.push({
+                  "id": filteredData[i].id,
+                  "file_name": filteredData[i].file_name,
+                  "ext": filteredData[i].ext,
+                  "size": filteredData[i].size,
+                  "dir_id": filteredData[i].dir_id,
+                  "url": filteredData[i].url,
+                  "remark": filteredData[i].remark,
+                  "create_time": formatDate(filteredData[i].create_time),
+                  "update_time": formatDate(filteredData[i].update_time),
+                  "user_name": filteredData[i].user_name,
+                })
+              }
+              folderObj.total=filteredData.length;
+            }
+            else{
+              for (let i = (folderObj.current_page-1)*folderObj.page_size;
+                   i < tmp.length&&i < folderObj.current_page*folderObj.page_size; i++) {
+                folderObj.data.push({
+                  "id": tmp[i].id,
+                  "file_name": tmp[i].file_name,
+                  "ext": tmp[i].ext,
+                  "size": tmp[i].size,
+                  "dir_id": tmp[i].dir_id,
+                  "url": tmp[i].url,
+                  "remark": tmp[i].remark,
+                  "create_time": formatDate(tmp[i].create_time),
+                  "update_time": formatDate(tmp[i].update_time),
+                  "user_name": tmp[i].user_name,
+                })
+              }
+              console.log("page_size:"+folderObj.page_size)
+              folderObj.total=tmp.length;
+            }
+
+
+
           }
         } else {
           console.log("FileLoader RES MISS");
@@ -549,6 +637,24 @@ export default defineComponent({
       console.log('error = ', data)
     }
 
+    const judgeFileType = (data:AnyObject):void => {
+      console.log("judgeFileType"+data)
+      try {
+        Service.judgeFileType(data).then((res) => {
+          if (res) {
+            return res
+          } else {
+          }
+        });
+      } catch (err) {
+        ElMessage({
+          type: 'warning',
+          message: err.message
+        })
+      }
+
+    }
+
     // const upload =(data:AnyObject):void=>{
     //   try {
     //     Service.uploadFile(data).then((res) => {
@@ -579,8 +685,8 @@ export default defineComponent({
 
       beforeUpload,
       onUploadSuccess,
-      onUploadError
-
+      onUploadError,
+      judgeFileType
     }
   }
 });

@@ -7,6 +7,7 @@ import com.example.backend.entity.userInfo.adminUserInfoRequest;
 import com.example.backend.mapper.UserMapper;
 import com.example.backend.services.AccessService;
 import com.example.backend.services.FileService;
+import com.example.backend.services.FolderService;
 import com.example.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
 @RestController
 @RequestMapping("/api/file")
 public class FileController {
@@ -35,6 +35,10 @@ public class FileController {
 
     @Autowired
     private FolderController folderController;
+
+    @Autowired
+    private FolderService folderService;
+
 
     @PostMapping("/loadFile")
     public ResponseBase loadFile(@RequestBody adminUserInfoRequest request,@RequestParam String dir_id) {
@@ -83,6 +87,7 @@ public class FileController {
         String accessToken = record.getAcsTkn();
         int userId = accessService.getAuthenticatedId(accessToken);
         User userInfo = userMapper.findByUserId(userId);
+
         int res_code = fileService.delFile(userInfo,record);
         if (res_code==0) {
             response.setStatus(-1);
@@ -117,7 +122,15 @@ public class FileController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-
+    @PostMapping("/judgeFileType")
+    public ResponseEntity<ResponseBase> judgeFileType(@RequestBody Files record) {
+        System.out.println("judgeFileType进入");
+        ResponseBase response = new ResponseBase();
+        int res_code = folderService.judgeFolder(record.getId());
+        System.out.println("judgeFileType进入："+res_code);
+        response.pushData(res_code);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
     @PostMapping("/uploadFile")
     public ResponseEntity<ResponseBase> uploadFile(@RequestBody Files record) {

@@ -324,6 +324,32 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
     ]
   },
   {
+    path: '/log',
+    component: layout,
+    redirect: '/Log/logManage',
+    meta: {
+      title: {
+        '/zh-CN': '日志管理',
+        '/en-US': 'Logs Manage'
+      },
+      icon: 'ic ic-group-fill'
+    },
+    children: [
+      {
+        path: '/Log/logManage',
+        name: 'LogManage',
+        component: () => import(/* @/views/Menu/menuManage.vueichText" */ '@/views/Log/logManage.vue'),
+        meta: {
+          title: {
+            '/zh-CN': '日志管理',
+            '/en-US': 'Log Manage'
+          },
+          icon: 'ic ic-group-fill'
+        }
+      }
+    ]
+  },
+  {
     path: '/worker',
     component: layout,
     redirect: '/Worker/workerManage',

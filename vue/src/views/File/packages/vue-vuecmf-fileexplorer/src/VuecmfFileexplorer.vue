@@ -107,9 +107,10 @@
             <el-table
                 ref="tableRef"
                 :data="file.data"
+                @filter-change="service.handleFilterChange"
                 :default-sort="{ prop: file.order_field.value, order: file.order_sort.value === 'desc' ? 'descending': 'ascending' }"
                 style="width: 100%"
-                :height="file.table_height"
+
                 size="large"
                 @selection-change="service.tableSelectionChange"
                 @sort-change="service.fileSortChange"
@@ -132,7 +133,16 @@
               </el-table-column>
               <el-table-column prop="update_time" label="修改时间" sortable min-width="150" />
               <el-table-column prop="user_name" label="修改人" min-width="100" />
-              <el-table-column prop="ext" label="扩展名" sortable min-width="100" />
+              service.generateFileExtensions
+              <el-table-column
+                  prop="ext"
+                  label="文件类型"
+                  min-width="100"
+                  :filters="file.fileExtensions"
+                  :filter-method="service.filterStatus"
+                  filter-placement="bottom-end"
+              >
+              </el-table-column>
               <el-table-column prop="size" label="大小" sortable min-width="100" >
                 <template #default="scope">
                   {{ service.formatFileSize(scope.row.size) }}
@@ -144,21 +154,23 @@
                   <el-link :href="scope.row.url" type="primary"  target="_blank">查看</el-link>
                 </template>
               </el-table-column>
+
             </el-table>
+            <div class="pagination">
+              <el-pagination
+                  @size-change="service.handleSizeChange"
+                  @current-change="service.handleCurrentChange"
+                  :current-page="file.current_page"
+                  :page-sizes="[5,10,20,30,40,50,100,200,300,500]"
+                  :page-size="file.page_size"
+                  :layout="file.page_layout"
+                  :pager-count="5"
+                  :total="file.total">
+              </el-pagination>
+            </div>
           </template>
 
-          <div class="pagination">
-            <el-pagination
-                @size-change="service.handleSizeChange"
-                @current-change="service.handleCurrentChange"
-                :current-page="file.current_page"
-                :page-sizes="[5,10,20,30,40,50,100,200,300,500]"
-                :page-size="file.page_size"
-                :layout="file.page_layout"
-                :pager-count="5"
-                :total="file.total">
-            </el-pagination>
-          </div>
+
 
         </el-main>
       </el-container>
@@ -357,7 +369,8 @@
 import Service from './Service'
 import {defineEmits, toRefs, ref, reactive} from "vue"
 import {ElTable, UploadInstance} from "element-plus";
-const emit = defineEmits(['loadFolder','saveFolder','moveFolder','delFolder','loadFile','uploadFile','saveFile','moveFile','delFile','selectFile', 'onUploadSuccess', 'onUploadError','beforeUpload', 'onPreview', 'onRemove','onProgress','onChange', 'onExceed','remarkFile'])
+import {serve} from "esbuild";
+const emit = defineEmits(['loadFolder','saveFolder','moveFolder','delFolder','loadFile','uploadFile','saveFile','moveFile','delFile','selectFile', 'onUploadSuccess', 'onUploadError','beforeUpload', 'onPreview', 'onRemove','onProgress','onChange', 'onExceed','remarkFile','judgeFileType'])
 // 获取 accessToken
 
 const settingForm = reactive({
@@ -380,7 +393,7 @@ const props = defineProps({
   //每页显示条数
   page_size: {
     type: Number,
-    default: 30,
+    default: 10,
   },
   //文件列表展示方式
   list_show: {
@@ -411,7 +424,6 @@ const props = defineProps({
   }
 
 })
-
 const {root_path, page_size, list_show, upload_api, tool_config} = toRefs(props)
 const uploadRef = ref<UploadInstance>()
 const tableRef = ref<InstanceType<typeof ElTable>>()
@@ -553,6 +565,7 @@ export default defineComponent({
     justify-content: center;
     margin: 10px auto;
   }
+
 
 }
 

@@ -1,5 +1,6 @@
 package com.example.backend.controllers;
 
+import com.example.backend.entity.meeting.FieldKeyWithToken;
 import com.example.backend.entity.meeting.Meeting;
 import com.example.backend.entity.meeting.MeetingWithMultiUsers;
 import com.example.backend.entity.todoList.TodoRecord;
@@ -27,7 +28,6 @@ import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellRangeAddress;
 
 @RestController
 @RequestMapping("/api/todolist")
@@ -54,6 +54,30 @@ public class TodoListCon {
             }
         }
 
+        catch (Exception e) {
+            res.setStatus(-1);
+            res.setMessage(e.getMessage());
+        }
+        return res;
+    }
+
+    @PostMapping("/searchByFieldKey")
+    public ResponseBase searchByFieldKey(@RequestBody FieldKeyWithToken request) {
+        ResponseBase res = new ResponseBase();
+
+        try {
+            String accessToken = request.getAccessToken();
+            int userId = accessService.getAuthenticatedId(accessToken);
+            List<TodoRecord> records = my_service.searchByAnything(request.getField(), request.getKey(), userId);
+
+            for (TodoRecord record : records) {
+                res.pushData(record);
+            }
+            if (records.isEmpty()) {
+//                System.out.println("result set is empty");
+                res.setStatus(1);
+            }
+        }
         catch (Exception e) {
             res.setStatus(-1);
             res.setMessage(e.getMessage());

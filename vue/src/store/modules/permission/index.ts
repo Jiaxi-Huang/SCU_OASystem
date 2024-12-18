@@ -6,6 +6,7 @@ import permissionStateTypes from './types'
 import RootStateTypes from '../../types'
 import Service from './api'
 
+const email = localStorage.getItem('email') || ''
 const username = localStorage.getItem('username') || ''
 const role = localStorage.getItem('role') || ''
 const department = localStorage.getItem('department') || ''
@@ -16,6 +17,7 @@ const avatar = localStorage.getItem('avatar') || ''
 const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
   namespaced: true,
   state: {
+    email,//邮箱
     username,//用户名
     role, // 用户包含的角色,
     department,//用户部门
@@ -28,6 +30,10 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
     authedRoutes: []
   },
   mutations: {
+    setEmail: (state: permissionStateTypes, { userEmail }) => {
+      state.email = userEmail
+      console.log(state.email)
+    },
     setUsername: (state: permissionStateTypes, { userName }) => {
       state.username = userName
       console.log(state.username)
@@ -73,6 +79,7 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
     getPermissonRoutes({ commit }, payload: any) {
       // api request
       const data = {
+        userEmail: payload.userEmail,
         userName: payload.userName,
         roleName: payload.roleName,
         userDepartment: payload.userDepartment,
@@ -148,6 +155,10 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
 
     },
     getUserInfos({ commit }, payload: any) {
+      if ('userEmail' in payload) {
+        localStorage.setItem('email', payload.userEmail);
+        commit('setEmail', payload);
+      }
       if ('userName' in payload) {
         localStorage.setItem('username', payload.userName);
         commit('setUsername', payload);
@@ -177,6 +188,9 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
     },
     authedRoutes(state: permissionStateTypes) {
       return state.authedRoutes
+    },
+    getEmail(state: permissionStateTypes) {
+      return state.email
     },
     getUsername(state: permissionStateTypes) {
       return state.username

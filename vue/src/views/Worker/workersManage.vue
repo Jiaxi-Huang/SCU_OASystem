@@ -4,17 +4,13 @@
     <el-alert title="Tips:权限控制体验：【管理员账号为：admin@outlook.com】、【超级管理员账号为：super@outlook.com】" type="info"> </el-alert>
     <el-card class="card-ctrl">
       <el-row>
-        <el-col :span="8" style="text-align: left">
-          <el-button type="primary" size="small" @click="onDistributeTodo">
-            <el-icon><plus /></el-icon>
-            分派任务</el-button
-          >
-          <el-button type="success" size="small" @click="onDistributeMeeting">
-            <el-icon><plus /></el-icon>
-            新建会议</el-button
-          >
+        <el-col :span="10" style="text-align: left">
+          <el-button type="primary" size="medium" @click="onDistributeTodo"><el-icon><plus /></el-icon>分派任务</el-button>
+          <el-button type="success" size="medium" @click="onDistributeMeeting"><el-icon><plus /></el-icon>新建会议</el-button>
+          <el-button type="info" size="medium" @click="onExport"><el-icon><download /></el-icon>导出列表</el-button>
+          <el-button type="info" size="medium" @click="onPrint"><el-icon><printer /></el-icon>打印列表</el-button>
         </el-col>
-        <el-col :span="16" style="text-align: right">
+        <el-col :span="14" style="text-align: right">
           <el-input
               v-model="searchKeyword"
               placeholder="请输入关键词"            style="width: 200px; margin-right: 10px"
@@ -23,11 +19,11 @@
       </el-row>
       <br />
       <el-table v-loading="loading" :data="displayData()" stripe class="table" @selection-change="handleSelectionChange">
-        <el-table-column type="selection" width="55" align="center"></el-table-column>
-        <el-table-column prop="userName" label="用户名" align="center"></el-table-column>
-        <el-table-column prop="userDepartment" label="部门" align="center"></el-table-column>
-        <el-table-column prop="userRole" label="职位" align="center"></el-table-column>
-        <el-table-column prop="userPhone" label="电话号码" align="center"></el-table-column>
+        <el-table-column type="selection" width="55" align="center" sortable @sort-change="handleSortChange"></el-table-column>
+        <el-table-column prop="userName" label="用户名" align="center" sortable @sort-change="handleSortChange"></el-table-column>
+        <el-table-column prop="userDepartment" label="部门" align="center" sortable @sort-change="handleSortChange"></el-table-column>
+        <el-table-column prop="userRole" label="职位" align="center" sortable @sort-change="handleSortChange"></el-table-column>
+        <el-table-column prop="userPhone" label="电话号码" align="center" sortable @sort-change="handleSortChange"></el-table-column>
 
         <el-table-column label="操作" align="center">
           <template #default="scope">
@@ -67,7 +63,7 @@
 <script lang="ts">
 import {defineComponent, reactive, toRefs, computed, onMounted, watch} from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Edit, Minus, Plus, Refresh } from '@element-plus/icons-vue'
+import {Download, Edit, Minus, Plus, Printer, Refresh} from '@element-plus/icons-vue'
 import WorkerEdit from './workersEdit.vue'
 import DistributeTodo from "@/views/Worker/components/distributeTodo.vue";
 import DistributeMeeting from "@/views/Worker/components/distributeMeeting.vue";
@@ -76,6 +72,8 @@ import Service from './api/index'
 export default defineComponent({
   name: 'WorkerManage',
   components: {
+    Printer,
+    Download,
     WorkerEdit,
     DistributeTodo,DistributeMeeting,
     Edit,
@@ -113,11 +111,36 @@ export default defineComponent({
           userRole: ''
         }
       },
+      sortField : '',
+      sortOrder : '',
+      userIds: [] as { userId: number }[],
       selectionRows: [] as { userId: number }[], // 假设 userId 是字符串或数字
       searchKeyword: '' // 添加 searchKeyword 变量
     })
     // 动态计算total;
     const total = computed(() => state.data.length)
+    /**
+     * @description 对数据进行排序
+     */
+    const sortData = () => {
+      if (!state.sortField) return state.data;
+
+      return [...state.data].sort((a, b) => {
+        const fieldA = a[state.sortField];
+        const fieldB = b[state.sortField];
+
+        if (fieldA < fieldB) return state.sortOrder === 'asc' ? -1 : 1;
+        if (fieldA > fieldB) return state.sortOrder === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+    /**
+     * @description 选择对应列排序
+     */
+    const handleSortChange = ({ prop, order }: { prop: string, order: 'ascending' | 'descending' | null }) => {
+      state.sortField = prop;
+      state.sortOrder = order === 'ascending' ? 'asc' : 'desc';
+    }
     /**
      * @description 请求接口获取当前设置角色，默认始终有超级管理员角色
      */
@@ -130,6 +153,7 @@ export default defineComponent({
           ...item,
           isSelect: false
         }));
+        state.userIds = adminUserInfo.data.map((item: any) => item.userId)
       }
     }
     /**
@@ -163,7 +187,12 @@ export default defineComponent({
       fetchData()
     }
     const displayData = ()=>{
-      return state.is_search ? state.filteredData : state.data;
+      return state.is_search ? sortData().filter(item =>
+          item.userName.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
+          item.userRole.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
+          item.userDepartment.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
+          item.userPhone.toLowerCase().includes(state.searchKeyword.toLowerCase())
+      ) : sortData();
     }
     const onSearch = () => {
       if (state.searchKeyword != '') {
@@ -190,6 +219,69 @@ export default defineComponent({
       state.posted.userRow.userRole = row.userRole
       state.posted.userRow.userDepartment = row.userDepartment
       state.edit_visible = true
+    }
+    const onExport = async() => {
+      ElMessageBox.confirm('确定要导出为Excel吗', '温馨提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'info'
+      }).then(async() => {
+        // 确认后调用获取 PDF 的方法
+        const userIds = state.selectionRows.length > 0 ? state.selectionRows : state.userIds
+        const data ={
+          'accessToken': sessionStorage.getItem('accessToken'),
+          'user_ids': userIds
+        }
+        Service.postAdminExportUser(data).then(() => {
+          ElMessage({
+            type: 'success',
+            message: 'Excel 文件正在下载...'
+          });
+        }).catch(() => {
+          ElMessage({
+            type: 'error',
+            message: '下载失败，请重试'
+          });
+        });
+      }).catch(() => {
+        ElMessage({
+          type: 'info',
+          message: '已取消'
+        });
+      });
+    }
+    /**
+     * @description 打印列表所选行
+     */
+    const onPrint = async() => {
+      ElMessageBox.confirm('确定要下载PDF吗', '温馨提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'info'
+      }).then(async() => {
+        // 确认后调用获取 PDF 的方法
+        const userIds = state.selectionRows.length > 0 ? state.selectionRows : state.userIds
+        const data ={
+          'accessToken':sessionStorage.getItem('accessToken'),
+          'user_ids': userIds
+        }
+        Service.postAdminPrintUser(data).then(() => {
+          ElMessage({
+            type: 'success',
+            message: 'PDF 文件正在下载...'
+          });
+        }).catch(() => {
+          ElMessage({
+            type: 'error',
+            message: '下载失败，请重试'
+          });
+        });
+      }).catch(() => {
+        ElMessage({
+          type: 'info',
+          message: '已取消'
+        });
+      });
     }
     // 使用 watch 监视 searchKeyword 的变化
     watch(() => state.searchKeyword, (newVal) => {
@@ -219,7 +311,10 @@ export default defineComponent({
       onEdit,
       onEditSuccess,
       onSearch,
-      fetchData
+      onExport,
+      onPrint,
+      fetchData,
+      handleSortChange
     }
   }
 })
