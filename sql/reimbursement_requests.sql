@@ -11,7 +11,7 @@
  Target Server Version : 80040
  File Encoding         : 65001
 
- Date: 15/12/2024 13:20:11
+ Date: 19/12/2024 20:17:23
 */
 
 SET NAMES utf8mb4;
@@ -34,6 +34,6 @@ CREATE TABLE `reimbursement_requests`  (
   INDEX `review_user_id`(`review_user_id` ASC) USING BTREE,
   CONSTRAINT `reimbursement_requests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user_infos` (`user_id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `reimbursement_requests_ibfk_2` FOREIGN KEY (`review_user_id`) REFERENCES `user_infos` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 24 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;
