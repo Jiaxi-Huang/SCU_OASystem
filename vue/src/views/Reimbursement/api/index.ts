@@ -1,8 +1,10 @@
 import request from '@/utils/request'
 
 const reimbursementApi = {
-  getReimbursementList: '/api/reimbursement/getReimbursementList',
+  getMyReimbursementList: '/api/reimbursement/getReimbursementList',
   getAdminReimbursementList: '/api/reimbursement/getAdminReimbursementList',
+  getReviewReimbursementList: '/api/reimbursement/getReviewReimbursementList',
+  getNotifyReimbursementList: '/api/reimbursement/getNotifyReimbursementList',
   updateReimbursement: '/api/reimbursement/modifyReimbursementRecord',
   deleteReimbursement: '/api/reimbursement/deleteReimbursementRecord',
   addReimbursement: '/api/reimbursement/addReimbursementRecord',
@@ -16,15 +18,58 @@ class Service {
   /**
    * @description POST 用户登录接口
    */
-  static getReimbursementList() {
+  static getMyReimbursementList() {
     const data = {'accessToken':sessionStorage.getItem('accessToken')}
     return request({
-      url: reimbursementApi.localHost + reimbursementApi.getReimbursementList,
+      url: reimbursementApi.localHost + reimbursementApi.getMyReimbursementList,
       method: 'POST',
       json: true,
       data: data,
     }).then((res) => {
-      if (res.status === 0) {
+      if (res.status === 200) {
+        return res
+      }
+      return null
+    })
+  }
+
+  static getAdminReimbursementList() {
+    return request({
+      url: reimbursementApi.localHost + reimbursementApi.getAdminReimbursementList,
+      method: 'POST',
+      json: true,
+    }).then((res) => {
+      if (res.status === 200) {
+        return res
+      }
+      return null
+    })
+  }
+
+  static getReviewReimbursementList() {
+    const data = {'accessToken':sessionStorage.getItem('accessToken')}
+    return request({
+      url: reimbursementApi.localHost + reimbursementApi.getReviewReimbursementList,
+      method: 'POST',
+      json: true,
+      data: data,
+    }).then((res) => {
+      if (res.status === 200) {
+        return res
+      }
+      return null
+    })
+  }
+
+  static getNotifyReimbursementList() {
+    const data = {'accessToken':sessionStorage.getItem('accessToken')}
+    return request({
+      url: reimbursementApi.localHost + reimbursementApi.getNotifyReimbursementList,
+      method: 'POST',
+      json: true,
+      data: data,
+    }).then((res) => {
+      if (res.status === 200) {
         return res
       }
       return null
@@ -75,19 +120,6 @@ class Service {
       return res.reimbursement_id
     })
   }
-
-    static getAdminReimbursementList() {
-      return request({
-        url: reimbursementApi.localHost + reimbursementApi.getAdminReimbursementList,
-        method: 'POST',
-        json: true,
-      }).then((res) => {
-        if (res.status === 200) {
-          return res
-        }
-        return null
-      })
-    }
 
     static addNotification(record:any) {
       return request({

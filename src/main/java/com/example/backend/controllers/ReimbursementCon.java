@@ -1,5 +1,7 @@
 package com.example.backend.controllers;
 
+import com.example.backend.entity.reimbursement.ReimJoinNotifyRecordWithAccessToken;
+import com.example.backend.entity.reimbursement.ReimJoinNotifyRecord;
 import com.example.backend.entity.reimbursement.ReimbursementRecordWithAccessToken;
 import com.example.backend.entity.ResponseBase;
 import com.example.backend.entity.reimbursement.ReimbursementRecord;
@@ -30,7 +32,7 @@ public class ReimbursementCon {
         ResponseBase res = new ResponseBase();
         try {
             String accessToken = request.getAccessToken();
-            System.out.println(accessToken);
+//            System.out.println("getReimbursementList accessToken: "+accessToken);
             int userId = accessService.getAuthenticatedId(accessToken);
             request.setUser_id(userId);
             List<ReimbursementRecord> records = reimbursementService.getReimbursementRecordByUserId(userId);  // 获取所有记录
@@ -45,11 +47,51 @@ public class ReimbursementCon {
         return res;
     }
 
+    @PostMapping("/getReviewReimbursementList")
+    public ResponseBase getReviewReimbursementRecord(@RequestBody ReimbursementRecordWithAccessToken request) {
+        ResponseBase res = new ResponseBase();
+        try {
+            String accessToken = request.getAccessToken();
+//            System.out.println("getReviewReimbursementList accessToken:"+accessToken);
+            int userId = accessService.getAuthenticatedId(accessToken);
+            request.setUser_id(userId);
+            List<ReimbursementRecord> records = reimbursementService.getReviewReimbursementRecordByUserId(userId);
+            res.setStatus(200);
+            for (ReimbursementRecord record : records) {
+                res.pushData(record);
+            }
+        } catch (Exception e) {
+            res.setStatus(-1);
+            res.setMessage(e.getMessage());
+        }
+        return res;
+    }
+
+    @PostMapping("/getNotifyReimbursementList")
+    public ResponseBase getNotifyReimbursementRecord(@RequestBody ReimJoinNotifyRecordWithAccessToken request) {
+        ResponseBase res = new ResponseBase();
+//        try {
+            String accessToken = request.getAccessToken();
+            int userId = accessService.getAuthenticatedId(accessToken);
+            request.setUser_id(userId);
+            System.out.println("getNotifyReimbursementList user_id: "+userId);
+            List<ReimJoinNotifyRecord> records = reimbursementService.getNotifyReimbursementRecordByUserId(userId);
+            res.setStatus(200);
+            for (ReimJoinNotifyRecord record : records) {
+                res.pushData(record);
+            }
+//        } catch (Exception e) {
+//            res.setStatus(-1);
+//            res.setMessage(e.getMessage());
+//        }
+        return res;
+    }
+
     @PostMapping("/getAdminReimbursementList")
     public ResponseEntity<ResponseBase> getAdminReimbursementRecord() {
         ResponseBase res = new ResponseBase();
         try {
-            List<ReimbursementRecord> records = reimbursementService.getAllRecords();  // 获取所有记录
+            List<ReimbursementRecord> records = reimbursementService.getAllRecords();
             res.setStatus(200);
             for (ReimbursementRecord record : records) {
                 res.pushData(record);

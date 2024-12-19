@@ -1,6 +1,7 @@
 package com.example.backend.services;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.backend.entity.reimbursement.ReimJoinNotifyRecord;
 import com.example.backend.entity.reimbursement.ReimbursementRecord;
 import com.example.backend.entity.reimbursement.ReimbursementRecordWithAccessToken;
 import com.example.backend.mapper.ReimbursementMapper;
@@ -21,6 +22,14 @@ public class ReimbursementService extends ServiceImpl<ReimbursementMapper, Reimb
 
     public List<ReimbursementRecord> getReimbursementRecordByUserId(int user_id) {
         return ReimbursementMapper.getReimbursementRecordByUserId(user_id);
+    }
+
+    public List<ReimbursementRecord> getReviewReimbursementRecordByUserId(int review_user_id) {
+        return ReimbursementMapper.getReviewReimbursementRecordByUserId(review_user_id);
+    }
+
+    public List<ReimJoinNotifyRecord> getNotifyReimbursementRecordByUserId(int notified_user_id) {
+        return ReimbursementMapper.getNotifyReimbursementRecordByUserId(notified_user_id);
     }
 
 
