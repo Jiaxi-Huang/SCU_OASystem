@@ -40,6 +40,7 @@ const renderChart = (data: ChartData) => {
     xAxis: {
       type: 'category',
       data: data.dates,
+      boundaryGap: false,
     },
     yAxis: {
       type: 'value',
