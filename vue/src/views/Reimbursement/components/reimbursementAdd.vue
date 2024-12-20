@@ -8,15 +8,15 @@
               <span>报销申请</span>
               <el-divider></el-divider>
             </div>
-            <el-form ref="activityForm" style="text-align: left" :model="sizeForm" label-width="80px" size="mini">
-              <el-form-item label="金额" :label-width="formLabelWidth">
+            <el-form ref="activityForm" style="text-align: left" :model="sizeForm" label-width="80px" size="small">
+              <el-form-item label="金额">
                 <el-input v-model="sizeForm.amount"></el-input>
               </el-form-item>
 
-              <el-form-item label="内容" :label-width="formLabelWidth">
+              <el-form-item label="内容">
                 <el-input v-model="sizeForm.description" autosize type="textarea"/>
               </el-form-item>
-              <el-form-item label="报送" :label-width="formLabelWidth">
+              <el-form-item label="报送">
                 <el-select
                     v-model="sizeForm.notified_user"
                     collapse-tags
@@ -31,7 +31,7 @@
                   />
                 </el-select>
               </el-form-item>
-              <el-form-item label="抄送" :label-width="formLabelWidth">
+              <el-form-item label="抄送">
                 <el-select
                     v-model="sizeForm.cc_user"
                     collapse-tags
@@ -59,12 +59,11 @@
   </div>
 </template>
 <script lang="ts">
-import {computed, defineComponent, onMounted, reactive, ref} from 'vue'
-import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { Edit, DeleteFilled, Check, ArrowLeft } from '@element-plus/icons-vue'
+import {defineComponent, onMounted, reactive, ref} from 'vue'
+import {useRouter} from 'vue-router'
+import {ElMessage} from 'element-plus'
+import {ArrowLeft, Check, DeleteFilled, Edit} from '@element-plus/icons-vue'
 import Service from "@/views/Reimbursement/api";
-import {valueOf} from "lodash";
 
 export default defineComponent({
   name: 'AdvanceForm',
@@ -86,7 +85,7 @@ export default defineComponent({
       status: [],
       submitted_at: '',
       cc_user: [],
-      notified_user: [],
+      notified_user: 0,
     })
 
     const all_users = ref([]);
@@ -97,7 +96,7 @@ export default defineComponent({
       Service.getAllUsers()
           .then((res) => {
             const users = res.data[0] || [];
-            all_users.value = users.map((user) => ({
+            all_users.value = users.map((user: any) => ({
               value: user.userId,
               label: user.username || user.email,
             }));
@@ -117,7 +116,7 @@ export default defineComponent({
       activityForm.value.validate((valid: any): boolean => {
         if (valid) {
           const currentDateTime = new Date();
-          function formatDate(date) {
+          function formatDate(date: any) {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从 0 开始，+1
             const day = String(date.getDate()).padStart(2, '0');
@@ -127,9 +126,8 @@ export default defineComponent({
 
             return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
           }
-
           const formattedDate = formatDate(currentDateTime);
-
+          // 添加报销记录
           let record = {
             accessToken: sessionStorage.getItem('accessToken'),
             amount: sizeForm.amount,
@@ -153,37 +151,36 @@ export default defineComponent({
               type: 'warning',
               message: err.message
             })
-            let notify_record = {
-              notified_user_id: sizeForm.notified_user,
-              request_type: 'reimbursement',
-              request_id: sizeForm.reimbursement_id,
-              submitted_at: currentDateTime,
-            }
-            try {
-              Service.addNotification(notify_record).then((res) => {
-              });
-              ElMessage({
-                type: 'success',
-                message: '提交成功'
-              })
-            } catch (err) {
-              ElMessage({
-                type: 'warning',
-                message: err.message
-              })
-              console.log('submit error')
-              return false
-            }
+          }
+          let notify_record = {
+            notified_user_id: sizeForm.notified_user,
+            request_type: 'reimbursement',
+            request_id: sizeForm.reimbursement_id,
+            submitted_at: currentDateTime,
+          }
+          try {
+            Service.addNotification(notify_record).then((res) => {
+            });
+            ElMessage({
+              type: 'success',
+              message: '提交成功'
+            })
+          } catch (err) {
+            ElMessage({
+              type: 'warning',
+              message: err.message
+            })
             console.log('submit error')
             return false
           }
-          sizeForm.reimbursement_id = ''
-          sizeForm.user_id = ''
+          sizeForm.reimbursement_id = 0
+          sizeForm.user_id = 0
           sizeForm.amount = ''
           sizeForm.description = ''
           sizeForm.status = []
           sizeForm.submitted_at = ''
-          sizeForm.notified_user = []
+          sizeForm.notified_user = 0
+          sizeForm.cc_user = []
           return true
         }
         console.log('submit error')
@@ -197,54 +194,13 @@ export default defineComponent({
     const handleBack = () => {
       router.go(-1)
     }
-    const handleEdit = (index: any, row: any) => {
-      // eslint-disable-next-line no-console
-      console.log(index, row)
-      tableData[index].edit = true
-    }
     /**
      * @description  useXXX写法,代替mixin有待改进的地方
      * */
     const checkEmpty = (row: any) => {
-      const result = Object.keys(row).some((key) => row[key] === '')
-      return result
-    }
-    const handleSave = (index: any, row: any): Boolean => {
-      // eslint-disable-next-line no-console
-      console.log(index, row)
-      if (checkEmpty(row)) {
-        ElMessage.warning('保存前请完善信息！')
-        return false
-      }
-      // save current row data and update table data;
-      tableData[index].edit = false
-      tableData[index] = row
-      ElMessage({
-        type: 'success',
-        message: '保存成功'
-      })
-      return true
-    }
-    const handleDelete = (index: any, row: any) => {
-      // eslint-disable-next-line no-console
-      console.log(index, row)
-      tableData.splice(index, 1)
-    }
-    // 新增一条记录
-    const handleAddRecord = () => {
-      tableData.push({
-        province: '',
-        city: '',
-        name: '',
-        address: '',
-        edit: true
-      })
+      return Object.keys(row).some((key) => row[key] === '')
     }
     return {
-      handleAddRecord,
-      handleEdit,
-      handleSave,
-      handleDelete,
       handleBack,
       sizeForm,
       all_users,

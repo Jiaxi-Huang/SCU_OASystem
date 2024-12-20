@@ -70,7 +70,7 @@ public class ReimbursementCon {
     @PostMapping("/getNotifyReimbursementList")
     public ResponseBase getNotifyReimbursementRecord(@RequestBody ReimJoinNotifyRecordWithAccessToken request) {
         ResponseBase res = new ResponseBase();
-//        try {
+        try {
             String accessToken = request.getAccessToken();
             int userId = accessService.getAuthenticatedId(accessToken);
             request.setUser_id(userId);
@@ -80,10 +80,10 @@ public class ReimbursementCon {
             for (ReimJoinNotifyRecord record : records) {
                 res.pushData(record);
             }
-//        } catch (Exception e) {
-//            res.setStatus(-1);
-//            res.setMessage(e.getMessage());
-//        }
+        } catch (Exception e) {
+            res.setStatus(-1);
+            res.setMessage(e.getMessage());
+        }
         return res;
     }
 

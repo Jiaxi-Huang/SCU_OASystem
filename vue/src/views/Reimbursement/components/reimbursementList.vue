@@ -389,7 +389,6 @@ export default defineComponent({
       state.tableData = state.paginatedNotifyData; // 设置当前表格的数据为 "抄送给我的报销申请" 数据
       updatePaginatedData();
     };
-
     const showAdminReim = () => {
       state.isMyReimShow = false;
       state.isReviewReimShow = false;
@@ -511,33 +510,35 @@ export default defineComponent({
         });
       }
       // 管理员角色，获取所有报销申请
-      try {
-        Service.getAdminReimbursementList().then((res) => {
-          if (res) {
-            const adminReimData = [];
-            var data = res.data;
-            for (let i = 0; i < data.length; i++) {
-              var record = {
-                reimbursement_id: data[i].reimbursement_id,
-                user_id: data[i].user_id,
-                amount: data[i].amount,
-                description: data[i].description,
-                status: data[i].status,
-                submitted_at: data[i].submitted_at,
-              };
-              adminReimData.push(record);
-              // console.log("adminReimData:", JSON.stringify(adminReimData))
+      if(isAdmin) {
+        try {
+          Service.getAdminReimbursementList().then((res) => {
+            if (res) {
+              const adminReimData = [];
+              var data = res.data;
+              for (let i = 0; i < data.length; i++) {
+                var record = {
+                  reimbursement_id: data[i].reimbursement_id,
+                  user_id: data[i].user_id,
+                  amount: data[i].amount,
+                  description: data[i].description,
+                  status: data[i].status,
+                  submitted_at: data[i].submitted_at,
+                };
+                adminReimData.push(record);
+                // console.log("adminReimData:", JSON.stringify(adminReimData))
+              }
+              state.paginatedAdminData = adminReimData;  //
+            } else {
+              console.log('获取管理员报销申请数据失败');
             }
-            state.paginatedAdminData = adminReimData;  //
-          } else {
-            console.log('获取管理员报销申请数据失败');
-          }
-        });
-      } catch (err) {
-        ElMessage({
-          type: 'warning',
-          message: err.message
-        });
+          });
+        } catch (err) {
+          ElMessage({
+            type: 'warning',
+            message: err.message
+          });
+        }
       }
     };
 
@@ -610,10 +611,7 @@ export default defineComponent({
       state.currentPage = val
       updatePaginatedData();  // 更新分页数据
     }
-    const onSubmit = () => {
-      // eslint-disable-next-line no-console
-      console.log('submit!')
-    }
+
     const handleFilterChange = (filters: any) => {
       state.filters.status = filters.status;
       updatePaginatedData();
@@ -630,7 +628,6 @@ export default defineComponent({
       ...toRefs(state),
       handleCurrentChange,
       handleSizeChange,
-      onSubmit,
       onAddReimbursement,
       handleEdit,
       handleDelete,

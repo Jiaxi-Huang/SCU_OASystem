@@ -1,7 +1,8 @@
 package com.example.backend.services;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.example.backend.entity.LeaveApprovalRecord;
+import com.example.backend.entity.leave.LeaveApprovalRecord;
+import com.example.backend.entity.leave.LeaveJoinNotifyRecord;
 import com.example.backend.mapper.LeaveApprovalMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,15 @@ public class LeaveApprovalService extends ServiceImpl<LeaveApprovalMapper, Leave
         return  leaveApprovalMapper.getAll();
     }
 
+    public List<LeaveApprovalRecord> getMyLeaveRecord(int userId) {
+        return leaveApprovalMapper.getMyLeaveRecord(userId);
+    }
+    public List<LeaveJoinNotifyRecord> getNotifyLeaveRecord(int userId) {
+        return leaveApprovalMapper.getNotifyLeaveRecord(userId);
+    }
+    public List<LeaveApprovalRecord> getReviewLeaveRecord(int userId) {
+        return leaveApprovalMapper.getReviewLeaveRecord(userId);
+    }
     public int updateLeaveApprovalRecord(LeaveApprovalRecord record) {
         int res_code = leaveApprovalMapper.updateLeaveApprovalRecord(
                 record.getLeave_id(), record.getUser_id(), record.getStart_date(),
