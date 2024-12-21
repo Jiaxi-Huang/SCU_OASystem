@@ -97,9 +97,10 @@ public class Auth {
     public ResponseEntity<userInfoResponse> userInfo(@RequestBody userInfoRequest request) {
         try {
             //获取邮箱
-            String email = request.getEmail();
-            User userInfo = userService.userInfo(email);
-            String avatar = userService.userInfoAvatar(email);
+            String accessToken = request.getAccessToken();
+            int user_id = accessService.getAuthenticatedId(accessToken);
+            User userInfo = userService.userInfo(user_id);
+            String avatar = userService.userInfoAvatar(user_id);
             if (userInfo!=null) {
                 userInfoResponse.Data userInfoResponseData = new userInfoResponse.Data();
                 userInfoResponseData.setUserEmail(userInfo.getEmail());
