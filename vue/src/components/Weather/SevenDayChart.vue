@@ -1,10 +1,25 @@
 <template>
-  <div ref="chart" style="width: 400px; height: 300px;"></div>
+  <div class="weather">
+    <el-tooltip effect="dark" placement="bottom">
+      <template #content>
+        <SevenDayChart />
+      </template>
+
+    </el-tooltip>
+    <div class="info">
+      <span>当前位置：{{ city }}</span>
+      <span>天气情况：{{ weatherDescription }}</span>
+      <span>温度：{{ temperature }}°C</span>
+      <div ref="chart" style="width: 400px; height: 300px;"></div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import SevenDayChart from "@/components/Weather/SevenDayChart.vue";
+import weathericon from '@/assets/images/weathericon.png';
 import * as echarts from 'echarts';
 
 // 定义 ChartData 类型
@@ -14,9 +29,28 @@ interface ChartData {
   maxTemperatures: number[];
 }
 
-const city = '成都';  // 确定要查询的城市
-
+const city = ref('');
+const weatherDescription = ref('');
+const temperature = ref('');
+const weatherIconUrl = ref(weathericon);
 const chart = ref<HTMLElement | null>(null);
+
+const getWeather = async (cityName: string) => {
+  const today = new Date().toISOString().split('T')[0];
+  try {
+    const response = await axios.get(`http://localhost:8080/api/weather?city=${cityName}&date=${today}`);
+    console.log("Request URL:", `http://localhost:8080/api/weather?city=${cityName}&date=${today}`);
+    const data = response.data;
+    console.log("Weather API response:", data);
+    if (data) {
+      weatherDescription.value = data.humidity;
+      temperature.value = data.temperature;
+    }
+  } catch (error) {
+    console.error("Error fetching weather data:", error);
+    temperature.value = 'Error';
+  }
+};
 
 const renderChart = (data: ChartData) => {
   if (!chart.value) {
@@ -28,6 +62,7 @@ const renderChart = (data: ChartData) => {
   const myChart = echarts.init(chart.value as HTMLElement);
 
   const option = {
+    backgroundColor: '#FFFFFF',
     title: {
       text: '七日温度变化',
     },
@@ -50,11 +85,13 @@ const renderChart = (data: ChartData) => {
         name: '最低温度',
         type: 'line',
         data: data.minTemperatures,
+        showSymbol: false,
       },
       {
         name: '最高温度',
         type: 'line',
         data: data.maxTemperatures,
+        showSymbol: false,
       },
     ],
   };
@@ -69,10 +106,10 @@ const getPastDates = (days: number): string[] => {
     date.setDate(date.getDate() - i);
     dates.push(date.toISOString().split('T')[0]);
   }
-  return dates.reverse(); // 确保日期顺序从过去到现在
+  return dates.reverse();
 };
 
-const getSevenDayWeather = async () => {
+const getSevenDayWeather = async (cityName: string) => {
   try {
     const pastDates = getPastDates(7);
     const chartData: ChartData = {
@@ -82,7 +119,7 @@ const getSevenDayWeather = async () => {
     };
 
     for (const date of pastDates) {
-      const response = await axios.get(`http://localhost:8080/api/weather?city=${city}&date=${date}`);
+      const response = await axios.get(`http://localhost:8080/api/weather?city=${cityName}&date=${date}`);
       const data = response.data;
       console.log(`Weather data for ${date}:`, data);
 
@@ -100,11 +137,40 @@ const getSevenDayWeather = async () => {
   }
 };
 
+const getCityAndWeather = async () => {
+  try {
+    const response = await axios.get("https://restapi.amap.com/v3/ip", {
+      params: {
+        key: "112f7278845a2b4a727d04cffeb63b0b",
+      },
+    });
+    const data = response.data;
+    console.log(data);
+    city.value = data.city.replace('市', '');
+    getWeather(city.value);
+    getSevenDayWeather(city.value); // 获取城市后调用 getSevenDayWeather 函数
+  } catch (error) {
+    console.error("Error fetching city data:", error);
+  }
+};
+
 onMounted(() => {
-  console.log('Component mounted, fetching seven-day weather data...');
-  getSevenDayWeather();
+  getCityAndWeather();
 });
 </script>
 
-<style scoped>
+<style lang="stylus" scoped>
+.weather
+  display: flex
+  flex-direction: column
+  align-items: flex-start
+  span
+    margin-top: 10px
+  img
+    margin-right: 5px
+.info
+  margin-top: 20px
+  span
+    display: block
+    margin-bottom: 10px
 </style>

@@ -8,6 +8,8 @@
         <el-image style="width: 80px; height: 50px; margin-right: 5px" :src="weatherIconUrl" alt="Weather Icon"></el-image>
       </el-button>
     </el-tooltip>
+    <span>{{ city }}</span>
+    <span>        </span>
     <span>{{ weatherDescription }}</span>
     <span>{{ temperature }}°C</span>
   </div>
@@ -15,21 +17,20 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import axios from 'axios'; // 确保正确导入 axios
-import SevenDayChart from "@/components/Weather/SevenDayChart.vue"; // 引入七日温度折线图组件
-import weathericon from '@/assets/images/weathericon.png'; // 确保路径和文件名正确
+import axios from 'axios';
+import SevenDayChart from "@/components/Weather/SevenDayChart.vue";
+import weathericon from '@/assets/images/weathericon.png';
 
-const city = '成都'; // 使用正确的城市名称
-
+const city = ref('');
 const weatherDescription = ref('');
-const temperature = ref(''); // 定义一个新的 ref 变量来存储温度
-const weatherIconUrl = ref(weathericon); // 默认图标
+const temperature = ref('');
+const weatherIconUrl = ref(weathericon);
 
-const getWeather = async () => {
+const getWeather = async (cityName: string) => {
   const today = new Date().toISOString().split('T')[0];
   try {
-    const response = await axios.get(`http://localhost:8080/api/weather?city=${city}&date=${today}`);
-    console.log("Request URL:", `http://localhost:8080/api/weather?city=${city}&date=${today}`); // 打印请求URL
+    const response = await axios.get(`http://localhost:8080/api/weather?city=${cityName}&date=${today}`);
+    console.log("Request URL:", `http://localhost:8080/api/weather?city=${cityName}&date=${today}`);
     const data = response.data;
     console.log("Weather API response:", data);
     if (data) {
@@ -42,8 +43,25 @@ const getWeather = async () => {
   }
 };
 
+const getCityAndWeather = async () => {
+  try {
+    const response = await axios.get("https://restapi.amap.com/v3/ip", {
+      params: {
+        key: "112f7278845a2b4a727d04cffeb63b0b",
+      },
+    });
+    const data = response.data;
+    console.log(data);
+    // 去掉城市名称中的“市”字
+    city.value = data.city.replace('市', '');
+    getWeather(city.value); // 获取城市后调用 getWeather 函数
+  } catch (error) {
+    console.error("Error fetching city data:", error);
+  }
+};
+
 onMounted(() => {
-  getWeather(); // 获取天气数据
+  getCityAndWeather(); // 获取城市和天气数据
 });
 </script>
 
