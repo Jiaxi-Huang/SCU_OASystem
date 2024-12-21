@@ -146,9 +146,9 @@ export default defineComponent({
               password: encrypt(password)
             }
             const res = await Service.postLogin(data)
-            const userInfo = await Service.postAuthUserInfo({ email })
             const accessToken = res?.data?.accessToken ?? null
             if (accessToken) {
+              const userInfo = await Service.postAuthUserInfo({ accessToken })
               // 将角色存储到全局vuex roles
               if (userInfo.status === 0) {
                 store.dispatch('permissionModule/getPermissonRoles', userInfo.data)

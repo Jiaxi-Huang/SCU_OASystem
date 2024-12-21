@@ -37,9 +37,9 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         return 0; // 用户名或密码错误
     }
     //返回登录的用户相关信息
-    public User userInfo(String email) {
+    public User userInfo(int user_id) {
         try {
-            User user = userMapper.findByEmail(email);
+            User user = userMapper.findByUserId(user_id);
             if (user != null) {
                 return user;
             }
@@ -61,9 +61,9 @@ public class UserService extends ServiceImpl<UserMapper, User> {
             return null; // 表示查询失败
         }
     }
-    public String userInfoAvatar(String email) {
+    public String userInfoAvatar(int user_id) {
         try {
-            return userMapper.findAvatarByEmail(email);
+            return userMapper.findAvatarByUserId(user_id);
         } catch (Exception e) {
             // 记录异常信息
             e.printStackTrace();

@@ -6,6 +6,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class userInfoRequest {
-    private String email;
-    private String roleName;
+    private String accessToken;
 }
