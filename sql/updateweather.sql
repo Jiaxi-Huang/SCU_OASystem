@@ -1,3 +1,0 @@
-UPDATE `oa_database`.`weather` SET `id`='5', `city`='成都', `temperature`='1~10', `humidity`='小雨', `wind`='1级', `creator_id`='60065', `creator`='桑郎平措', `create_time`=NULL, `date`='2024-12-18' WHERE (`id`='5');
-UPDATE `oa_database`.`weather` SET `id`='9', `city`='成都', `temperature`='5~9', `humidity`='阴', `wind`='1级', `creator_id`='60065', `creator`='桑郎平措', `create_time`=NULL, `date`='2024-12-12' WHERE (`id`='9');
-UPDATE `oa_database`.`weather` SET `id`='10', `city`='北京', `temperature`='5~9', `humidity`='阴', `wind`='1级', `creator_id`='60065', `creator`='桑郎平措', `create_time`=NULL, `date`='2024-12-18' WHERE (`id`='10');

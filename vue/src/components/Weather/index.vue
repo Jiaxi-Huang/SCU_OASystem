@@ -1,7 +1,12 @@
 <template>
   <div class="weather">
-    <el-tooltip placement="top" effect="light">
-      <el-image style="width: 80px; height: 50px; margin-right: 5px" :src="weatherIconUrl" alt="Weather Icon"></el-image>
+    <el-tooltip effect="dark" placement="bottom">
+      <template #content>
+        <SevenDayChart />
+      </template>
+      <el-button type="text">
+        <el-image style="width: 80px; height: 50px; margin-right: 5px" :src="weatherIconUrl" alt="Weather Icon"></el-image>
+      </el-button>
     </el-tooltip>
     <span>{{ weatherDescription }}</span>
     <span>{{ temperature }}°C</span>
@@ -11,7 +16,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios'; // 确保正确导入 axios
-import WeatherService from './index'; // 确保相对路径正确
+import SevenDayChart from "@/components/Weather/SevenDayChart.vue"; // 引入七日温度折线图组件
 import weathericon from '@/assets/images/weathericon.png'; // 确保路径和文件名正确
 
 const city = '成都'; // 使用正确的城市名称
@@ -36,7 +41,6 @@ const getWeather = async () => {
     temperature.value = 'Error';
   }
 };
-
 
 onMounted(() => {
   getWeather(); // 获取天气数据
