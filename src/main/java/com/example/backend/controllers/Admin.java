@@ -56,6 +56,7 @@ public class Admin {
                 temp.setUserDepartment(user.getDepartment());
                 temp.setUserRole(user.getRole());
                 temp.setUserPhone(user.getPhone());
+                temp.setUserAvatar(userService.userInfoAvatar(user.getUserId()));
                 data.add(temp);
             }
             adminUserInfoResponse response = new adminUserInfoResponse(

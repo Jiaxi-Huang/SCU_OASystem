@@ -79,13 +79,7 @@ const permissionModule: Module<permissionStateTypes, RootStateTypes> = {
     getPermissonRoutes({ commit }, payload: any) {
       // api request
       const data = {
-        userEmail: payload.userEmail,
-        userName: payload.userName,
         roleName: payload.roleName,
-        userDepartment: payload.userDepartment,
-        userIntro: payload.userIntro,
-        userPhone:payload.userPhone,
-        userAvatar: payload.userAvatar
       }
       // 后端根据角色名称，查询授权菜单
       Service.postAuthPermission(data).then((res) => {

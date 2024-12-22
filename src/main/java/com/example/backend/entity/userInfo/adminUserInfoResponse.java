@@ -22,6 +22,7 @@ public class adminUserInfoResponse {
         private String userDepartment;
         private String userRole;
         private String userPhone;
+        private String userAvatar;
 
         public int getUserId() {return userId;}
         public void setUserId(int userId) {this.userId = userId;}
@@ -56,6 +57,9 @@ public class adminUserInfoResponse {
         public void setUserPhone(String userPhone) {
             this.userPhone = userPhone;
         }
+        public String getUserAvatar() {return userAvatar;}
+
+        public void setUserAvatar(String userAvatar) {this.userAvatar = userAvatar;}
     }
         public int getStatus() {
         return status;

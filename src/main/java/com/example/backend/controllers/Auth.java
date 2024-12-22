@@ -393,7 +393,7 @@ public class Auth {
             int user_id = userService.preBindByWechat(phone).getUserId();
             int isSuccess = userService.bindByWechat(user_id,openid);
             if (isSuccess > 0) {
-                return ResponseEntity.status(HttpStatus.OK).body(new LoginResponse(0, "绑定成功", true, accessService.generateAccessToken(32)));
+                return ResponseEntity.status(HttpStatus.OK).body(new LoginResponse(0, "绑定成功", true, null));
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LoginResponse(1, "绑定失败", false, null));
             }
