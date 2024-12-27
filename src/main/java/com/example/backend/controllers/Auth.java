@@ -92,7 +92,6 @@ public class Auth {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
     @PostMapping("/user/userInfo")
     public ResponseEntity<userInfoResponse> userInfo(@RequestBody userInfoRequest request) {
         try {
@@ -177,7 +176,7 @@ public class Auth {
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
                             0,
-                            "获取职位信息成功",
+                            "获取职位���息成功",
                             true,
                             data
                     );

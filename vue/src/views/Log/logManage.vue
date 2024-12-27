@@ -23,10 +23,10 @@
       <div class="pagination">
         <el-pagination
           :current-page="param.page"
-          :page-size="param.limit"
+          :page-size="param.size"
           layout="sizes,prev,pager,next,total"
-          :page-sizes="[10, 20, 50]"
-          :total="total"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="param.total"
           background
           @current-change="onCurrentChange"
           @size-change="onSizeChange"
@@ -59,7 +59,8 @@ export default defineComponent({
         d: '/log/delete'
       },
       param: {
-        limit: 10,
+        total: 0,
+        size: 10,
         page: 1
       },
       data: [
@@ -85,8 +86,6 @@ export default defineComponent({
       selectionRows: [] as { id: number }[], //
       searchKeyword: '' // 添加 searchKeyword 变量
     })
-    // 动态计算total;
-    const total = computed(() => state.data.length)
     /**
      * @description 对数据进行排序
      */
@@ -125,14 +124,16 @@ export default defineComponent({
       if (adminUserInfo.status === 0) {
         state.data = adminUserInfo.data
         state.ids = adminUserInfo.data.map((item:any) => item.id)
+        state.param.total = state.data.length
       }
+
     }
-    const onCurrentChange = () => {
-      fetchData()
+    const onCurrentChange = (val: number) => {
+      state.param.page = val
     }
     const onSizeChange = (val: number) => {
-      state.param.limit = val
-      fetchData()
+      state.param.page = 1
+      state.param.size = val
     }
     const onCreate = () => {
       state.add_visible = true
@@ -149,19 +150,22 @@ export default defineComponent({
       return state.is_search ? sortData().filter(item =>
           item.logContent.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
           item.logDate.toLowerCase().includes(state.searchKeyword.toLowerCase())
-      ) : sortData();
+      ).slice((state.param.page-1)*state.param.size, state.param.page*state.param.size) : sortData().slice((state.param.page-1)*state.param.size, state.param.page*state.param.size);
     }
     const onSearch = () => {
-      if (state.searchKeyword != '') {
+      if (state.searchKeyword !== '') {
         state.is_search = true
         state.param.page = 1; // 重置页码为第一页
         state.filteredData = state.data.filter(item =>
             item.logContent.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
             item.logDate.toLowerCase().includes(state.searchKeyword.toLowerCase())
         );
+        state.param.total = state.filteredData.length
       }
       else{
         state.is_search = false
+        state.param.page = 1; // 重置页码为第一页
+        state.param.total = state.data.length
       }
     }
       const useConfirmDelete = async (row: any) => {
@@ -269,11 +273,7 @@ export default defineComponent({
     }
       // 使用 watch 监视 searchKeyword 的变化
       watch(() => state.searchKeyword, (newVal) => {
-        if (newVal !== '') {
           onSearch()
-        } else {
-          state.is_search = false
-        }
       })
       //初始调用
       onMounted(() => {
@@ -282,7 +282,6 @@ export default defineComponent({
       })
       return {
         ...toRefs(state),
-        total,
         displayData,
         handleSelectionChange,
         onCurrentChange,

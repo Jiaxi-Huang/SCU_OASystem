@@ -1,3 +1,44 @@
+<style lang="stylus" scoped>
+.table-container{
+  .form-inline{
+    margin:15px;
+    text-align:left;
+  }
+  .table-list{
+    margin:15px;
+  }
+
+}
+
+.chart-widget-list p{
+  border-bottom 1px solid #f1f3fa
+  margin-bottom 0.5rem
+  padding-bottom 0.5rem
+  display flex
+  flex-direction row
+  justify-content space-between
+  align-items center
+}
+
+.icon-square{
+  width 12px
+  height 12px
+  display inline-block
+}
+.red{
+  background-color #ec6769
+}
+.green{
+  background-color  #93cb79
+}
+.yellow {
+  background-color #f9c761
+}
+.deep-blue{
+  background-color #5572c3
+}
+</style>
+
 <template>
   <div class="table-container">
     <el-form :inline="true" :model="formInline" class="form-inline">
@@ -17,6 +58,12 @@
       <el-form-item>
         <el-button type="primary" @click="onToExcel" :icon="Download">导出</el-button>
       </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="onShowStatistics()" :icon="Odometer">统计信息</el-button>
+      </el-form-item>
+    </el-form>
+
+    <el-form :inline="true" :model="formInline" class="form-inline">
       <el-form-item label="按" style="width: 180px">
         <el-select v-model="search_field" placeholder="无" style="width: 180px">
           <el-option label="无" value="none"></el-option>
@@ -36,6 +83,7 @@
         <el-button type="primary" @click="onRefresh" :icon="Refresh"></el-button>
       </el-form-item>
     </el-form>
+
     <el-table ref="filterTableRef" class="table-list" row-key="todo_id" :data="paginatedData" style="width: 100%"
               @filter-change="handleFilterChange" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"></el-table-column>
@@ -179,6 +227,30 @@
       </div>
     </el-dialog>
 
+    <el-dialog v-model="statisticsVisible" title="统计信息">
+      <el-card shadow="hover" class="card">
+        <p>
+          <span><i class="icon-square red"></i> 总事项数 </span> <span>{{ tableData.length }}</span>
+        </p>
+        <div class="e-chart" style="height: 201px; width: 100%">
+          <div ref="refAverageSales" style="width: inherit; height: inherit;"></div>
+        </div>
+        <div class="chart-widget-list">
+          <p>
+            <span><i class="icon-square green"></i> 未完成</span><span>{{ statistics.fin }}</span>
+          </p>
+          <p>
+            <span><i class="icon-square deep-blue"></i> 已完成 </span> <span>{{ statistics.unfin }}</span>
+          </p>
+        </div>
+      </el-card>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="statisticsVisible = false">确认</el-button>
+      </div>
+    </el-dialog>
+
+
     <el-pagination
       :current-page="currentPage"
       :page-sizes="[5, 10, 15, 20, 25]"
@@ -193,16 +265,20 @@
   </div>
 </template>
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue'
+import {computed, defineComponent, nextTick, onMounted, reactive, ref, toRefs, watch} from 'vue'
 import { useRouter } from 'vue-router'
 import permission from '@/directive/permission'
 import Service from '../api/index'
 import {ElMessage, ElMessageBox} from "element-plus";
-import {CirclePlus, Delete, Download, Refresh} from "@element-plus/icons-vue";
+import {CirclePlus, Delete, Download, Odometer, Refresh} from "@element-plus/icons-vue";
+import {useInitPieChart} from "./useInitPieCharts";
 
 export default defineComponent({
   name: 'todoTableList',
   computed: {
+    Odometer() {
+      return Odometer
+    },
     Refresh() {
       return Refresh
     },
@@ -220,10 +296,10 @@ export default defineComponent({
     permission
   },
   setup() {
-    // 思考 ref 响应式和 reactive 响应式的区别； 修改对象属性值，是否会刷新数据
 
     const router = useRouter()
     const filterTableRef = ref(null)
+    const refAverageSales = ref<HTMLElement | null>(null)
     const state = reactive({
       tableData: [
         {
@@ -239,7 +315,6 @@ export default defineComponent({
       modifyFormVisible: false,
       detailFormVisible: false,
       form: {},
-
       paginatedData: [],
       record_cnt: 0,
 
@@ -262,6 +337,8 @@ export default defineComponent({
 
       search_field: "none",
       search_key: "",
+      statisticsVisible: false,
+      statistics: {},
     })
     const formInline = reactive({
       user: '',
@@ -575,6 +652,32 @@ export default defineComponent({
 
     }
 
+    const onShowStatistics = () => {
+      state.statisticsVisible = true
+      let fin = 0, unfin = 0;
+      state.tableData.forEach(record => {
+        record.todo_fin == "未完成" ? ++fin:++unfin;
+      })
+      state.statistics.fin = fin;
+      state.statistics.unfin = unfin;
+      const data = [
+        {
+          name: "已完成",
+          value: fin
+        },
+        {
+          name: "未完成",
+          value: unfin
+        }];
+      nextTick(() => {
+        if (refAverageSales.value) {
+          useInitPieChart(refAverageSales.value, data)
+        } else {
+          console.log("refAverageSales not exist!")
+        }
+      })
+    }
+
     const onRefresh = () => {
       getPersonalTodoList()
     }
@@ -590,6 +693,7 @@ export default defineComponent({
       handleEdit,
       handleDelete,
       filterTableRef,
+      refAverageSales,
       resetDateFilter,
       clearFilter,
       formatter,
@@ -607,20 +711,10 @@ export default defineComponent({
       onToExcel,
       onSearchSubmit,
       onRefresh,
+      onShowStatistics,
     }
   }
 })
 </script>
-<style lang="stylus" scoped>
-.table-container{
-    .form-inline{
-        margin:15px;
-        text-align:left;
-    }
-    .table-list{
-        margin:15px;
-    }
 
-}
-</style>
 
