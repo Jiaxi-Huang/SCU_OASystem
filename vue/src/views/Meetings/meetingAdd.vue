@@ -21,7 +21,7 @@
               <el-form-item label="持续时间">
                 <el-input v-model="sizeForm.mtin_len" autosize type="textarea"/>
               </el-form-item>
-              <el-form-item label="截止时间">
+              <el-form-item label="开始时间">
                 <div>
                   <el-col :span="11">
                     <el-date-picker v-model="sizeForm.date1"
