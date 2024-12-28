@@ -31,12 +31,12 @@
                   </el-col>
                 </div>
               </el-form-item>
-              <el-form-item label="从属">
-                <el-checkbox-group v-model="sizeForm.type">
-                  <el-checkbox-button label="为自己添加"></el-checkbox-button>
-                  <el-checkbox-button label="为他人添加"></el-checkbox-button>
-                </el-checkbox-group>
-              </el-form-item>
+<!--              <el-form-item label="从属">-->
+<!--                <el-checkbox-group v-model="sizeForm.type">-->
+<!--                  <el-checkbox-button label="为自己添加"></el-checkbox-button>-->
+<!--                  <el-checkbox-button label="为他人添加"></el-checkbox-button>-->
+<!--                </el-checkbox-group>-->
+<!--              </el-form-item>-->
 
 <!--              <el-form-item label="自己的ID" v-show="forSelf">-->
 <!--                <el-input v-model="sizeForm.adder_id" placeholder="暂时这样，以后会自动填入且无法修改"></el-input>-->

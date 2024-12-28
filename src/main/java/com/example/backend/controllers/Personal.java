@@ -28,17 +28,16 @@ public class Personal {
     private AccessService accessService;
     @Autowired
     private CaptchaService captchaService;
-    @PostMapping("/basicInfo")
-    public ResponseEntity<personalSettingResponse> basicInfo(@RequestBody personalSettingRequest request) {
+    @PostMapping("/wechatInfo")
+    public ResponseEntity<personalSettingResponse> wechatInfo(@RequestBody personalSettingRequest request) {
         try{
         String username = request.getUsername();
-        String phone = request.getPhone();
         String intro = request.getIntro();
         String accessToken = request.getAccessToken();
         int userId = accessService.getAuthenticatedId(accessToken);
-        int isSuccess = userService.basicInfoSetting(username,phone,intro,userId);
+        int isSuccess = userService.wechatInfoSetting(username,intro,userId);
         if(isSuccess > 0){
-            personalSettingResponse.Data data = new personalSettingResponse.Data(username,phone,intro);
+            personalSettingResponse.Data data = new personalSettingResponse.Data(username,null,intro);
             personalSettingResponse response = new personalSettingResponse(
                     0,
                     "更新成功",
@@ -47,6 +46,45 @@ public class Personal {
             );
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
+            else{
+                personalSettingResponse response = new personalSettingResponse(
+                        0,
+                        "更新失败",
+                        false,
+                        null
+                );
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+        }
+        catch(Exception e){
+            personalSettingResponse response = new personalSettingResponse(
+                    2,
+                    "服务器内部错误",
+                    false,
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    @PostMapping("/basicInfo")
+    public ResponseEntity<personalSettingResponse> basicInfo(@RequestBody personalSettingRequest request) {
+        try{
+            String username = request.getUsername();
+            String phone = request.getPhone();
+            String intro = request.getIntro();
+            String accessToken = request.getAccessToken();
+            int userId = accessService.getAuthenticatedId(accessToken);
+            int isSuccess = userService.basicInfoSetting(username,phone,intro,userId);
+            if(isSuccess > 0){
+                personalSettingResponse.Data data = new personalSettingResponse.Data(username,phone,intro);
+                personalSettingResponse response = new personalSettingResponse(
+                        0,
+                        "更新成功",
+                        true,
+                        data
+                );
+                return ResponseEntity.status(HttpStatus.OK).body(response);
+            }
             else{
                 personalSettingResponse response = new personalSettingResponse(
                         0,

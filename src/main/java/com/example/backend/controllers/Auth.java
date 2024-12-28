@@ -92,14 +92,14 @@ public class Auth {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
     @PostMapping("/user/userInfo")
     public ResponseEntity<userInfoResponse> userInfo(@RequestBody userInfoRequest request) {
         try {
             //获取邮箱
-            String email = request.getEmail();
-            User userInfo = userService.userInfo(email);
-            String avatar = userService.userInfoAvatar(email);
+            String accessToken = request.getAccessToken();
+            int user_id = accessService.getAuthenticatedId(accessToken);
+            User userInfo = userService.userInfo(user_id);
+            String avatar = userService.userInfoAvatar(user_id);
             if (userInfo!=null) {
                 userInfoResponse.Data userInfoResponseData = new userInfoResponse.Data();
                 userInfoResponseData.setUserEmail(userInfo.getEmail());
@@ -176,7 +176,7 @@ public class Auth {
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
                             0,
-                            "获取职位信息成功",
+                            "获取职位���息成功",
                             true,
                             data
                     );
@@ -392,7 +392,7 @@ public class Auth {
             int user_id = userService.preBindByWechat(phone).getUserId();
             int isSuccess = userService.bindByWechat(user_id,openid);
             if (isSuccess > 0) {
-                return ResponseEntity.status(HttpStatus.OK).body(new LoginResponse(0, "绑定成功", true, accessService.generateAccessToken(32)));
+                return ResponseEntity.status(HttpStatus.OK).body(new LoginResponse(0, "绑定成功", true, null));
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LoginResponse(1, "绑定失败", false, null));
             }
@@ -400,6 +400,75 @@ public class Auth {
         catch(Exception e){
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new LoginResponse(2, "服务器内部错误", false, null));
+        }
+    }
+    @PostMapping("/wechat/routes")
+    public ResponseEntity<AuthedRoutesResponse> wechatAutheredRoutes(@RequestBody AuthedRoutesRequest request) {
+        //获取邮箱
+        try{
+            String accessToken = request.getAccessToken();
+            int user_id = accessService.getAuthenticatedId(accessToken);
+            String roleName = userService.getById(user_id).getRole();
+            if (roleName != null) {
+                if (roleName.equals("admin")) {
+                    AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
+                    List<String> authedRoutes = Arrays.asList(
+                            "space","service","conference","resource","question","property","user","worker",
+                            "apply","device","todo","meeting","reimbursement","leave"
+                    );
+                    data.setAuthedRoutes(authedRoutes);
+                    AuthedRoutesResponse response = new AuthedRoutesResponse(
+                            0,
+                            "获取职位信息成功",
+                            true,
+                            data
+                    );
+                    return ResponseEntity.status(HttpStatus.OK).body(response);
+                } else if (roleName.equals("manager")) {
+                    AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
+                    List<String> authedRoutes = Arrays.asList(
+                            "space","service","conference","resource","question","property","user","worker",
+                            "apply","device","todo","meeting","reimbursement","leave"
+                    );
+                    data.setAuthedRoutes(authedRoutes);
+                    AuthedRoutesResponse response = new AuthedRoutesResponse(
+                            0,
+                            "获取职位信息成功",
+                            true,
+                            data
+                    );
+                    return ResponseEntity.status(HttpStatus.OK).body(response);
+                } else {
+                    AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
+                    List<String> authedRoutes = Arrays.asList(
+                            "user","worker","todo","meeting","reimbursement","leave");
+                    data.setAuthedRoutes(authedRoutes);
+                    AuthedRoutesResponse response = new AuthedRoutesResponse(
+                            0,
+                            "获取职位���息成功",
+                            true,
+                            data
+                    );
+                    return ResponseEntity.status(HttpStatus.OK).body(response);
+                }
+            } else {
+                // 构建失败响应
+                AuthedRoutesResponse response = new AuthedRoutesResponse(
+                        1,
+                        "获取职位信息失败",
+                        false,
+                        null
+                );
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+        }catch (Exception e) {
+            AuthedRoutesResponse response = new AuthedRoutesResponse(
+                    2,
+                    "服务器内部错误",
+                    false,
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 }

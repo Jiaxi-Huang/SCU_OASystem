@@ -5,6 +5,7 @@ import com.example.backend.entity.authedRoutes.AuthedRoutesRequest;
 import com.example.backend.entity.authedRoutes.AuthedRoutesResponse;
 import com.example.backend.entity.userInfo.adminUserInfoRequest;
 import com.example.backend.entity.userInfo.adminUserInfoResponse;
+import com.example.backend.entity.userInfo.userInfoResponse;
 import com.example.backend.services.AccessService;
 import com.example.backend.services.MenuService;
 import com.example.backend.services.UserService;
@@ -56,6 +57,7 @@ public class Admin {
                 temp.setUserDepartment(user.getDepartment());
                 temp.setUserRole(user.getRole());
                 temp.setUserPhone(user.getPhone());
+                temp.setUserAvatar(userService.userInfoAvatar(user.getUserId()));
                 data.add(temp);
             }
             adminUserInfoResponse response = new adminUserInfoResponse(
@@ -181,6 +183,61 @@ public class Admin {
         }
         catch (Exception e) {
             adminUserInfoResponse response = new adminUserInfoResponse(
+                    2,
+                    "服务器内部错误",
+                    false,
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    @PostMapping("/user/detail")
+    public ResponseEntity<userInfoResponse> userDetail(@RequestBody adminUserInfoRequest request) {
+        try {
+            String accessToken = request.getAccessToken();
+            int user_id = request.getUserId();
+            int adminId = accessService.getAuthenticatedId(accessToken);
+            String role = userService.getById(adminId).getRole();
+            if(role.equals("admin")||role.equals("manager")) {
+                User userInfo = userService.userInfo(user_id);
+                String avatar = userService.userInfoAvatar(user_id);
+                if (userInfo != null) {
+                    userInfoResponse.Data userInfoResponseData = new userInfoResponse.Data();
+                    userInfoResponseData.setUserEmail(userInfo.getEmail());
+                    userInfoResponseData.setRoleName(userInfo.getRole());
+                    userInfoResponseData.setUserName(userInfo.getUsername());
+                    userInfoResponseData.setUserIntro(userInfo.getIntro());
+                    userInfoResponseData.setUserPhone(userInfo.getPhone());
+                    userInfoResponseData.setUserDepartment(userInfo.getDepartment());
+                    userInfoResponseData.setUserAvatar(avatar);
+                    userInfoResponse response = new userInfoResponse(
+                            0,
+                            "获取职位信息成功",
+                            true,
+                            userInfoResponseData
+                    );
+                    return ResponseEntity.status(HttpStatus.OK).body(response);
+                } else {
+                    userInfoResponse response = new userInfoResponse(
+                            1,
+                            "更新用户信息失败",
+                            false,
+                            null
+                    );
+                    return ResponseEntity.status(HttpStatus.OK).body(response);
+                }
+            }
+            else{
+                userInfoResponse response = new userInfoResponse(
+                        1,
+                        "权限不足",
+                        false,
+                        null
+                );
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+        } catch (Exception e) {
+            userInfoResponse response = new userInfoResponse(
                     2,
                     "服务器内部错误",
                     false,

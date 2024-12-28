@@ -4,6 +4,33 @@
   padding 0px 20px
   background-color #fafbfe
 
+  .chart-widget-list p{
+    border-bottom 1px solid #f1f3fa
+    margin-bottom 0.5rem
+    padding-bottom 0.5rem
+    display flex
+    flex-direction row
+    justify-content space-between
+    align-items center
+  }
+
+  .icon-square{
+    width 12px
+    height 12px
+    display inline-block
+  }
+  .red{
+    background-color #ec6769
+  }
+  .green{
+    background-color  #93cb79
+  }
+  .yellow {
+    background-color #f9c761
+  }
+  .deep-blue{
+    background-color #5572c3
+  }
   .page-title-box{
   box-sizing border-box
   display flex
@@ -261,6 +288,11 @@
         <el-form-item>
           <el-button type="primary" @click="onToExcel()" :icon="Download">导出</el-button>
         </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onShowStatistics()" :icon="Odometer">统计信息</el-button>
+        </el-form-item>
+      </el-form>
+      <el-form :inline="true" :model="formInline" class="form-inline">
         <el-form-item label="按">
           <el-select v-model="task.search_field" placeholder="无">
             <el-option label="无" value="none"></el-option>
@@ -274,12 +306,14 @@
           <el-input v-model="task.search_key" placeholder="全局搜索"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="onSearchSubmit">查询</el-button>
+          <el-button type="primary" @click="onSearchSubmit" :icon="Search">查询</el-button>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="getPersonalMeetingList" :icon="Refresh"></el-button>
         </el-form-item>
       </el-form>
+
+
       <el-col :span="24">
         <div class="board">
 
@@ -584,6 +618,34 @@
             </div>
           </el-dialog>
 
+          <el-dialog v-model="task.statisticsVisible" title="统计信息">
+
+            <el-card shadow="hover" class="card">
+              <p>
+                <span><i class="icon-square red"></i> 总会议数</span> <span>{{ task.statistics.total }}</span>
+              </p>
+                <div class="e-chart" style="height: 201px; width: 100%">
+                  <div ref="refAverageSales" style="width: inherit; height: inherit;"></div>
+                </div>
+                <div class="chart-widget-list">
+                  <p>
+                    <span><i class="icon-square yellow"></i> 已完成的会议数</span><span>{{ task.passed.length }}</span>
+                  </p>
+                  <p>
+                    <span><i class="icon-square green"></i> 已预约的会议数 </span><span>{{ task.scheduled.length }}</span>
+                  </p>
+                  <p>
+                    <span><i class="icon-square deep-blue"></i> 今天的会议数</span> <span>{{ task.progressing.length }}</span>
+                  </p>
+                </div>
+              </el-card>
+
+            <div slot="footer" class="dialog-footer">
+              <el-button type="primary" @click="task.statisticsVisible = false">确认</el-button>
+            </div>
+          </el-dialog>
+
+
         </div>
       </el-col>
     </el-row>
@@ -592,7 +654,8 @@
 
 
 <script setup lang="ts">
-import { onMounted, ref, onUnmounted, reactive } from 'vue'
+
+import {onMounted, ref, onUnmounted, reactive, nextTick} from 'vue'
 import {
   Operation,
   Suitcase,
@@ -602,13 +665,15 @@ import {
   Edit,
   CirclePlus,
   Download,
-  Refresh
+  Refresh, Odometer, Search, MoreFilled
 } from '@element-plus/icons-vue'
 import Service from "@/views/Meetings/api/index";
 import {ElMessage, ElMessageBox} from "element-plus";
 import { useRouter } from 'vue-router'
 import permission from '@/directive/permission'
+import {useInitPieChart} from "./components/useInitPieCharts";
 
+const refAverageSales = ref<HTMLElement | null>(null)
 const router = useRouter()
 
 let eventGuid = 0
@@ -656,12 +721,13 @@ const task = reactive<taskType>({
   detailFormVisible_add: false,
   search_field: "none",
   search_key: "",
+  statisticsVisible: false,
+  statistics: {},
 
 })
 
 onMounted(() => {
   getPersonalMeetingList()
-
 })
 
 // 组件卸载时销毁实例
@@ -679,6 +745,32 @@ const showMeetingDetails = (row:any) => {
   task.detailForm = row
   console.log(task.detailForm)
   task.detailFormVisible = true
+}
+
+const onShowStatistics = () => {
+  task.statisticsVisible = true
+  const data = [
+    {
+      name: "今天的会议",
+      value: task.progressing.length
+    },
+    {
+      name: "已预约会议",
+      value: task.scheduled.length
+    },
+    {
+      name: "已完成会议",
+      value: task.passed.length
+    }];
+  task.statistics.total = task.progressing.length + task.scheduled.length + task.passed.length
+  nextTick(() => {
+    if (refAverageSales.value) {
+      useInitPieChart(refAverageSales.value, data)
+    } else {
+      console.log("refAverageSales not exist!")
+    }
+  })
+
 }
 
 const onModifyClicked = (item: any) => {

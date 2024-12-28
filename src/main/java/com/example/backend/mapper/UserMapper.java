@@ -20,8 +20,8 @@ public interface UserMapper extends BaseMapper<User>{
     User findByPhone(String phone);
     @Select("SELECT * FROM user_infos WHERE wechat_user_id=#{openid}")
     User findByOpenid(String openid);
-    @Select("SELECT avatar FROM user_infos LEFT JOIN user_avatar ON user_infos.user_id=user_avatar.user_id WHERE email = #{email}")
-    String findAvatarByEmail(String email);
+    @Select("SELECT avatar FROM user_avatar WHERE user_id = #{user_id}")
+    String findAvatarByUserId(int user_id);
     @Insert("INSERT INTO user_infos (email, password, role) VALUES(#{email}, #{password}, #{role})")
     //@Options(useGeneratedKeys = true, keyProperty = "user_id")
     int insertUser(String email, String password, String role);
@@ -33,6 +33,8 @@ public interface UserMapper extends BaseMapper<User>{
     int updatePassword(String email, String password);
     @Update("UPDATE user_infos SET username = #{username},phone = #{phone},intro= #{intro} WHERE user_id = #{user_id}")
     int updateUserInfo(String username, String phone,String intro, int user_id);
+    @Update("UPDATE user_infos SET username = #{username},intro= #{intro} WHERE user_id = #{user_id}")
+    int updateWechatUserInfo(String username,String intro, int user_id);
     @Update("UPDATE user_infos SET username = #{username}, department=#{department}, role=#{role} WHERE user_id = #{user_id}")
     int adminUpdateUserInfo(String username, String department, String role, int user_id);
     @Update("UPDATE user_infos SET password = #{password} WHERE user_id = #{user_id}")

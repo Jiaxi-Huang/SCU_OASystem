@@ -43,10 +43,10 @@
       <div class="pagination">
         <el-pagination
           :current-page="param.page"
-          :page-size="param.limit"
+          :page-size="param.size"
           layout="sizes,prev,pager,next,total"
           :page-sizes="[10, 20, 50]"
-          :total="total"
+          :total="param.total"
           background
           @current-change="onCurrentChange"
           @size-change="onSizeChange"
@@ -92,7 +92,8 @@ export default defineComponent({
         d: '/role/delete'
       },
       param: {
-        limit: 10,
+        total: 0,
+        size: 10,
         page: 1
       },
       data: [
@@ -118,8 +119,6 @@ export default defineComponent({
       selectionRows: [] as { userId: number }[], // 假设 userId 是字符串或数字
       searchKeyword: '' // 添加 searchKeyword 变量
     })
-    // 动态计算total;
-    const total = computed(() => state.data.length)
     /**
      * @description 对数据进行排序
      */
@@ -159,14 +158,15 @@ export default defineComponent({
       if (adminUserInfo.status === 0) {
         state.data = adminUserInfo.data
         state.userIds = adminUserInfo.data.map((item: any) => item.userId)
+        state.param.total = state.data.length
       }
     }
-    const onCurrentChange = () => {
-      fetchData()
+    const onCurrentChange = (val:number) => {
+      state.param.page = val
     }
     const onSizeChange = (val: number) => {
-      state.param.limit = val
-      fetchData()
+      state.param.page = 1
+      state.param.size = val
     }
     const onCreate = () => {
       state.add_visible = true
@@ -185,7 +185,7 @@ export default defineComponent({
           item.userRole.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
           item.userDepartment.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
           item.userPhone.toLowerCase().includes(state.searchKeyword.toLowerCase())
-      ) : sortData();
+      ).slice((state.param.page-1)*state.param.size, state.param.page*state.param.size) : sortData().slice((state.param.page-1)*state.param.size, state.param.page*state.param.size);
     }
     const onSearch = () => {
       if (state.searchKeyword != '') {
@@ -197,9 +197,12 @@ export default defineComponent({
             item.userDepartment.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
             item.userPhone.toLowerCase().includes(state.searchKeyword.toLowerCase())
         );
+        state.param.total = state.filteredData.length
       }
       else{
         state.is_search = false
+        state.param.page = 1; // 重置页码为第一页
+        state.param.total = state.data.length
       }
     }
       const onEdit = (index: any, row: any) => {
@@ -315,11 +318,7 @@ export default defineComponent({
     }
       // 使用 watch 监视 searchKeyword 的变化
       watch(() => state.searchKeyword, (newVal) => {
-        if (newVal !== '') {
           onSearch()
-        } else {
-          state.is_search = false
-        }
       })
       //初始调用
       onMounted(() => {
@@ -328,7 +327,6 @@ export default defineComponent({
       })
       return {
         ...toRefs(state),
-        total,
         displayData,
         handleSelectionChange,
         onCurrentChange,
