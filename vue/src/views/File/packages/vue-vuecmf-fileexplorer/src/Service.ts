@@ -418,7 +418,7 @@ export default class Service {
                     if (res) {
                         let fileType=res.data[0]
                         this.config.file.path = '/' + this.config.folder.searchData[-fileType].title
-                        if(nodeData.pid != -0&&nodeData.pid != -1&&nodeData.pid != -2){
+                        if(nodeData.id != 0&&nodeData.id != -1&&nodeData.id != -2){
                             this.config.file.path = '/' + this.config.folder.searchData[-fileType].title +  '/' + this.getSearchFolderPath(nodeData.title, nodeData.pid)
                         }
                     } else {
@@ -464,6 +464,7 @@ export default class Service {
     getSearchFolderPath = (path:string, pid: number):string => {
         let item=this.searchById(this.config.folder.searchData,pid)
         if(item.id != -0&&item.id != -1&&item.id != -2){
+            console.log(item)
                        path = this.getSearchFolderPath(item.title + '/' +  path, item.pid)
                    }
         return path

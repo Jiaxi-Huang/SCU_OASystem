@@ -44,16 +44,21 @@ public class FileController {
     public ResponseBase loadFile(@RequestBody adminUserInfoRequest request,@RequestParam String dir_id) {
         ResponseBase res = new ResponseBase();
         try {
+
             String accessToken = request.getAccessToken();
             int userId = accessService.getAuthenticatedId(accessToken);
             List<Files> records = fileService.getFile();
             User userInfo = userMapper.findByUserId(userId);
             int FolderType =folderController.judgeFolder(Integer.parseInt(dir_id));
+
             for (Files record : records) {
+
                 User fileUser=userMapper.findByUserId(record.getUserId());
+
                 record.setUserName(fileUser.getUsername());
                 res.pushData(record);
             }
+
             res.pushData(FolderType);
             res.pushData(userInfo.getUserId());
             res.pushData(userInfo.getDepartment());

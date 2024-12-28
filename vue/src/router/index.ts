@@ -836,7 +836,33 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
         }
       }
     ]
-  }
+  },
+    {
+        path: '/attendance',
+        component: layout,
+        redirect: '/attendance/attendanceManage',
+        meta: {
+            title: {
+                '/zh-CN': '考勤管理',
+                '/en-US': 'Attendance Manage'
+            },
+            icon: 'ic ic-barrage-fill'
+        },
+        children: [
+            {
+                path: '/attendance/attendanceManage',
+                name: 'attendance_record',
+                component: () => import(/* webpackChunkName: "personalCenter" */ '@/views/attendance/attendanceManage.vue'),
+                meta: {
+                    title: {
+                        '/zh-CN': '考勤管理',
+                        '/en-US': 'Attendance Manage'
+                    },
+                    icon: 'ic ic-barrage-fill'
+                }
+            }
+        ]
+    }
 ]
 const router = createRouter({
   history: createWebHashHistory(), // hash模式：createWebHashHistory，history模式：createWebHistory
