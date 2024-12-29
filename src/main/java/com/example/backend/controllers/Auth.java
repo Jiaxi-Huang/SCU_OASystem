@@ -147,7 +147,7 @@ public class Auth {
                     List<String> authedRoutes = Arrays.asList(
                             "/dashboard", "/guide", "/menu","/dragable", "/calendar", "/menu", "/upload", "/personal",
                             "/copy","/zip", "/excel", "/table", "/projectboard","/qrcode","/cropper", "/editor","/log",
-                            "/role","/worker","/leaveApproval","/reimbursement","/todoList", "/meetings","/file","/MyCalender"
+                            "/role","/worker","/leaveApproval","/reimbursement","/todoList", "/meetings","/file","/MyCalender","/attendance"
                     );
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
