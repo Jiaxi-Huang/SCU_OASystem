@@ -862,6 +862,32 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
                 }
             }
         ]
+    },
+    {
+        path: '/personalAttendance',
+        component: layout,
+        redirect: '/personalAttendance/personalAttendance',
+        meta: {
+            title: {
+                '/zh-CN': '考勤打卡',
+                '/en-US': 'personalAttendance'
+            },
+            icon: 'ic ic-barrage-fill'
+        },
+        children: [
+            {
+                path: '/personalAttendance/personalAttendance',
+                name: 'personalAttendance',
+                component: () => import(/* webpackChunkName: "personalCenter" */ '@/views/attendance/attendance.vue'),
+                meta: {
+                    title: {
+                        '/zh-CN': '考勤打卡',
+                        '/en-US': 'personalAttendance'
+                    },
+                    icon: 'ic ic-barrage-fill'
+                }
+            }
+        ]
     }
 ]
 const router = createRouter({

@@ -19,5 +19,7 @@ public class Attendance {
     private String userName;
     private String department;
     private String role;
-    private String location;
+    private String inLocation;
+    private String outLocation;
+    private String accessToken;
 }

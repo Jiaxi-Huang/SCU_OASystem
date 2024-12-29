@@ -4,11 +4,7 @@
       <el-form-item label="员工名" prop="userName">
         <el-input v-model="form.userName" placeholder="请输入员工名"></el-input>
       </el-form-item>
-      <el-form-item label="考勤位置" prop="location">
-        <el-select v-model="form.location" placeholder="请选择位置">
-          <el-option v-for="location in locations" :key="location.value" :label="location.label" :value="location.value"></el-option>
-        </el-select>
-      </el-form-item>
+
       <el-form-item label="考勤日期">
         <div>
           <el-col :span="30">
@@ -26,6 +22,11 @@
           ></el-time-picker>
         </el-col>
       </el-form-item>
+      <el-form-item label="上班打卡位置" prop="inLocation"  >
+        <el-select v-model="form.inLocation" placeholder="请选择位置" >
+          <el-option v-for="inLocation in locations" :key="inLocation.value" :label="inLocation.label" :value="inLocation.value"></el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="下班打卡时间">
         <el-col :span="12">
           <el-time-picker v-model="form.checkOut" placeholder="选择时间" style="width: 100%"
@@ -33,7 +34,11 @@
           ></el-time-picker>
         </el-col>
       </el-form-item>
-
+      <el-form-item label="下班打卡位置" prop="outLocation">
+        <el-select v-model="form.outLocation" placeholder="请选择位置">
+          <el-option v-for="outLocation in locations" :key="outLocation.value" :label="outLocation.label" :value="outLocation.value"></el-option>
+        </el-select>
+      </el-form-item>
       <el-row class="btn-container">
         <el-button size="mini" type="primary" @click="submitForm()"> <i class="fa fa-plus"> </i> 新增 </el-button>
       </el-row>
@@ -52,22 +57,26 @@ export default defineComponent({
         { required: true, message: '请输入员工名', trigger: 'blur' },
       ],
       attendanceDate: [
-        { required: true, message: '请选择部门', trigger: 'change' },
+        { required: true, message: '请选择考勤日期', trigger: 'change' },
       ],
       checkIn: [
-        { required: true, message: '请输入员工职能', trigger: 'change' },
+        { required: true, message: '请输入上班考勤时间', trigger: 'change' },
       ],
       checkOut: [
-        { required: true, message: '请输入员工职能', trigger: 'change' },
+        { required: true, message: '请输入下班考勤时间', trigger: 'change' },
       ],
-      location: [
-        { required: true, message: '请输入员工职能', trigger: 'change' },
+      inLocation: [
+        { required: false, message: '请输入上班考勤位置', trigger: 'change' },
+      ],
+      outLocation: [
+        { required: false, message: '请输入下班考勤位置', trigger: 'change' },
       ],
     }
     const locations = [
+      { value: '内网ip', label: '内网ip' },
       { value: '成都', label: '成都' },
       { value: '上海', label: '上海' },
-      { value: '北京', label: '北京' }
+      { value: '北京', label: '北京' },
     ]
     const url = `/role/add`
     const formRef = ref()
@@ -78,7 +87,8 @@ export default defineComponent({
         attendanceDate: '',
         checkIn: '',
         checkOut:'',
-        location:''
+        inLocation:'',
+        outLocation:''
       },
       loading: false
     })
@@ -93,7 +103,8 @@ export default defineComponent({
             attendanceDate: state.form.attendanceDate,
             checkIn: state.form.checkIn,
             checkOut: state.form.checkOut,
-            location: state.form.location
+            inLocation: state.form.inLocation,
+            outLocation: state.form.outLocation
           }
           const res = await Service.postAddAttendance(data)
           if(res.status ===0) {

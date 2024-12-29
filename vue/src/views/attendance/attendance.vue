@@ -4,27 +4,12 @@
     <el-alert title="Tips:权限控制体验：【管理员账号为：admin@outlook.com】、【超级管理员账号为：super@outlook.com】" type="info"> </el-alert>
     <el-card class="card-ctrl">
       <el-row style="margin: 15px">
-        <el-col :span="24" class="page-title-box">
-          <h4 class="page-title">当天考勤情况</h4>
-          <div class="page-title-right">
-            <div style="margin-right: 10px">
-              <!-- 在日期选择后触发 fetchData 函数 -->
-              <el-date-picker v-model="pickDate" type="date" placeholder="选择日期" @change="fetchData"></el-date-picker>
-            </div>
-          </div>
-        </el-col>
+
       </el-row>
       <el-row>
         <el-col :span="10" style="text-align: left">
-          <el-button type="primary" size="medium" @click="onCreate"><el-icon><plus /></el-icon>新增考勤</el-button>
-          <el-button type="info" size="medium" @click="onExport"><el-icon><download /></el-icon>导出列表</el-button>
-          <el-button type="info" size="medium" @click="onPrint"><el-icon><printer /></el-icon>打印列表</el-button>
-        </el-col>
-        <el-col :span="14" style="text-align: right">
-          <el-input
-              v-model="searchKeyword"
-              placeholder="请输入关键词"            style="width: 200px; margin-right: 10px"
-          ></el-input>
+          <el-button type="primary" size="medium" @click="onCheckIn">上班打卡</el-button>
+          <el-button type="primary" size="medium" @click="onCheckOut">下班打卡</el-button>
         </el-col>
       </el-row>
 
@@ -36,10 +21,12 @@
         <el-table-column prop="userName" label="用户名" align="center" sortable @sort-change="handleSortChange"></el-table-column>
         <el-table-column prop="department" label="部门" align="center" sortable @sort-change="handleSortChange"></el-table-column>
         <el-table-column prop="role" label="职位" align="center" sortable @sort-change="handleSortChange"></el-table-column>
+        <el-table-column prop="attendanceDate" label="日期" align="center" sortable @sort-change="handleSortChange"></el-table-column>
         <el-table-column prop="checkIn" label="上班打卡时间" align="center" sortable @sort-change="handleSortChange"></el-table-column>
         <el-table-column prop="inLocation" label="上班打卡位置" align="center" sortable @sort-change="handleSortChange"></el-table-column>
         <el-table-column prop="checkOut" label="下班打卡时间" align="center" sortable @sort-change="handleSortChange"></el-table-column>
         <el-table-column prop="outLocation" label="下班打卡位置" align="center" sortable @sort-change="handleSortChange"></el-table-column>
+
         <el-table-column
             prop="status"
             label="考勤状态"
@@ -58,43 +45,8 @@
             <el-tag :type="scope.row.status === 2 ? 'primary' : 'success'" disable-transitions>{{ scope.row.status }}</el-tag>
           </template>
         </el-table-column>
-
-        <el-table-column label="操作" align="center">
-          <template #default="scope">
-            <el-tooltip class="item" effect="dark" content="信息修改" placement="bottom">
-              <el-button circle plain type="primary" size="small" @click="onEdit(scope.$index, scope.row)">
-                <el-icon><edit /></el-icon>
-              </el-button>
-            </el-tooltip>
-            <el-tooltip  class="item" effect="dark" content="删除" placement="bottom">
-              <el-button circle plain type="danger" size="small" @click="onDelete(scope.$index, scope.row)">
-                <el-icon><minus /></el-icon>
-              </el-button>
-            </el-tooltip>
-          </template>
-        </el-table-column>
       </el-table>
-      <div class="pagination">
-        <el-pagination
-            :current-page="param.page"
-            :page-size="param.size"
-            layout="sizes,prev,pager,next,total"
-            :page-sizes="[2,10, 20, 50]"
-            :total="param.total"
-            background
-            @current-change="onCurrentChange"
-            @size-change="onSizeChange"
-        >
-        </el-pagination>
-      </div>
     </el-card>
-
-    <el-dialog v-model="edit_visible" center :title="posted.userRow.userRole">
-      <role-edit :current-row="posted.userRow" @success="onEditSuccess"></role-edit>
-    </el-dialog>
-    <el-dialog v-model="add_visible" title="新增考勤">
-      <role-new @success="onCreateSuccess"></role-new>
-    </el-dialog>
   </div>
 </template>
 <script lang="ts">
@@ -104,7 +56,7 @@ import {Download, Edit, Minus, Plus, Printer, Refresh, Search} from '@element-pl
 import RoleEdit from './attendanceEdit.vue'
 import RoleNew from './attendanceNew.vue'
 import Service from './api/index'
-import {AnyObject} from "@/views/File/packages/vue-vuecmf-fileexplorer/src/typings/vuecmf";
+
 
 export default defineComponent({
   name: 'RoleManage',
@@ -160,11 +112,88 @@ export default defineComponent({
       },
       sortField : '',
       sortOrder : '',
-      ids: [] as { id: number }[],
-      selectionRows: [] as { id: number }[], // 假设 userId 是字符串或数字
-      searchKeyword: '' ,// 添加 searchKeyword 变量
-      pickDate:new Date().toISOString().split('T')[0]
+      userIds: [] as { userId: number }[],
+      selectionRows: [] as { userId: number }[], // 假设 userId 是字符串或数字
+      searchKeyword: '' // 添加 searchKeyword 变量
     })
+    const onCheckIn = async () => {
+      try {
+        const confirm = await ElMessageBox.confirm('上班打卡, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        });
+
+        if (confirm) {
+          const data = {'accessToken': sessionStorage.getItem('accessToken')};
+          const res = await Service.postCheckInAttendance(data.accessToken);
+
+          if (res.status === 0) {
+            ElMessage({
+              type: 'success',
+              message: '上班打卡成功'
+            });
+            fetchData(); // 重新获取数据
+          } else if (res.status === -1) {
+            ElMessage({
+              type: 'warning',
+              message: '已经上班打卡过了'
+            });
+          } else {
+            ElMessage({
+              type: 'error',
+              message: '打卡失败'
+            });
+          }
+        }
+      } catch (error) {
+        console.log(error);
+        ElMessage({
+          type: 'info',
+          message: '已取消打卡'
+        });
+      }
+    };
+
+
+    const onCheckOut = async () => {
+      ElMessageBox.confirm('下班打卡, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+          .then(async () => {
+            const data = {'accessToken': sessionStorage.getItem('accessToken')}
+            const res = await Service.postCheckOutAttendance(data.accessToken);
+            if (res.status === 0) {
+              ElMessage({
+                type: 'success',
+                message: '下班打卡成功'
+              })
+              fetchData()
+            }
+            else if(res.status === -1){
+              ElMessage({
+                type: 'warning',
+                message: '已经下班打卡过了'
+              })
+            }
+            else{
+              ElMessage({
+                type: 'error',
+                message: '打卡失败'
+              })
+            }
+          })
+          .catch(() => {
+            ElMessage({
+              type: 'info',
+              message: '已取消打卡'
+            })
+          })
+    }
+
+
 
     /**
      * @description 对数据进行排序
@@ -192,7 +221,7 @@ export default defineComponent({
      * @description 获取选择行的userId列表
      */
     const handleSelectionChange = (selection:any[]) => {
-      state.selectionRows = selection.map(item => item.id)
+      state.selectionRows = selection.map(item => item.userId)
       console.log("SelectionRows",state.selectionRows)
     }
     /**
@@ -201,11 +230,10 @@ export default defineComponent({
     const fetchData = async () => {
       state.is_search = false
       const data = {'accessToken': sessionStorage.getItem('accessToken')}
-      console.log(state.pickDate)
-      const adminUserInfo = await Service.postAttendanceList(state.pickDate)
+      const adminUserInfo = await Service.postPersonalAttendance(data)
       if (adminUserInfo.status === 0) {
         state.data = adminUserInfo.data
-        state.ids = adminUserInfo.data.map((item: any) => item.id)
+        state.userIds = adminUserInfo.data.map((item: any) => item.userId)
         state.param.total = state.data.length
       }
     }
@@ -231,7 +259,8 @@ export default defineComponent({
       return state.is_search ? sortData().filter(item =>
           item.userName.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
           item.userRole.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-          item.userDepartment.toLowerCase().includes(state.searchKeyword.toLowerCase())
+          item.userDepartment.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
+          item.userPhone.toLowerCase().includes(state.searchKeyword.toLowerCase())
       ).slice((state.param.page-1)*state.param.size, state.param.page*state.param.size) : sortData().slice((state.param.page-1)*state.param.size, state.param.page*state.param.size);
     }
     const onSearch = () => {
@@ -241,7 +270,8 @@ export default defineComponent({
         state.filteredData = state.data.filter(item =>
             item.userName.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
             item.userRole.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-            item.userDepartment.toLowerCase().includes(state.searchKeyword.toLowerCase())
+            item.userDepartment.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
+            item.userPhone.toLowerCase().includes(state.searchKeyword.toLowerCase())
         );
         state.param.total = state.filteredData.length
       }
@@ -303,12 +333,12 @@ export default defineComponent({
         type: 'info'
       }).then(async() => {
         // 确认后调用获取 PDF 的方法
-        const ids = state.selectionRows.length > 0 ? state.selectionRows : state.ids
+        const userIds = state.selectionRows.length > 0 ? state.selectionRows : state.userIds
         const data ={
           'accessToken': sessionStorage.getItem('accessToken'),
-          'user_ids': ids
+          'user_ids': userIds
         }
-        Service.postAdminExportAttendance(data).then(() => {
+        Service.postAdminExportUser(data).then(() => {
           ElMessage({
             type: 'success',
             message: 'Excel 文件正在下载...'
@@ -336,12 +366,12 @@ export default defineComponent({
         type: 'info'
       }).then(async() => {
         // 确认后调用获取 PDF 的方法
-        const ids = state.selectionRows.length > 0 ? state.selectionRows : state.ids
+        const userIds = state.selectionRows.length > 0 ? state.selectionRows : state.userIds
         const data ={
           'accessToken': sessionStorage.getItem('accessToken'),
-          'user_ids': ids
+          'user_ids': userIds
         }
-        Service.postAdminPrintAttendance(data).then(() => {
+        Service.postAdminPrintUser(data).then(() => {
           ElMessage({
             type: 'success',
             message: 'PDF 文件正在下载...'
@@ -389,6 +419,8 @@ export default defineComponent({
       fetchData,
       handleSortChange,
       filterStatus,
+      onCheckIn,
+      onCheckOut
     }
   }
 })

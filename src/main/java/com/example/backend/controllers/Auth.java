@@ -172,7 +172,7 @@ public class Auth {
                 } else {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
-                            "/meetings","/todoList","/leaveApproval","/reimbursement","/file", "/MyCalender","/personal");
+                            "/meetings","/todoList","/leaveApproval","/reimbursement","/file", "/MyCalender","/personal","/personalAttendance");
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
                             0,
