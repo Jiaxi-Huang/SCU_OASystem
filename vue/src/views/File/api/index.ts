@@ -23,9 +23,14 @@ class Service {
      * @description POST 用户登录接口
      */
     static loadFile(dir_id:any) {
-        const data = {'accessToken':sessionStorage.getItem('accessToken')}
+        const data =
+            {
+                acsTkn:sessionStorage.getItem('accessToken'),
+                dirId:dir_id
+            }
+
         return request({
-            url: `${fileApi.localHost + fileApi.loadFile}?dir_id=${dir_id}`,
+            url:fileApi.localHost + fileApi.loadFile,
             //传递文件夹指向，确定是个人还是部门还是公司
             method: 'POST',
             json: true,
