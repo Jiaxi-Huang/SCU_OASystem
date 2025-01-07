@@ -160,7 +160,7 @@ public class Auth {
                 } else if (roleName.equals("manager")) {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
-                            "/worker", "/todoList", "/reimbursement","/meetings","/leaveApproval","/file","/MyCalender","/personal");
+                            "/worker", "/todoList", "/reimbursement","/meetings","/leaveApproval","/file","/MyCalender","/personal","/personalAttendance");
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
                             0,

@@ -49,7 +49,7 @@
 import { defineComponent, reactive, toRefs, ref } from 'vue'
 import Service from './api/index'
 export default defineComponent({
-  name: 'RoleNew',
+  name: 'attendanceNew',
   emits: ['success'],
   setup(props, { emit }) {
     const rules = {
@@ -78,7 +78,7 @@ export default defineComponent({
       { value: '上海', label: '上海' },
       { value: '北京', label: '北京' },
     ]
-    const url = `/role/add`
+    const url = `/attendance/add`
     const formRef = ref()
     // 只将响应式数据进行响应式处理
     const state = reactive({
