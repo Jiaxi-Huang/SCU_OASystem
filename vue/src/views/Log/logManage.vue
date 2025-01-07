@@ -2,11 +2,13 @@
   <div>
     <el-card class="card-ctrl">
       <el-row>
-        <el-col :span="10" style="text-align: left">
+        <el-col :span="14" style="text-align: left">
+          <el-button type="danger" size="medium" @click="onDelete"><el-icon><delete /></el-icon>批量删除</el-button>
           <el-button type="info" size="medium" @click="onExport"><el-icon><download /></el-icon>导出操作日志</el-button>
           <el-button type="info" size="medium" @click="onPrint"><el-icon><printer /></el-icon>打印操作日志</el-button>
+          <el-button type="success" size="medium" @click="onStatistic"><el-icon><odometer /></el-icon>统计信息</el-button>
         </el-col>
-        <el-col :span="14" style="text-align: right">
+        <el-col :span="10" style="text-align: right">
           <el-input
               v-model="searchKeyword"
               placeholder="请输入关键词"            style="width: 200px; margin-right: 10px"
@@ -15,10 +17,20 @@
       </el-row>
       <br />
       <el-table v-loading="loading" :data="displayData()" stripe class="table" @selection-change="handleSelectionChange">
+        <el-table-column type="selection" width="55" align="center" sortable @sort-change="handleSortChange"></el-table-column>
         <el-table-column prop="id" label="操作ID" align="center" sortable @sort-change="handleSortChange"></el-table-column>
         <el-table-column prop="userId" label="用户ID" align="center" sortable @sort-change="handleSortChange"></el-table-column>
         <el-table-column prop="logContent" label="操作内容" align="center" sortable @sort-change="handleSortChange"></el-table-column>
         <el-table-column prop="logDate" label="操作时间" align="center" sortable @sort-change="handleSortChange"></el-table-column>
+        <el-table-column label="操作" align="center">
+          <template #default="scope">
+            <el-tooltip class="item" effect="dark" content="详情" placement="bottom">
+              <el-button circle plain type="info" size="small" @click="onDetail(scope.$index, scope.row)">
+                <el-icon><InfoFilled /></el-icon>
+              </el-button>
+            </el-tooltip>
+          </template>
+        </el-table-column>
       </el-table>
       <div class="pagination">
         <el-pagination
@@ -34,17 +46,29 @@
         </el-pagination>
       </div>
     </el-card>
+    <el-dialog v-model="detail_visible" center title="日志信息详情">
+      <log-detail :current-row="posted.logRow"></log-detail>
+    </el-dialog>
+    <el-dialog v-model="statistic_visible" center title="统计信息">
+      <log-statistic :data="data"></log-statistic>
+    </el-dialog>
   </div>
 </template>
 <script lang="ts">
 import {defineComponent, reactive, toRefs, computed, onMounted, watch} from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import {Download, Edit, Minus, Plus, Printer, Refresh} from '@element-plus/icons-vue'
+import {Delete, Download, Edit, InfoFilled, Minus, Odometer, Plus, Printer, Refresh} from '@element-plus/icons-vue'
 import Service from './api/index'
+import LogStatistic from "./components/logsStatistic.vue";
+import LogDetail from "./components/logsDetail.vue";
 
 export default defineComponent({
   name: 'LogManage',
   components: {
+    LogDetail, LogStatistic,
+    Delete,
+    Odometer,
+    InfoFilled,
     Printer,
     Download,
     Edit,
@@ -69,11 +93,10 @@ export default defineComponent({
       filteredData: [],
       loading: false,
       is_search: false,
-      add_visible: false,
-      edit_visible: false,
       detail_visible: false,
+      statistic_visible: false,
       posted: {
-        userRow: {
+        logRow: {
           id: null,
           userId: null,
           logContent: '',
@@ -120,10 +143,10 @@ export default defineComponent({
     const fetchData = async () => {
       state.is_search = false
       const data = {'accessToken': sessionStorage.getItem('accessToken')}
-      const adminUserInfo = await Service.postAdminQueryLogList(data)
-      if (adminUserInfo.status === 0) {
-        state.data = adminUserInfo.data
-        state.ids = adminUserInfo.data.map((item:any) => item.id)
+      const adminLogInfo = await Service.postAdminQueryLogList(data)
+      if (adminLogInfo.status === 0) {
+        state.data = adminLogInfo.data
+        state.ids = adminLogInfo.data.map((item:any) => item.id)
         state.param.total = state.data.length
       }
 
@@ -135,16 +158,13 @@ export default defineComponent({
       state.param.page = 1
       state.param.size = val
     }
-    const onCreate = () => {
-      state.add_visible = true
-    }
-    const onCreateSuccess = (val: any) => {
-      state.add_visible = false
-      fetchData()
-    }
-    const onEditSuccess = () => {
-      state.edit_visible = false
-      fetchData()
+    const onDetail = (index: any, row: any) => {
+      console.log('row', row)
+      state.posted.logRow.id = row.id
+      state.posted.logRow.userId = row.userId
+      state.posted.logRow.logContent = row.logContent
+      state.posted.logRow.logDate = row.logDate
+      state.detail_visible = true
     }
     const displayData = () => {
       return state.is_search ? sortData().filter(item =>
@@ -168,16 +188,17 @@ export default defineComponent({
         state.param.total = state.data.length
       }
     }
-      const useConfirmDelete = async (row: any) => {
-        ElMessageBox.confirm('此操作将删除该条操作日志, 是否继续?', '提示', {
+      const useConfirmDelete = async() => {
+        ElMessageBox.confirm('此操作将删除这些操作日志（你的删除行为依然会被记录）, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         })
             .then(async () => {
               // 此处执行接口异步删除日志
+              const ids = state.selectionRows.length > 0 ? state.selectionRows : state.ids
               const data = {
-                id: row.id,
+                ids: ids,
                 accessToken: sessionStorage.getItem('accessToken')
               }
               const res = await Service.postAdminDeleteLog(data);
@@ -186,7 +207,7 @@ export default defineComponent({
                   type: 'success',
                   message: '删除成功'
                 })
-                fetchData()
+                await fetchData()
               } else {
                 ElMessage({
                   type: 'error',
@@ -201,9 +222,8 @@ export default defineComponent({
               })
             })
       }
-      const onDelete = (index: any, row: any) => {
-        console.log(index, row)
-        useConfirmDelete(row)
+      const onDelete = async() => {
+        await useConfirmDelete()
       }
     /**
      * @description 导出列表所选行
@@ -271,6 +291,9 @@ export default defineComponent({
         });
       });
     }
+    const onStatistic = async()=>{
+      state.statistic_visible = true
+    }
       // 使用 watch 监视 searchKeyword 的变化
       watch(() => state.searchKeyword, (newVal) => {
           onSearch()
@@ -286,13 +309,13 @@ export default defineComponent({
         handleSelectionChange,
         onCurrentChange,
         onSizeChange,
-        onCreate,
-        onCreateSuccess,
-        onEditSuccess,
+        onDetail,
+        useConfirmDelete,
         onDelete,
         onSearch,
         onExport,
         onPrint,
+        onStatistic,
         fetchData,
         handleSortChange
       }

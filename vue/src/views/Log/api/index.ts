@@ -53,7 +53,7 @@ class Service {
           const url = window.URL.createObjectURL(res);
           const link = document.createElement('a');
           link.href = url;
-          link.setAttribute('download', '用户列表_' + new Date().getTime() + '.xls'); // 设置下载文件名
+          link.setAttribute('download', '操作日志_' + new Date().getTime() + '.xls'); // 设置下载文件名
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link); // 清理
@@ -82,7 +82,7 @@ class Service {
           const url = window.URL.createObjectURL(res);
           const link = document.createElement('a');
           link.href = url;
-          link.setAttribute('download', '用户列表_' + new Date().getTime() + '.pdf'); // 设置下载文件名
+          link.setAttribute('download', '操作日志_' + new Date().getTime() + '.pdf'); // 设置下载文件名
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link); // 清理

@@ -1,13 +1,12 @@
 <template>
   <div>
-    <el-alert title="Tips:点击【新增】按钮进行新增员工；点击【编辑】按钮，对员工的部门以及职能信息进行操作！" type="warning"> </el-alert>
-    <el-alert title="Tips:权限控制体验：【管理员账号为：admin@outlook.com】、【超级管理员账号为：super@outlook.com】" type="info"> </el-alert>
     <el-card class="card-ctrl">
       <el-row>
         <el-col :span="10" style="text-align: left">
           <el-button type="primary" size="medium" @click="onCreate"><el-icon><plus /></el-icon>新增用户</el-button>
           <el-button type="info" size="medium" @click="onExport"><el-icon><download /></el-icon>导出列表</el-button>
           <el-button type="info" size="medium" @click="onPrint"><el-icon><printer /></el-icon>打印列表</el-button>
+          <el-button type="success" size="medium" @click="onStatistic"><el-icon><odometer /></el-icon>统计信息</el-button>
         </el-col>
         <el-col :span="14" style="text-align: right">
           <el-input
@@ -27,7 +26,12 @@
 
         <el-table-column label="操作" align="center">
           <template #default="scope">
-            <el-tooltip class="item" effect="dark" content="信息修改" placement="bottom">
+            <el-tooltip class="item" effect="dark" content="详情" placement="bottom">
+              <el-button circle plain type="info" size="small" @click="onDetail(scope.$index, scope.row)">
+                <el-icon><InfoFilled /></el-icon>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip class="item" effect="dark" content="修改" placement="bottom">
               <el-button circle plain type="primary" size="small" @click="onEdit(scope.$index, scope.row)">
                 <el-icon><edit /></el-icon>
               </el-button>
@@ -54,7 +58,12 @@
         </el-pagination>
       </div>
     </el-card>
-
+    <el-dialog v-model="detail_visible" center title="员工信息详情">
+      <role-detail :current-row="posted.userRow"></role-detail>
+    </el-dialog>
+    <el-dialog v-model="statistic_visible" center title="统计信息">
+      <role-statistic :data="data"></role-statistic>
+    </el-dialog>
     <el-dialog v-model="edit_visible" center :title="posted.userRow.userRole">
       <role-edit :current-row="posted.userRow" @success="onEditSuccess"></role-edit>
     </el-dialog>
@@ -64,24 +73,30 @@
   </div>
 </template>
 <script lang="ts">
-import {defineComponent, reactive, toRefs, computed, onMounted, watch} from 'vue'
+import {defineComponent, reactive, toRefs, computed, onMounted, watch, nextTick} from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import {Download, Edit, Minus, Plus, Printer, Refresh} from '@element-plus/icons-vue'
-import RoleEdit from './rolesEdit.vue'
-import RoleNew from './rolesNew.vue'
+import {Download, Edit, InfoFilled, Minus, Plus, Printer, Refresh, Odometer} from '@element-plus/icons-vue'
+import RoleDetail from './components/rolesDetail.vue'
+import RoleEdit from './components/rolesEdit.vue'
+import RoleNew from './components/rolesNew.vue'
+import RoleStatistic from "./components/rolesStatistic.vue"
 import Service from './api/index'
 
 export default defineComponent({
   name: 'RoleManage',
   components: {
+    InfoFilled,
     Printer,
     Download,
+    RoleDetail,
     RoleEdit,
     RoleNew,
+    RoleStatistic,
     Edit,
     Minus,
     Plus,
-    Refresh
+    Refresh,
+    Odometer
   },
   setup() {
     const state = reactive({
@@ -105,12 +120,16 @@ export default defineComponent({
       add_visible: false,
       edit_visible: false,
       detail_visible: false,
+      statistic_visible: false,
       posted: {
         userRow: {
           userId: null,
           userName: '',
           userRole: '',
-          userDepartment: ''
+          userDepartment: '',
+          userEmail: '',
+          userPhone: '',
+          userAvatar: '',
         }
       },
       sortField : '',
@@ -204,6 +223,17 @@ export default defineComponent({
         state.param.page = 1; // 重置页码为第一页
         state.param.total = state.data.length
       }
+    }
+    const onDetail = (index: any, row: any) => {
+      console.log('row', row)
+      state.posted.userRow.userId = row.userId
+      state.posted.userRow.userName = row.userName
+      state.posted.userRow.userRole = row.userRole
+      state.posted.userRow.userDepartment = row.userDepartment
+      state.posted.userRow.userEmail = row.userEmail
+      state.posted.userRow.userPhone = row.userPhone
+      state.posted.userRow.userAvatar = row.userAvatar
+      state.detail_visible = true
     }
       const onEdit = (index: any, row: any) => {
         console.log('row', row)
@@ -316,6 +346,9 @@ export default defineComponent({
         });
       });
     }
+    const onStatistic = async()=>{
+      state.statistic_visible = true
+    }
       // 使用 watch 监视 searchKeyword 的变化
       watch(() => state.searchKeyword, (newVal) => {
           onSearch()
@@ -334,11 +367,13 @@ export default defineComponent({
         onCreate,
         onCreateSuccess,
         onEditSuccess,
+        onDetail,
         onEdit,
         onDelete,
         onSearch,
         onExport,
         onPrint,
+        onStatistic,
         fetchData,
         handleSortChange
       }

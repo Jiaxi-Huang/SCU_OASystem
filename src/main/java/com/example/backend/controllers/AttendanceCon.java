@@ -8,6 +8,7 @@ import com.example.backend.services.AccessService;
 import com.example.backend.services.AttendanceService;
 
 import com.example.backend.services.UserService;
+import com.example.backend.services.utils.IpUtil;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Font;

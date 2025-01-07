@@ -23,7 +23,7 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, watchEffect, reactive, toRef, toRefs } from 'vue'
 import { useStore } from '@/store'
-import Service from './api/index'
+import Service from '../api'
 import {ElMessage} from "element-plus";
 
 interface stateTypes {

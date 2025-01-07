@@ -22,7 +22,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, reactive, toRefs, ref } from 'vue'
-import Service from './api/index'
+import Service from '../api'
 export default defineComponent({
   name: 'RoleNew',
   emits: ['success'],
