@@ -1,44 +1,29 @@
-/*
-Navicat MySQL Data Transfer
+-- 使用数据库
+USE oa_database;
 
-Source Server         : localhost
-Source Server Version : 80040
-Source Host           : localhost:3306
-Source Database       : oa_database
+-- 插入成都从 2025-01-01 到 2025-01-08 的天气数据
+INSERT INTO weather (city, temperature, humidity, wind, win, win_meter, visibility, pressure, air, air_pm25, air_level, creator_id, creator, date)
+VALUES
+-- 2025-01-01
+('成都', '5~12', '晴', '2级', '北风', '7km/h', '30km', '1007', '67', '37', '良', '60065', '桑郎平措', '2025-01-01'),
 
-Target Server Type    : MYSQL
-Target Server Version : 80040
-File Encoding         : 65001
+-- 2025-01-02
+('成都', '6~13', '多云', '3级', '南风', '10km/h', '25km', '1005', '50', '25', '优', '60065', '桑郎平措', '2025-01-02'),
 
-Date: 2024-12-19 20:26:55
-*/
+-- 2025-01-03
+('成都', '4~10', '阴', '2级', '东风', '8km/h', '20km', '1008', '80', '45', '良', '60065', '桑郎平措', '2025-01-03'),
 
-SET FOREIGN_KEY_CHECKS=0;
+-- 2025-01-04
+('成都', '3~9', '小雨', '4级', '西风', '12km/h', '15km', '1006', '90', '55', '轻度污染', '60065', '桑郎平措', '2025-01-04'),
 
--- ----------------------------
--- Table structure for weather
--- ----------------------------
-DROP TABLE IF EXISTS `weather`;
-CREATE TABLE `weather` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `city` varchar(100) DEFAULT NULL,
-  `temperature` varchar(10) DEFAULT NULL,
-  `humidity` varchar(10) DEFAULT NULL,
-  `wind` varchar(50) DEFAULT NULL,
-  `creator_id` varchar(50) DEFAULT NULL,
-  `creator` varchar(100) DEFAULT NULL,
-  `create_time` datetime DEFAULT NULL,
-  `date` date DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+-- 2025-01-05
+('成都', '2~8', '雪', '3级', '北风', '9km/h', '10km', '1004', '100', '65', '中度污染', '60065', '桑郎平措', '2025-01-05'),
 
--- ----------------------------
--- Records of weather
--- ----------------------------
-INSERT INTO `weather` VALUES ('12', '成都', '5~10', '多云', '1级', '60065', '桑郎平措', null, '2024-12-19');
-INSERT INTO `weather` VALUES ('13', '成都', '5~10', '阴', '1级', '60065', '桑郎平措', null, '2024-12-18');
-INSERT INTO `weather` VALUES ('14', '成都', '5~10', '晴', '1级', '60065', '桑郎平措', null, '2024-12-17');
-INSERT INTO `weather` VALUES ('15', '成都', '5~10', '多雨', '1级', '60065', '桑郎平措', null, '2024-12-16');
-INSERT INTO `weather` VALUES ('16', '成都', '5~10', '小雨', '1级', '60065', '桑郎平措', null, '2024-12-15');
-INSERT INTO `weather` VALUES ('17', '成都', '5~10', '阴', '1级', '60065', '桑郎平措', null, '2024-12-14');
-INSERT INTO `weather` VALUES ('18', '成都', '5~10', '阴', '1级', '60065', '桑郎平措', null, '2024-12-13');
+-- 2025-01-06
+('成都', '1~7', '雾', '1级', '东风', '5km/h', '5km', '1009', '120', '75', '重度污染', '60065', '桑郎平措', '2025-01-06'),
+
+-- 2025-01-07
+('成都', '4~11', '晴', '2级', '南风', '7km/h', '30km', '1007', '60', '30', '良', '60065', '桑郎平措', '2025-01-07'),
+
+-- 2025-01-08
+('成都', '5~12', '多云', '3级', '西风', '10km/h', '25km', '1005', '70', '40', '良', '60065', '桑郎平措', '2025-01-08');

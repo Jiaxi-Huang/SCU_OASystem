@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Select;
 
 @Mapper
 public interface WeatherMapper extends BaseMapper<Weather> {
-    @Select("SELECT * FROM weather WHERE city = #{city} AND date = #{date} LIMIT 1")
+    @Select("SELECT id, city, temperature, humidity, wind, win, win_meter, visibility, pressure, air, air_pm25, air_level, date " +
+            "FROM weather WHERE city = #{city} AND date = #{date} LIMIT 1")
     Weather findByCityAndDate(@Param("city") String city, @Param("date") String date);
 }
