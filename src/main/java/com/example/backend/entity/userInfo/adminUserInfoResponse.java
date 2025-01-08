@@ -20,6 +20,7 @@ public class adminUserInfoResponse {
         private int userId;
         private String userName;
         private String userDepartment;
+        private String userEmail;
         private String userRole;
         private String userPhone;
         private String userAvatar;
@@ -60,6 +61,9 @@ public class adminUserInfoResponse {
         public String getUserAvatar() {return userAvatar;}
 
         public void setUserAvatar(String userAvatar) {this.userAvatar = userAvatar;}
+        public String getUserEmail() {return userEmail;}
+
+        public void setUserEmail(String userEmail) {this.userEmail = userEmail;}
     }
         public int getStatus() {
         return status;

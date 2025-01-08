@@ -2,11 +2,12 @@
   <div class="page-container">
     <div class="info">
       <el-divider content-position="left">个人中心</el-divider>
-      <span style="text-align: left"
-        >个人中心通常用来作为个人基本信息展示和个人事务通知中心
-        <el-link type="primary" href="https://fullcalendar.io/docs/initialize-globals-demo"
-          >fullCalendar Demo <el-tooltip class="item" effect="dark" placement="top-start"> <i class="el-icon-question"></i></el-tooltip> </el-link
-      ></span>
+      <span style="text-align: left">
+        个人中心通常用来作为个人基本信息展示和个人事务通知中心
+<!--        <el-link type="primary" href="https://fullcalendar.io/docs/initialize-globals-demo"-->
+<!--          >fullCalendar Demo <el-tooltip class="item" effect="dark" placement="top-start">-->
+<!--          <i class="el-icon-question"></i></el-tooltip> </el-link>-->
+      </span>
     </div>
     <el-row :gutter="20">
       <el-col :span="7" :offset="1">
@@ -58,7 +59,7 @@
 
       <el-col :span="15" :push="0">
         <el-card class="box-card">
-          <fullcalendar></fullcalendar>
+          <FullCalendar></FullCalendar>
         </el-card>
       </el-col>
     </el-row>
@@ -69,6 +70,7 @@ import { defineComponent, reactive, toRefs, ref, onMounted, computed } from 'vue
 import { useStore } from '@/store'
 import Service from './api/index'
 import fullcalendar from './components/fullCalendar/index.vue'
+import FullCalendar from './components/myCalendar/index.vue'
 interface stateType {
   inputVisible: boolean
   inputValue: string
@@ -77,7 +79,7 @@ interface stateType {
 export default defineComponent({
   name: 'PersonalCenter',
   components: {
-    fullcalendar
+    FullCalendar
   },
   setup() {
     const formLabelWidth = ref(100)

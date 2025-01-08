@@ -98,19 +98,6 @@
 
 <template>
   <div class="calendar-info">
-    <el-row style="margin: 15px">
-      <el-col :span="24" class="page-title-box">
-        <h4 class="page-title">Calendar</h4>
-        <div class="page-title-right">
-          <div style="margin-right: 50px">
-            <div style="text-align: left"><el-checkbox v-model="togglechecked" label="不显示周末" size="large" @change="handleWeekendsToggle"></el-checkbox></div>
-          </div>
-          <div style="margin-right: 10px"><el-date-picker v-model="pickDate" type="date" placeholder="选择日期"> </el-date-picker></div>
-          <el-button :icon="Refresh" circle type="primary" style="maring-left: 10px" @click="refreshDate"></el-button>
-          <el-button :icon="Search" circle type="primary" @click="goToDate"></el-button>
-        </div>
-      </el-col>
-    </el-row>
     <el-row>
       <el-col :span="24">
         <el-card>

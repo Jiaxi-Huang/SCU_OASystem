@@ -1,16 +1,15 @@
 <template>
   <div>
-    <el-alert title="Tips:点击【编辑】按钮，进行不同角色的菜单授权操作！" type="warning"> </el-alert>
-    <el-alert title="Tips:权限控制体验：【管理员账号为：admin@outlook.com】、【超级管理员账号为：super@outlook.com】" type="info"> </el-alert>
     <el-card class="card-ctrl">
       <el-row>
-        <el-col :span="10" style="text-align: left">
+        <el-col :span="20" style="text-align: left">
           <el-button type="primary" size="medium" @click="onDistributeTodo"><el-icon><plus /></el-icon>分派任务</el-button>
           <el-button type="success" size="medium" @click="onDistributeMeeting"><el-icon><plus /></el-icon>新建会议</el-button>
           <el-button type="info" size="medium" @click="onExport"><el-icon><download /></el-icon>导出列表</el-button>
           <el-button type="info" size="medium" @click="onPrint"><el-icon><printer /></el-icon>打印列表</el-button>
+          <el-button type="success" size="medium" @click="onStatistic"><el-icon><odometer /></el-icon>统计信息</el-button>
         </el-col>
-        <el-col :span="14" style="text-align: right">
+        <el-col :span="4" style="text-align: right">
           <el-input
               v-model="searchKeyword"
               placeholder="请输入关键词"            style="width: 200px; margin-right: 10px"
@@ -27,6 +26,11 @@
 
         <el-table-column label="操作" align="center">
           <template #default="scope">
+            <el-tooltip class="item" effect="dark" content="详情" placement="bottom">
+              <el-button circle plain type="info" size="small" @click="onDetail(scope.$index, scope.row)">
+                <el-icon><InfoFilled /></el-icon>
+              </el-button>
+            </el-tooltip>
             <el-tooltip class="item" effect="dark" content="菜单授权" placement="bottom">
               <el-button circle plain type="primary" size="small" @click="onEdit(scope.$index, scope.row)">
                 <el-icon><edit /></el-icon>
@@ -49,6 +53,12 @@
         </el-pagination>
       </div>
     </el-card>
+    <el-dialog v-model="detail_visible" center title="员工信息详情">
+      <worker-detail :current-row="posted.userRow"></worker-detail>
+    </el-dialog>
+    <el-dialog v-model="statistic_visible" center title="统计信息">
+      <worker-statistic :data="data"></worker-statistic>
+    </el-dialog>
     <el-dialog v-model="edit_visible" center :title="posted.userRow.userRole">
       <worker-edit :current-row="posted.userRow" @success="onEditSuccess"></worker-edit>
     </el-dialog>
@@ -63,23 +73,29 @@
 <script lang="ts">
 import {defineComponent, reactive, toRefs, computed, onMounted, watch} from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import {Download, Edit, Minus, Plus, Printer, Refresh} from '@element-plus/icons-vue'
-import WorkerEdit from './workersEdit.vue'
-import DistributeTodo from "@/views/Worker/components/distributeTodo.vue";
-import DistributeMeeting from "@/views/Worker/components/distributeMeeting.vue";
+import {Download, Edit, InfoFilled, Minus, Plus, Printer, Refresh,Odometer} from '@element-plus/icons-vue'
+import WorkerEdit from "./components/workersEdit.vue"
+import WorkerDetail from "./components/workersDetail.vue"
+import WorkerStatistic from "./components/workersStatistic.vue"
+import DistributeTodo from "./components/distributeTodo.vue"
+import DistributeMeeting from "./components/distributeMeeting.vue"
 import Service from './api/index'
 
 export default defineComponent({
   name: 'WorkerManage',
   components: {
+    InfoFilled,
     Printer,
     Download,
+    WorkerDetail,
     WorkerEdit,
+    WorkerStatistic,
     DistributeTodo,DistributeMeeting,
     Edit,
     Minus,
     Plus,
-    Refresh
+    Refresh,
+    Odometer
   },
   setup() {
     const state = reactive({
@@ -104,12 +120,16 @@ export default defineComponent({
       detail_visible: false,
       todo_visible: false,
       meeting_visible: false,
+      statistic_visible: false,
       posted: {
         userRow: {
           userId: null,
           userName:'',
           userDepartment:'',
-          userRole: ''
+          userRole: '',
+          userEmail: '',
+          userPhone: '',
+          userAvatar: '',
         }
       },
       sortField : '',
@@ -212,6 +232,17 @@ export default defineComponent({
         state.param.total = state.data.length
       }
     }
+    const onDetail = (index: any, row: any) => {
+      console.log('row', row)
+      state.posted.userRow.userId = row.userId
+      state.posted.userRow.userName = row.userName
+      state.posted.userRow.userRole = row.userRole
+      state.posted.userRow.userDepartment = row.userDepartment
+      state.posted.userRow.userEmail = row.userEmail
+      state.posted.userRow.userPhone = row.userPhone
+      state.posted.userRow.userAvatar = row.userAvatar
+      state.detail_visible = true
+    }
     /**
      * @description 选择点击编辑授权角色；roleName
      */
@@ -286,6 +317,9 @@ export default defineComponent({
         });
       });
     }
+    const onStatistic = async()=>{
+      state.statistic_visible = true
+    }
     // 使用 watch 监视 searchKeyword 的变化
     watch(() => state.searchKeyword, (newVal) => {
         onSearch()
@@ -306,11 +340,13 @@ export default defineComponent({
       onDistributeTodoSuccess,
       onDistributeMeeting,
       onDistributeMeetingSuccess,
+      onDetail,
       onEdit,
       onEditSuccess,
       onSearch,
       onExport,
       onPrint,
+      onStatistic,
       fetchData,
       handleSortChange
     }

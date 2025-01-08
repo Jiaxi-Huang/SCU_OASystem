@@ -17,7 +17,7 @@ public class AttendanceService extends ServiceImpl<AttendanceMapper, Attendance>
 
     public int addAttendance(Attendance record) {
         return attendanceMapper.addAttendance(record.getUserId(), record.getAttendanceDate(),
-                record.getCheckIn(), record.getCheckOut(), record.getStatus(), record.getLocation());
+                record.getCheckIn(), record.getCheckOut(), record.getStatus(), record.getInLocation(),record.getOutLocation());
     }
 
     public List<Attendance> getAttendanceRecord(String date) {
@@ -30,6 +30,15 @@ public class AttendanceService extends ServiceImpl<AttendanceMapper, Attendance>
     }
 
     public int editAttendance(Attendance record) {
-        return attendanceMapper.editAttendance(record.getId(),record.getCheckIn(),record.getCheckOut(),record.getStatus());
+        return attendanceMapper.editAttendance(record.getId(),record.getAttendanceDate(),record.getCheckIn(),record.getCheckOut(), record.getInLocation(), record.getOutLocation(),record.getStatus());
+    }
+
+    public List<Attendance> getPersonalAttendanceRecord(int userId) {
+        return attendanceMapper.getPersonalAttendanceRecord(userId);
+    }
+
+
+    public List<Attendance> excelAttendance(List<Integer> ids) {
+        return attendanceMapper.excelAttendance(ids);
     }
 }
