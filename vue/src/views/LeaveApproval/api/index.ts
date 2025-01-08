@@ -1,25 +1,70 @@
 import request from '@/utils/request'
 
 const leaveApprovalApi = {
-  getLeaveApproval: '/api/leaveApproval/getLeaveRecord',
   localHost:'http://localhost:8080',
+  getMyLeaveRecord: '/api/leaveApproval/getMyLeaveRecord',
+  getNotifyLeaveRecord: '/api/leaveApproval/getNotifyLeaveRecord',
+  getReviewLeaveRecord: '/api/leaveApproval/getReviewLeaveRecord',
+  getAdminLeaveRecord: '/api/leaveApproval/getAdminLeaveRecord',
   modifyLeaveApproval: '/api/leaveApproval/modifyLeaveRecord',
   addLeaveApproval: '/api/leaveApproval/addLeaveRecord',
-  deleteLeaveApproval: '/api/leaveApproval/deleteLeaveRecord'
+  deleteLeaveApproval: '/api/leaveApproval/deleteLeaveRecord',
+  addNotification: '/api/notification/addNotification',
+  getAllUsers: '/api/notification/getAllUsers',
 }
 
 class Service {
-  /**
-   * @description POST 用户登录接口
-   */
-  static postGetLeaveApproval() {
+  static postGetMyLeaveRecord() {
+    const data = {'accessToken':sessionStorage.getItem('accessToken')}
     return request({
-      url: leaveApprovalApi.localHost + leaveApprovalApi.getLeaveApproval,
+      url: leaveApprovalApi.localHost + leaveApprovalApi.getMyLeaveRecord,
       method: 'POST',
       json: true,
+      data: data,
     }).then((res) => {
       if (res.status === 0) {
-        console.log("postGetLeaveApproval success")
+        return res
+      }
+      return null
+    })
+  }
+  static postGetNotifyLeaveRecord() {
+    const data = {'accessToken':sessionStorage.getItem('accessToken')}
+    return request({
+      url: leaveApprovalApi.localHost + leaveApprovalApi.getNotifyLeaveRecord,
+      method: 'POST',
+      json: true,
+      data: data,
+    }).then((res) => {
+      if (res.status === 0) {
+        return res
+      }
+      return null
+    })
+  }
+  static postGetReviewLeaveRecord() {
+    const data = {'accessToken':sessionStorage.getItem('accessToken')}
+    return request({
+      url: leaveApprovalApi.localHost + leaveApprovalApi.getReviewLeaveRecord,
+      method: 'POST',
+      json: true,
+      data: data,
+    }).then((res) => {
+      if (res.status === 0) {
+        return res
+      }
+      return null
+    })
+  }
+  static postGetAdminLeaveRecord() {
+    const data = {'accessToken':sessionStorage.getItem('accessToken')}
+    return request({
+      url: leaveApprovalApi.localHost + leaveApprovalApi.getAdminLeaveRecord,
+      method: 'POST',
+      json: true,
+      data: data,
+    }).then((res) => {
+      if (res.status === 0) {
         return res
       }
       return null
@@ -72,6 +117,18 @@ class Service {
       data: record,
     }).then((res) => {
       if (res.status === 0) {
+        return res
+      }
+      return null
+    })
+  }
+  static getAllUsers() {
+    return request({
+      url: leaveApprovalApi.localHost + leaveApprovalApi.getAllUsers,
+      method: 'POST',
+      json: true,
+    }).then((res) => {
+      if (res.status === 200) {
         return res
       }
       return null

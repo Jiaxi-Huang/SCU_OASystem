@@ -1,12 +1,28 @@
 package com.example.backend.controllers;
 
+import com.example.backend.entity.User;
 import com.example.backend.entity.reimbursement.ReimJoinNotifyRecordWithAccessToken;
 import com.example.backend.entity.reimbursement.ReimJoinNotifyRecord;
 import com.example.backend.entity.reimbursement.ReimbursementRecordWithAccessToken;
 import com.example.backend.entity.ResponseBase;
 import com.example.backend.entity.reimbursement.ReimbursementRecord;
+import com.example.backend.entity.todoList.TodoRecord;
+import com.example.backend.entity.userInfo.adminUserInfoRequest;
 import com.example.backend.services.AccessService;
 import com.example.backend.services.ReimbursementService;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import jakarta.servlet.http.HttpServletResponse;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 @RestController
@@ -70,7 +87,7 @@ public class ReimbursementCon {
     @PostMapping("/getNotifyReimbursementList")
     public ResponseBase getNotifyReimbursementRecord(@RequestBody ReimJoinNotifyRecordWithAccessToken request) {
         ResponseBase res = new ResponseBase();
-//        try {
+        try {
             String accessToken = request.getAccessToken();
             int userId = accessService.getAuthenticatedId(accessToken);
             request.setUser_id(userId);
@@ -80,10 +97,10 @@ public class ReimbursementCon {
             for (ReimJoinNotifyRecord record : records) {
                 res.pushData(record);
             }
-//        } catch (Exception e) {
-//            res.setStatus(-1);
-//            res.setMessage(e.getMessage());
-//        }
+        } catch (Exception e) {
+            res.setStatus(-1);
+            res.setMessage(e.getMessage());
+        }
         return res;
     }
 
@@ -103,7 +120,6 @@ public class ReimbursementCon {
         }
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
-
 
     @PostMapping("/modifyReimbursementRecord")
     public ResponseBase modifyReimbursementRecord(@RequestBody ReimbursementRecord record) {
@@ -132,11 +148,12 @@ public class ReimbursementCon {
         return res;
     }
 
-
     @PostMapping("/deleteReimbursementRecord")
     public ResponseBase deleteReimbursementRecord(@RequestBody ReimbursementRecord record) {
         int res_code = reimbursementService.deleteReimbursementRecord(record);
         System.out.println("deleteRecord res_code: " + res_code);
         return new ResponseBase();
     }
+
+
 }

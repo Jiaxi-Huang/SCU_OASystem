@@ -1,4 +1,4 @@
-package com.example.backend.controllers;
+package com.example.backend.services.utils;
 
 import cn.hutool.core.io.resource.ClassPathResource;
 import jakarta.annotation.PostConstruct;

@@ -114,7 +114,7 @@ class Service {
             method: 'POST',
             json: true,
         }).then((res) => {
-            if (res.status === 0||res.status === -1) {
+            if (res.status === 0||res.status === -1||res.status === -2) {
                 return Promise.resolve(res)
             }
             return Promise.reject(res)

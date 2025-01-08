@@ -41,20 +41,19 @@ public class FileController {
 
 
     @PostMapping("/loadFile")
-    public ResponseBase loadFile(@RequestBody adminUserInfoRequest request,@RequestParam String dir_id) {
+    public ResponseBase loadFile(@RequestBody Files record1) {
         ResponseBase res = new ResponseBase();
         try {
 
-            String accessToken = request.getAccessToken();
+            String accessToken = record1.getAcsTkn();
             int userId = accessService.getAuthenticatedId(accessToken);
             List<Files> records = fileService.getFile();
             User userInfo = userMapper.findByUserId(userId);
-            int FolderType =folderController.judgeFolder(Integer.parseInt(dir_id));
+            int FolderType =folderController.judgeFolder(Integer.parseInt(String.valueOf(record1.getDirId())));
 
             for (Files record : records) {
 
                 User fileUser=userMapper.findByUserId(record.getUserId());
-
                 record.setUserName(fileUser.getUsername());
                 res.pushData(record);
             }

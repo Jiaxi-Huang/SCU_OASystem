@@ -55,6 +55,7 @@ public class Admin {
                 temp.setUserId(user.getUserId());
                 temp.setUserName(user.getUsername());
                 temp.setUserDepartment(user.getDepartment());
+                temp.setUserEmail(user.getEmail());
                 temp.setUserRole(user.getRole());
                 temp.setUserPhone(user.getPhone());
                 temp.setUserAvatar(userService.userInfoAvatar(user.getUserId()));
@@ -90,7 +91,7 @@ public class Admin {
             if (isSuccess > 0) {
                 adminUserInfoResponse response = new adminUserInfoResponse(
                         0,
-                        "获取用户列表成功",
+                        "添加用户成功",
                         true,
                         null
                 );

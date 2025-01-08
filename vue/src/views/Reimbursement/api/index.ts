@@ -1,23 +1,20 @@
 import request from '@/utils/request'
 
 const reimbursementApi = {
+  localHost:'http://localhost:8080',
   getMyReimbursementList: '/api/reimbursement/getReimbursementList',
-  getAdminReimbursementList: '/api/reimbursement/getAdminReimbursementList',
   getReviewReimbursementList: '/api/reimbursement/getReviewReimbursementList',
   getNotifyReimbursementList: '/api/reimbursement/getNotifyReimbursementList',
+  getAdminReimbursementList: '/api/reimbursement/getAdminReimbursementList',
   updateReimbursement: '/api/reimbursement/modifyReimbursementRecord',
   deleteReimbursement: '/api/reimbursement/deleteReimbursementRecord',
   addReimbursement: '/api/reimbursement/addReimbursementRecord',
   addNotification: '/api/notification/addNotification',
   getAllUsers: '/api/notification/getAllUsers',
-  localHost:'http://localhost:8080',
 }
 
 
 class Service {
-  /**
-   * @description POST 用户登录接口
-   */
   static getMyReimbursementList() {
     const data = {'accessToken':sessionStorage.getItem('accessToken')}
     return request({

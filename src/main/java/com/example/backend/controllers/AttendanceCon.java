@@ -8,6 +8,7 @@ import com.example.backend.services.AccessService;
 import com.example.backend.services.AttendanceService;
 
 import com.example.backend.services.UserService;
+import com.example.backend.services.utils.IpUtil;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Font;
@@ -258,6 +259,7 @@ public class AttendanceCon {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String date=sdf.format(calendar.getTime());
         List<Attendance> records=attendanceService.getAttendanceRecord(date);
+        int is_exist=0;
         for (Attendance record : records) {
             String AttendanceDate= String.valueOf(record.getAttendanceDate());
             if(record.getUserId()==userId&&AttendanceDate.equals(date)) {
@@ -266,10 +268,16 @@ public class AttendanceCon {
                     res.setMessage("You have already checked out today.");
                     return ResponseEntity.status(HttpStatus.OK).body(res);
                 }else{
+                    is_exist=1;
                     attendance=record;
                     break;
                 }
             }
+        }
+        if(is_exist==0) {
+            res.setStatus(-2);
+            res.setMessage("You have not checked in today.");
+            return ResponseEntity.status(HttpStatus.OK).body(res);
         }
         // 获取当前时间
         LocalTime currentTime = LocalTime.now();
@@ -315,13 +323,15 @@ public class AttendanceCon {
                 headerRow.createCell(7).setCellValue("下班打卡位置");
                 headerRow.createCell(8).setCellValue("考勤状态");
             }
-            else if(role.equals("manager")){
-                headerRow.createCell(0).setCellValue("用户名");
-                headerRow.createCell(1).setCellValue("部门");
-                headerRow.createCell(2).setCellValue("职位");
-                headerRow.createCell(3).setCellValue("电话号码");
+
+            else{
+                headerRow.createCell(0).setCellValue("日期");
+                headerRow.createCell(1).setCellValue("上班打卡时间");
+                headerRow.createCell(2).setCellValue("上班打卡位置");
+                headerRow.createCell(3).setCellValue("下班打卡时间");
+                headerRow.createCell(4).setCellValue("下班打卡位置");
+                headerRow.createCell(5).setCellValue("考勤状态");
             }
-            else{}
             // Fill data into rows
             int rowNum = 1;
             if(role.equals("admin")){
@@ -345,20 +355,26 @@ public class AttendanceCon {
                     row.createCell(8).setCellValue(attendance.getStatus());
                 }
             }
-            else if(role.equals("manager")){
+            else{
                 for (Attendance attendance : attendances) {
                     User userInfo = userMapper.findByUserId(attendance.getUserId());
                     attendance.setUserName(userInfo.getUsername());
                     attendance.setDepartment(userInfo.getDepartment());
                     attendance.setRole(userInfo.getRole());
                     Row row = sheet.createRow(rowNum++);
-                    row.createCell(0).setCellValue(attendance.getUserName());
-                    row.createCell(1).setCellValue(attendance.getDepartment());
-                    row.createCell(2).setCellValue(attendance.getRole());
-                    row.createCell(3).setCellValue(attendance.getCheckIn().toString());
+                    String attendanceDate = (attendance.getAttendanceDate() != null) ? attendance.getAttendanceDate().toString() : "未打卡";
+                    row.createCell(0).setCellValue(attendanceDate);
+                    String checkInTime = (attendance.getCheckIn() != null) ? attendance.getCheckIn().toString() : "未打卡";
+                    row.createCell(1).setCellValue(checkInTime);
+                    row.createCell(2).setCellValue(attendance.getInLocation());
+                    String checkOutTime = (attendance.getCheckOut() != null) ? attendance.getCheckOut().toString() : "未打卡";
+                    row.createCell(3).setCellValue(checkOutTime);
+                    row.createCell(4).setCellValue(attendance.getOutLocation());
+                    attendance.setStatus(setStatus(attendance));
+                    row.createCell(5).setCellValue(attendance.getStatus());
                 }
             }
-            else{}
+
             // Set response headers for file download
             response.setContentType("application/vnd.ms-excel");
             response.setHeader("Content-Disposition", "attachment;");
@@ -390,7 +406,7 @@ public class AttendanceCon {
             font.setColor(BaseColor.BLACK);
             // 创建表格
             // 根据 role 决定列数
-            int numberOfColumns = role.equals("admin") ? 9 : 4;
+            int numberOfColumns = role.equals("admin") ? 9 :6;
             PdfPTable table = new PdfPTable(numberOfColumns);
             table.setWidthPercentage(100); // 表格宽度占页面 100%
 
@@ -399,10 +415,9 @@ public class AttendanceCon {
             if(role.equals("admin")) {
                 headers = new String[]{"用户ID", "用户名", "部门", "职位", "上班打卡时间", "上班打卡位置", "下班打卡时间", "下班打卡位置", "考勤状态"};
             }
-            else if(role.equals("manager")){
-                headers = new String[]{"用户名","部门", "职位", "上班打卡位置"};
+            else{
+                headers = new String[]{"日期", "上班打卡时间", "上班打卡位置", "下班打卡时间", "下班打卡位置", "考勤状态"};
             }
-            else{headers=new String[]{};}//处理不规范用法
             for (String header : headers) {
                 PdfPCell cell = new PdfPCell(new Paragraph(header, font));
                 cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
@@ -431,15 +446,20 @@ public class AttendanceCon {
                     table.addCell(new Paragraph(attendance.getStatus(), font));
                 }
             }
-            else if(role.equals("manager")){
+            else{
                 for (Attendance attendance : attendances) {
-                    table.addCell(new Paragraph(attendance.getUserName(), font));
-                    table.addCell(new Paragraph(attendance.getDepartment(), font));
-                    table.addCell(new Paragraph(attendance.getRole(), font));
+                    String checkInTime = (attendance.getCheckIn() != null) ? attendance.getCheckIn().toString() : "未打卡";
+                    String checkOutTime = (attendance.getCheckOut() != null) ? attendance.getCheckOut().toString() : "未打卡";
+                    String attendanceDate = (attendance.getAttendanceDate() != null) ? attendance.getAttendanceDate().toString() : "未打卡";
+                    table.addCell(new Paragraph(attendanceDate, font));
+                    table.addCell(new Paragraph(checkInTime, font));
                     table.addCell(new Paragraph(attendance.getInLocation(), font));
+                    table.addCell(new Paragraph(checkOutTime, font));
+                    table.addCell(new Paragraph(attendance.getOutLocation(), font));
+                    attendance.setStatus(setStatus(attendance));
+                    table.addCell(new Paragraph(attendance.getStatus(), font));
                 }
             }
-            else{}
             // 将表格添加到文档
             document.add(table);
             document.close();

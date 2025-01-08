@@ -69,7 +69,7 @@ interface stateTypes {
   }
 }
 export default defineComponent({
-  name: 'RolesEdit',
+  name: 'attendanceEdit',
   props: {
     currentRow: {
       type: Object,
@@ -85,8 +85,8 @@ export default defineComponent({
     const lang = computed(() => store.getters['settingsModule/getLangState'])
 
     const state = reactive<stateTypes>({
-      url: `/role/allow`,
-      purl: `/role/permissions`,
+      url: `/attendance/allow`,
+      purl: `/attendance/permissions`,
       loading: false,
       form: {
         userName: '',

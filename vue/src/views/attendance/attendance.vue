@@ -10,6 +10,14 @@
         <el-col :span="10" style="text-align: left">
           <el-button type="primary" size="medium" @click="onCheckIn">上班打卡</el-button>
           <el-button type="primary" size="medium" @click="onCheckOut">下班打卡</el-button>
+          <el-button type="info" size="medium" @click="onExport"><el-icon><download /></el-icon>导出列表</el-button>
+          <el-button type="info" size="medium" @click="onPrint"><el-icon><printer /></el-icon>打印列表</el-button>
+        </el-col>
+        <el-col :span="14" style="text-align: right">
+          <el-input
+              v-model="searchKeyword"
+              placeholder="请输入关键词"            style="width: 200px; margin-right: 10px"
+          ></el-input>
         </el-col>
       </el-row>
 
@@ -17,10 +25,6 @@
 
       <el-table v-loading="loading" :data="displayData()" stripe class="table" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center" sortable @sort-change="handleSortChange"></el-table-column>
-        <el-table-column prop="userId" label="用户ID" align="center" sortable @sort-change="handleSortChange"></el-table-column>
-        <el-table-column prop="userName" label="用户名" align="center" sortable @sort-change="handleSortChange"></el-table-column>
-        <el-table-column prop="department" label="部门" align="center" sortable @sort-change="handleSortChange"></el-table-column>
-        <el-table-column prop="role" label="职位" align="center" sortable @sort-change="handleSortChange"></el-table-column>
         <el-table-column prop="attendanceDate" label="日期" align="center" sortable @sort-change="handleSortChange"></el-table-column>
         <el-table-column prop="checkIn" label="上班打卡时间" align="center" sortable @sort-change="handleSortChange"></el-table-column>
         <el-table-column prop="inLocation" label="上班打卡位置" align="center" sortable @sort-change="handleSortChange"></el-table-column>
@@ -45,21 +49,32 @@
             <el-tag :type="scope.row.status === 2 ? 'primary' : 'success'" disable-transitions>{{ scope.row.status }}</el-tag>
           </template>
         </el-table-column>
+        <el-table-column label="操作" align="center">
+          <template #default="scope">
+            <el-tooltip class="item" effect="dark" content="详情" placement="bottom">
+              <el-button circle plain type="info" size="small" @click="onDetail(scope.$index, scope.row)">
+                <el-icon><InfoFilled /></el-icon>
+              </el-button>
+            </el-tooltip>
+          </template>
+        </el-table-column>
       </el-table>
     </el-card>
+    <el-dialog v-model="detail_visible" center title="考勤详情">
+      <personal-attendance-detail :current-row="posted.userRow"></personal-attendance-detail>
+    </el-dialog>
   </div>
 </template>
 <script lang="ts">
 import {defineComponent, reactive, toRefs, computed, onMounted, watch} from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import {Download, Edit, Minus, Plus, Printer, Refresh, Search} from '@element-plus/icons-vue'
-import RoleEdit from './attendanceEdit.vue'
-import RoleNew from './attendanceNew.vue'
+import {Download, Edit, InfoFilled, Minus, Plus, Printer, Refresh, Search} from '@element-plus/icons-vue'
+import PersonalAttendanceDetail from "@/views/attendance/personalAttendanceDetail.vue";
 import Service from './api/index'
 
 
 export default defineComponent({
-  name: 'RoleManage',
+  name: 'Attendance',
   computed: {
     Search() {
       return Search
@@ -69,10 +84,10 @@ export default defineComponent({
     }
   },
   components: {
+    InfoFilled,
     Printer,
     Download,
-    RoleEdit,
-    RoleNew,
+    PersonalAttendanceDetail,
     Edit,
     Minus,
     Plus,
@@ -81,10 +96,10 @@ export default defineComponent({
   setup() {
     const state = reactive({
       url: {
-        c: '/role/add',
-        r: '/role/list',
-        u: '/role/update',
-        d: '/role/delete'
+        c: '/Attendance/add',
+        r: '/Attendance/list',
+        u: '/Attendance/update',
+        d: '/Attendance/delete'
       },
       param: {
         total: 0,
@@ -92,7 +107,10 @@ export default defineComponent({
         page: 1
       },
       data: [
-        //{ userName: '超级管理员', userDepartment:'',userRole:'',userPhone:''},
+        {
+          attendanceDate:'',
+          status:''
+        },
       ],
       filteredData: [],
       loading: false,
@@ -103,11 +121,13 @@ export default defineComponent({
       posted: {
         userRow: {
           id: null,
-          userName: '',
-          userRole: '',
-          userDepartment: '',
+          attendanceDate:'',
           checkIn:'',
-          checkOut:''
+          checkOut:'',
+          inLocation:'',
+          outLocation:'',
+          status:''
+
         }
       },
       sortField : '',
@@ -178,6 +198,12 @@ export default defineComponent({
                 message: '已经下班打卡过了'
               })
             }
+            else if(res.status === -2){
+              ElMessage({
+                type: 'warning',
+                message: '今天还没上班打卡'
+              })
+            }
             else{
               ElMessage({
                 type: 'error',
@@ -221,7 +247,7 @@ export default defineComponent({
      * @description 获取选择行的userId列表
      */
     const handleSelectionChange = (selection:any[]) => {
-      state.selectionRows = selection.map(item => item.userId)
+      state.selectionRows = selection.map(item => item.id)
       console.log("SelectionRows",state.selectionRows)
     }
     /**
@@ -233,7 +259,7 @@ export default defineComponent({
       const adminUserInfo = await Service.postPersonalAttendance(data)
       if (adminUserInfo.status === 0) {
         state.data = adminUserInfo.data
-        state.userIds = adminUserInfo.data.map((item: any) => item.userId)
+        state.userIds = adminUserInfo.data.map((item: any) => item.id)
         state.param.total = state.data.length
       }
     }
@@ -244,23 +270,10 @@ export default defineComponent({
       state.param.page = 1
       state.param.size = val
     }
-    const onCreate = () => {
-      state.add_visible = true
-    }
-    const onCreateSuccess = (val: any) => {
-      state.add_visible = false
-      fetchData()
-    }
-    const onEditSuccess = () => {
-      state.edit_visible = false
-      fetchData()
-    }
     const displayData = () => {
       return state.is_search ? sortData().filter(item =>
-          item.userName.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-          item.userRole.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-          item.userDepartment.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-          item.userPhone.toLowerCase().includes(state.searchKeyword.toLowerCase())
+          item.attendanceDate.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
+          item.status.toLowerCase().includes(state.searchKeyword.toLowerCase())
       ).slice((state.param.page-1)*state.param.size, state.param.page*state.param.size) : sortData().slice((state.param.page-1)*state.param.size, state.param.page*state.param.size);
     }
     const onSearch = () => {
@@ -268,10 +281,8 @@ export default defineComponent({
         state.is_search = true
         state.param.page = 1; // 重置页码为第一页
         state.filteredData = state.data.filter(item =>
-            item.userName.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-            item.userRole.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-            item.userDepartment.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-            item.userPhone.toLowerCase().includes(state.searchKeyword.toLowerCase())
+            item.attendanceDate.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
+            item.status.toLowerCase().includes(state.searchKeyword.toLowerCase())
         );
         state.param.total = state.filteredData.length
       }
@@ -281,48 +292,17 @@ export default defineComponent({
         state.param.total = state.data.length
       }
     }
-    const onEdit = (index: any, row: any) => {
+    const onDetail = (index: any, row: any) => {
       console.log('row', row)
-      state.posted.userRow.id = row.id
-      state.posted.userRow.userName = row.userName
+      state.posted.userRow.attendanceDate = row.attendanceDate
       state.posted.userRow.checkIn = row.checkIn
+      state.posted.userRow.inLocation= row.inLocation
       state.posted.userRow.checkOut = row.checkOut
-      state.edit_visible = true
+      state.posted.userRow.outLocation = row.outLocation
+      state.posted.userRow.status = row.status
+      state.detail_visible = true
     }
-    const useConfirmDelete = async (row: any) => {
-      ElMessageBox.confirm('此操作将删除该员工所有数据, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-          .then(async () => {
-            // 此处执行接口异步删除员工
-            console.log(row.id)
-            const res = await Service.postDeleteAttendance(row.id);
-            if (res.status === 0) {
-              ElMessage({
-                type: 'success',
-                message: '删除成功'
-              })
-              fetchData()
-            } else {
-              ElMessage({
-                type: 'error',
-                message: '删除失败'
-              })
-            }
-          })
-          .catch(() => {
-            ElMessage({
-              type: 'info',
-              message: '已取消删除'
-            })
-          })
-    }
-    const onDelete = (index: any, row: any) => {
-      console.log(index, row)
-      useConfirmDelete(row)
-    }
+
     /**
      * @description 导出列表所选行
      */
@@ -333,12 +313,12 @@ export default defineComponent({
         type: 'info'
       }).then(async() => {
         // 确认后调用获取 PDF 的方法
-        const userIds = state.selectionRows.length > 0 ? state.selectionRows : state.userIds
+        const ids = state.selectionRows.length > 0 ? state.selectionRows : state.userIds
         const data ={
           'accessToken': sessionStorage.getItem('accessToken'),
-          'user_ids': userIds
+          'user_ids': ids
         }
-        Service.postAdminExportUser(data).then(() => {
+        Service.postAdminExportAttendance(data).then(() => {
           ElMessage({
             type: 'success',
             message: 'Excel 文件正在下载...'
@@ -366,12 +346,12 @@ export default defineComponent({
         type: 'info'
       }).then(async() => {
         // 确认后调用获取 PDF 的方法
-        const userIds = state.selectionRows.length > 0 ? state.selectionRows : state.userIds
+        const ids = state.selectionRows.length > 0 ? state.selectionRows : state.userIds
         const data ={
           'accessToken': sessionStorage.getItem('accessToken'),
-          'user_ids': userIds
+          'user_ids': ids
         }
-        Service.postAdminPrintUser(data).then(() => {
+        Service.postAdminPrintAttendance(data).then(() => {
           ElMessage({
             type: 'success',
             message: 'PDF 文件正在下载...'
@@ -408,11 +388,7 @@ export default defineComponent({
       handleSelectionChange,
       onCurrentChange,
       onSizeChange,
-      onCreate,
-      onCreateSuccess,
-      onEditSuccess,
-      onEdit,
-      onDelete,
+      onDetail,
       onSearch,
       onExport,
       onPrint,

@@ -61,6 +61,11 @@
 
         <el-table-column label="操作" align="center">
           <template #default="scope">
+            <el-tooltip class="item" effect="dark" content="详情" placement="bottom">
+              <el-button circle plain type="info" size="small" @click="onDetail(scope.$index, scope.row)">
+                <el-icon><InfoFilled /></el-icon>
+              </el-button>
+            </el-tooltip>
             <el-tooltip class="item" effect="dark" content="信息修改" placement="bottom">
               <el-button circle plain type="primary" size="small" @click="onEdit(scope.$index, scope.row)">
                 <el-icon><edit /></el-icon>
@@ -88,26 +93,30 @@
         </el-pagination>
       </div>
     </el-card>
-
+    <el-dialog v-model="detail_visible" center title="考勤详情">
+      <attendance-detail :current-row="posted.userRow"></attendance-detail>
+    </el-dialog>
     <el-dialog v-model="edit_visible" center :title="posted.userRow.userRole">
-      <role-edit :current-row="posted.userRow" @success="onEditSuccess"></role-edit>
+      <attendance-edit :current-row="posted.userRow" @success="onEditSuccess"></attendance-edit>
     </el-dialog>
     <el-dialog v-model="add_visible" title="新增考勤">
-      <role-new @success="onCreateSuccess"></role-new>
+      <attendance-new @success="onCreateSuccess"></attendance-new>
     </el-dialog>
   </div>
 </template>
 <script lang="ts">
 import {defineComponent, reactive, toRefs, computed, onMounted, watch} from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import {Download, Edit, Minus, Plus, Printer, Refresh, Search} from '@element-plus/icons-vue'
-import RoleEdit from './attendanceEdit.vue'
-import RoleNew from './attendanceNew.vue'
+import {Download, Edit, InfoFilled, Minus, Plus, Printer, Refresh, Search} from '@element-plus/icons-vue'
+import AttendanceDetail from './attendanceDetail.vue'
+import AttendanceEdit from './attendanceEdit.vue'
+import AttendanceNew from './attendanceNew.vue'
 import Service from './api/index'
 import {AnyObject} from "@/views/File/packages/vue-vuecmf-fileexplorer/src/typings/vuecmf";
 
+
 export default defineComponent({
-  name: 'RoleManage',
+  name: 'AttendanceManage',
   computed: {
     Search() {
       return Search
@@ -117,10 +126,12 @@ export default defineComponent({
     }
   },
   components: {
+    AttendanceDetail,
+    InfoFilled,
     Printer,
     Download,
-    RoleEdit,
-    RoleNew,
+    AttendanceEdit,
+    AttendanceNew,
     Edit,
     Minus,
     Plus,
@@ -129,10 +140,10 @@ export default defineComponent({
   setup() {
     const state = reactive({
       url: {
-        c: '/role/add',
-        r: '/role/list',
-        u: '/role/update',
-        d: '/role/delete'
+        c: '/attendance/add',
+        r: '/attendance/list',
+        u: '/attendance/update',
+        d: '/attendance/delete'
       },
       param: {
         total: 0,
@@ -140,7 +151,13 @@ export default defineComponent({
         page: 1
       },
       data: [
-        //{ userName: '超级管理员', userDepartment:'',userRole:'',userPhone:''},
+        {
+          status:'',
+          userId:'',
+          userName:'',
+          department:'',
+          role:'',
+        },
       ],
       filteredData: [],
       loading: false,
@@ -151,11 +168,15 @@ export default defineComponent({
       posted: {
         userRow: {
           id: null,
+          userId:'',
           userName: '',
           userRole: '',
           userDepartment: '',
           checkIn:'',
-          checkOut:''
+          checkOut:'',
+          inLocation:'',
+          outLocation:'',
+          status:''
         }
       },
       sortField : '',
@@ -229,9 +250,11 @@ export default defineComponent({
     }
     const displayData = () => {
       return state.is_search ? sortData().filter(item =>
+          item.userId.toString().toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
           item.userName.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-          item.userRole.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-          item.userDepartment.toLowerCase().includes(state.searchKeyword.toLowerCase())
+          item.role.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
+          item.department.toLowerCase().includes(state.searchKeyword.toLowerCase())||
+          item.status.toLowerCase().includes(state.searchKeyword.toLowerCase())
       ).slice((state.param.page-1)*state.param.size, state.param.page*state.param.size) : sortData().slice((state.param.page-1)*state.param.size, state.param.page*state.param.size);
     }
     const onSearch = () => {
@@ -239,9 +262,11 @@ export default defineComponent({
         state.is_search = true
         state.param.page = 1; // 重置页码为第一页
         state.filteredData = state.data.filter(item =>
+            item.userId.toString().toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
             item.userName.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-            item.userRole.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-            item.userDepartment.toLowerCase().includes(state.searchKeyword.toLowerCase())
+            item.role.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
+            item.department.toLowerCase().includes(state.searchKeyword.toLowerCase())||
+            item.status.toLowerCase().includes(state.searchKeyword.toLowerCase())
         );
         state.param.total = state.filteredData.length
       }
@@ -250,6 +275,19 @@ export default defineComponent({
         state.param.page = 1; // 重置页码为第一页
         state.param.total = state.data.length
       }
+    }
+    const onDetail = (index: any, row: any) => {
+      console.log('row', row)
+      state.posted.userRow.userId = row.userId
+      state.posted.userRow.userName = row.userName
+      state.posted.userRow.userRole = row.role
+      state.posted.userRow.userDepartment = row.department
+      state.posted.userRow.checkIn = row.checkIn
+      state.posted.userRow.inLocation= row.inLocation
+      state.posted.userRow.checkOut = row.checkOut
+      state.posted.userRow.outLocation = row.outLocation
+      state.posted.userRow.status = row.status
+      state.detail_visible = true
     }
     const onEdit = (index: any, row: any) => {
       console.log('row', row)
@@ -260,7 +298,7 @@ export default defineComponent({
       state.edit_visible = true
     }
     const useConfirmDelete = async (row: any) => {
-      ElMessageBox.confirm('此操作将删除该员工所有数据, 是否继续?', '提示', {
+      ElMessageBox.confirm('此操作将删除该考勤数据, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -381,6 +419,7 @@ export default defineComponent({
       onCreate,
       onCreateSuccess,
       onEditSuccess,
+      onDetail,
       onEdit,
       onDelete,
       onSearch,

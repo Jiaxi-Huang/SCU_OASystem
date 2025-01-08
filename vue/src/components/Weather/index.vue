@@ -5,11 +5,10 @@
         <SevenDayChart />
       </template>
       <el-button type="text">
-        <el-image style="width: 80px; height: 50px; margin-right: 5px" :src="weatherIconUrl" alt="Weather Icon"></el-image>
+        <el-image style="width: 50px; height: 50px; margin-right: 5px" :src="weatherIconUrl" alt="Weather Icon" />
       </el-button>
     </el-tooltip>
     <span>{{ city }}</span>
-    <span>        </span>
     <span>{{ weatherDescription }}</span>
     <span>{{ temperature }}°C</span>
   </div>
@@ -19,12 +18,39 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import SevenDayChart from "@/components/Weather/SevenDayChart.vue";
-import weathericon from '@/assets/images/weathericon.png';
+
+// 导入所有天气图标
+import qingIcon from '@/assets/images/qing.png';
+import xueIcon from '@/assets/images/xue.png';
+import yuIcon from '@/assets/images/yu.png';
+import duoyunIcon from '@/assets/images/duoyun.png';
+import yinIcon from '@/assets/images/yin.png';
+import wuIcon from '@/assets/images/wu.png'; // 新增的雾图标
 
 const city = ref('');
 const weatherDescription = ref('');
 const temperature = ref('');
-const weatherIconUrl = ref(weathericon);
+const weatherIconUrl = ref('');
+
+// 根据天气情况返回对应的图标
+const getWeatherIcon = (weather: string) => {
+  switch (weather) {
+    case '晴':
+      return qingIcon;
+    case '雪':
+      return xueIcon;
+    case '雨':
+      return yuIcon;
+    case '多云':
+      return duoyunIcon;
+    case '阴':
+      return yinIcon;
+    case '雾': // 新增对“雾”天气的判断
+      return wuIcon;
+    default:
+      return qingIcon; // 默认返回晴天的图标
+  }
+};
 
 const getWeather = async (cityName: string) => {
   const today = new Date().toISOString().split('T')[0];
@@ -36,6 +62,8 @@ const getWeather = async (cityName: string) => {
     if (data) {
       weatherDescription.value = data.humidity;
       temperature.value = data.temperature;
+      // 根据天气情况设置图标
+      weatherIconUrl.value = getWeatherIcon(data.humidity);
     }
   } catch (error) {
     console.error("Error fetching weather data:", error);
@@ -52,9 +80,14 @@ const getCityAndWeather = async () => {
     });
     const data = response.data;
     console.log(data);
-    // 去掉城市名称中的“市”字
-    city.value = data.city.replace('市', '');
-    getWeather(city.value); // 获取城市后调用 getWeather 函数
+
+    // 检查 data.city 是否为字符串
+    if (typeof data.city === 'string') {
+      city.value = data.city.replace('市', '');
+      getWeather(city.value); // 获取城市后调用 getWeather 函数
+    } else {
+      console.error('City data is not a string:', data.city);
+    }
   } catch (error) {
     console.error("Error fetching city data:", error);
   }

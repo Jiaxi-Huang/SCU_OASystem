@@ -1,7 +1,13 @@
 package com.example.backend.controllers;
 
-import com.example.backend.entity.LeaveApprovalRecord;
+import com.example.backend.entity.leave.LeaveApprovalRecord;
 import com.example.backend.entity.ResponseBase;
+import com.example.backend.entity.leave.LeaveApprovalRecordWithAccessToken;
+import com.example.backend.entity.leave.LeaveJoinNotifyRecord;
+import com.example.backend.entity.leave.LeaveJoinNotifyRecordWithAccessToken;
+import com.example.backend.entity.reimbursement.ReimbursementRecord;
+import com.example.backend.entity.reimbursement.ReimbursementRecordWithAccessToken;
+import com.example.backend.services.AccessService;
 import com.example.backend.services.LeaveApprovalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,15 +26,78 @@ public class LeaveApprovalCon {
     @Autowired
     private LeaveApprovalService leave_service;
 
-    @PostMapping("/getLeaveRecord")
-    public ResponseEntity<ResponseBase> getLeaveRecord() {
-        ResponseBase response = new ResponseBase();
-        List<LeaveApprovalRecord> records = leave_service.getAllRecords();
+    @Autowired
+    private AccessService accessService;
 
-        for (LeaveApprovalRecord record : records) {
-            response.pushData(record);
+    @PostMapping("/getMyLeaveRecord")
+    public ResponseBase getMyLeaveRecord(@RequestBody LeaveApprovalRecordWithAccessToken request) {
+        ResponseBase res = new ResponseBase();
+        try {
+            String accessToken = request.getAccessToken();
+            int userId = accessService.getAuthenticatedId(accessToken);
+            request.setUser_id(userId);
+            List<LeaveApprovalRecord> records = leave_service.getMyLeaveRecord(userId);
+            res.setStatus(0);
+            for (LeaveApprovalRecord record : records) {
+                res.pushData(record);
+            }
+        } catch (Exception e) {
+            res.setStatus(-1);
+            res.setMessage(e.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return res;
+    }
+    @PostMapping("/getNotifyLeaveRecord")
+    public ResponseBase getNotifyLeaveRecord(@RequestBody LeaveJoinNotifyRecordWithAccessToken request) {
+        ResponseBase res = new ResponseBase();
+//        try {
+            String accessToken = request.getAccessToken();
+            int userId = accessService.getAuthenticatedId(accessToken);
+            request.setUser_id(userId);
+            List<LeaveJoinNotifyRecord> records = leave_service.getNotifyLeaveRecord(userId);
+            res.setStatus(0);
+            for (LeaveJoinNotifyRecord record : records) {
+                res.pushData(record);
+            }
+//        } catch (Exception e) {
+//            res.setStatus(-1);
+//            res.setMessage(e.getMessage());
+//        }
+        return res;
+    }
+    @PostMapping("/getReviewLeaveRecord")
+    public ResponseBase getReviewLeaveRecord(@RequestBody LeaveApprovalRecordWithAccessToken request) {
+        ResponseBase res = new ResponseBase();
+        try {
+            String accessToken = request.getAccessToken();
+            int userId = accessService.getAuthenticatedId(accessToken);
+            request.setUser_id(userId);
+            List<LeaveApprovalRecord> records = leave_service.getReviewLeaveRecord(userId);
+            res.setStatus(0);
+            for (LeaveApprovalRecord record : records) {
+                res.pushData(record);
+            }
+        } catch (Exception e) {
+            res.setStatus(-1);
+            res.setMessage(e.getMessage());
+        }
+        return res;
+    }
+    @PostMapping("/getAdminLeaveRecord")
+    public ResponseBase getAdminLeaveRecord() {
+        ResponseBase res = new ResponseBase();
+        try {
+            List<LeaveApprovalRecord> records = leave_service.getAllRecords();  // 获取所有记录
+            System.out.println("getAdminLeaveRecord: " + res);
+            res.setStatus(0);
+            for (LeaveApprovalRecord record : records) {
+                res.pushData(record);
+            }
+        } catch (Exception e) {
+            res.setStatus(-1);
+            res.setMessage(e.getMessage());
+        }
+        return res;
     }
 
     @PostMapping("/modifyLeaveRecord")

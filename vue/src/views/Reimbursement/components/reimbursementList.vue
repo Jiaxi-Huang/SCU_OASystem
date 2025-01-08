@@ -16,15 +16,24 @@
       <el-form-item>
         <el-button type="primary" @click="showAdminReim" v-if="isAdmin">所有报销申请</el-button>
       </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="onDownload" :icon="Download">打印</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="onToExcel" :icon="Download">导出</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="onShowStatistics()" :icon="Odometer">统计信息</el-button>
+      </el-form-item>
     </el-form>
     <el-table id="myReim" ref="filterTableRef" class="table-list" row-key="reimbursement_id" :data="paginatedMyData" style="width: 100%"
               @filter-change="handleFilterChange" v-show="isMyReimShow">
       <el-table-column
-        prop="reimbursement_id"
-        label="报销编号"
-        sortable
-        width="180"
-        column-key="reimbursement_id"
+          prop="reimbursement_id"
+          label="报销编号"
+          sortable
+          width="180"
+          column-key="reimbursement_id"
       >
       </el-table-column>
       <el-table-column prop="user_id" label="提交用户id" width="180" truncated> </el-table-column>
@@ -41,8 +50,11 @@
           filter-placement="bottom-end"
       >
         <template #default="scope">
-          <el-tag :type="scope.row.status === '已通过' ? 'primary' : 'success'" disable-transitions>{{ scope.row.status}}</el-tag>
-        </template>
+          <el-tag
+              :type="scope.row.status === '已通过' ? 'success' : (scope.row.status === '未审核' ? 'primary' : 'danger')"
+              disable-transitions>
+            {{ scope.row.status }}
+          </el-tag>        </template>
       </el-table-column>
       <el-table-column prop="submitted_at" label="提交时间" truncated> </el-table-column>
       <el-table-column align="right">
@@ -50,7 +62,7 @@
           <el-input v-model="search" size="mini" placeholder="输入标题字段关键字搜索" />
         </template>
         <template #default="scope">
-<!--          <el-button size="mini" @click="modifyPop(scope.row)">修改</el-button>-->
+          <!--          <el-button size="mini" @click="modifyPop(scope.row)">修改</el-button>-->
           <el-button size="mini" @click="detailPop(scope.row)">查看详情</el-button>
           <el-popconfirm confirm-button-text="确定" cancel-button-text="取消" icon="el-icon-info" icon-color="red" title="确定删除该条记录吗？" @confirm="handleDelete(scope.$index, scope.row)">
             <template #reference>
@@ -85,8 +97,11 @@
           filter-placement="bottom-end"
       >
         <template #default="scope">
-          <el-tag :type="scope.row.status === '已通过' ? 'primary' : 'success'" disable-transitions>{{ scope.row.status}}</el-tag>
-        </template>
+          <el-tag
+              :type="scope.row.status === '已通过' ? 'success' : (scope.row.status === '未审核' ? 'primary' : 'danger')"
+              disable-transitions>
+            {{ scope.row.status }}
+          </el-tag>        </template>
       </el-table-column>
       <el-table-column prop="submitted_at" label="提交时间" truncated> </el-table-column>
       <el-table-column align="right">
@@ -94,7 +109,7 @@
           <el-input v-model="search" size="mini" placeholder="输入标题字段关键字搜索" />
         </template>
         <template #default="scope">
-                    <el-button size="mini" @click="modifyPop(scope.row)">处理</el-button>
+          <el-button size="mini" @click="modifyPop(scope.row)">处理</el-button>
           <el-button size="mini" @click="detailPop(scope.row)">查看详情</el-button>
           <el-popconfirm confirm-button-text="确定" cancel-button-text="取消" icon="el-icon-info" icon-color="red" title="确定删除该条记录吗？" @confirm="handleDelete(scope.$index, scope.row)">
             <template #reference>
@@ -129,8 +144,11 @@
           filter-placement="bottom-end"
       >
         <template #default="scope">
-          <el-tag :type="scope.row.status === '已通过' ? 'primary' : 'success'" disable-transitions>{{ scope.row.status}}</el-tag>
-        </template>
+          <el-tag
+              :type="scope.row.status === '已通过' ? 'success' : (scope.row.status === '未审核' ? 'primary' : 'danger')"
+              disable-transitions>
+            {{ scope.row.status }}
+          </el-tag>        </template>
       </el-table-column>
       <el-table-column prop="submitted_at" label="提交时间" truncated> </el-table-column>
       <el-table-column align="right">
@@ -168,7 +186,11 @@
           filter-placement="bottom-end"
       >
         <template #default="scope">
-          <el-tag :type="scope.row.status === '已通过' ? 'primary' : 'success'" disable-transitions>{{ scope.row.status}}</el-tag>
+          <el-tag
+              :type="scope.row.status === '已通过' ? 'success' : (scope.row.status === '未审核' ? 'primary' : 'danger')"
+              disable-transitions>
+            {{ scope.row.status }}
+          </el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="submitted_at" label="提交时间" truncated> </el-table-column>
@@ -177,7 +199,7 @@
           <el-input v-model="search" size="mini" placeholder="输入标题字段关键字搜索" />
         </template>
         <template #default="scope">
-                    <el-button size="mini" @click="modifyPop(scope.row)">修改</el-button>
+          <el-button size="mini" @click="modifyPop(scope.row)">修改</el-button>
           <el-button size="mini" @click="detailPop(scope.row)">查看详情</el-button>
           <el-popconfirm confirm-button-text="确定" cancel-button-text="取消" icon="el-icon-info" icon-color="red" title="确定删除该条记录吗？" @confirm="handleDelete(scope.$index, scope.row)">
             <template #reference>
@@ -247,28 +269,66 @@
       </div>
     </el-dialog>
 
+    <el-dialog v-model="statisticsVisible" title="统计信息">
+      <el-card shadow="hover" class="card">
+        <p>
+          <span><i class="icon-square red"></i> 总记录数 </span> <span>{{ tableData.length }}</span>
+        </p>
+        <div class="e-chart" style="height: 201px; width: 100%">
+          <div ref="refAverageSales" style="width: inherit; height: inherit;"></div>
+        </div>
+        <div class="chart-widget-list">
+          <p>
+            <span><i class="icon-square green"></i> 已通过</span><span>{{ statistics.pass }}</span>
+          </p>
+          <p>
+            <span><i class="icon-square deep-blue"></i> 未审核 </span> <span>{{ statistics.unfin }}</span>
+          </p>
+          <p>
+            <span><i class="icon-square red"></i> 未通过 </span> <span>{{ statistics.rej }}</span>
+          </p>
+        </div>
+      </el-card>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="statisticsVisible = false">确认</el-button>
+      </div>
+    </el-dialog>
+
     <el-pagination
-      :current-page="currentPage"
-      :page-sizes="[5, 10, 15, 20, 25]"
-      :page-size="pageSize"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="record_cnt"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
+        :current-page="currentPage"
+        :page-sizes="[5, 10, 15, 20, 25]"
+        :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="record_cnt"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
     >
     </el-pagination>
 
   </div>
 </template>
 <script lang="ts">
-import {computed, defineComponent, onMounted, reactive, ref, toRefs, watch} from 'vue'
+import {computed, defineComponent, nextTick, onMounted, reactive, ref, toRefs, watch} from 'vue'
 import { useRouter } from 'vue-router'
 import permission from '@/directive/permission'
 import Service from '../api/index'
-import {ElMessage} from "element-plus";
+import {ElMessage, ElMessageBox} from "element-plus";
+import {Download, Odometer, Printer} from "@element-plus/icons-vue";
+import {useInitPieChart} from "./useInitPieCharts";
+import * as XLSX from 'xlsx';
 
 export default defineComponent({
   name: 'reimbursementList',
+  computed: {
+    Download() {
+      return Download
+    },
+    Odometer() {
+      return Odometer
+    }
+  },
+  components: {Download, Printer, Odometer},
   directives: {
     permission
   },
@@ -276,6 +336,7 @@ export default defineComponent({
 
     const router = useRouter()
     const filterTableRef = ref()
+    const refAverageSales = ref<HTMLElement | null>(null)
     const state = reactive({
       tableData: [
         {
@@ -292,7 +353,9 @@ export default defineComponent({
       search: '',
       modifyFormVisible: false,
       detailFormVisible: false,
+      statisticsVisible: false,
       form: {},
+      statistics: {pass: 0, rej: 0, unfin: 0},
       record_cnt: 0,
       status_options: [
         {
@@ -389,7 +452,6 @@ export default defineComponent({
       state.tableData = state.paginatedNotifyData; // 设置当前表格的数据为 "抄送给我的报销申请" 数据
       updatePaginatedData();
     };
-
     const showAdminReim = () => {
       state.isMyReimShow = false;
       state.isReviewReimShow = false;
@@ -511,33 +573,35 @@ export default defineComponent({
         });
       }
       // 管理员角色，获取所有报销申请
-      try {
-        Service.getAdminReimbursementList().then((res) => {
-          if (res) {
-            const adminReimData = [];
-            var data = res.data;
-            for (let i = 0; i < data.length; i++) {
-              var record = {
-                reimbursement_id: data[i].reimbursement_id,
-                user_id: data[i].user_id,
-                amount: data[i].amount,
-                description: data[i].description,
-                status: data[i].status,
-                submitted_at: data[i].submitted_at,
-              };
-              adminReimData.push(record);
-              // console.log("adminReimData:", JSON.stringify(adminReimData))
+      if(isAdmin) {
+        try {
+          Service.getAdminReimbursementList().then((res) => {
+            if (res) {
+              const adminReimData = [];
+              var data = res.data;
+              for (let i = 0; i < data.length; i++) {
+                var record = {
+                  reimbursement_id: data[i].reimbursement_id,
+                  user_id: data[i].user_id,
+                  amount: data[i].amount,
+                  description: data[i].description,
+                  status: data[i].status,
+                  submitted_at: data[i].submitted_at,
+                };
+                adminReimData.push(record);
+                // console.log("adminReimData:", JSON.stringify(adminReimData))
+              }
+              state.paginatedAdminData = adminReimData;  //
+            } else {
+              console.log('获取管理员报销申请数据失败');
             }
-            state.paginatedAdminData = adminReimData;  //
-          } else {
-            console.log('获取管理员报销申请数据失败');
-          }
-        });
-      } catch (err) {
-        ElMessage({
-          type: 'warning',
-          message: err.message
-        });
+          });
+        } catch (err) {
+          ElMessage({
+            type: 'warning',
+            message: err.message
+          });
+        }
       }
     };
 
@@ -610,10 +674,7 @@ export default defineComponent({
       state.currentPage = val
       updatePaginatedData();  // 更新分页数据
     }
-    const onSubmit = () => {
-      // eslint-disable-next-line no-console
-      console.log('submit!')
-    }
+
     const handleFilterChange = (filters: any) => {
       state.filters.status = filters.status;
       updatePaginatedData();
@@ -623,6 +684,113 @@ export default defineComponent({
       // eslint-disable-next-line no-console
       router.replace('/reimbursement/reimbursementAdd')
     }
+    const onDownload = () => {
+      ElMessageBox.confirm('确定要打印当前表格数据吗？', '温馨提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'info'
+      }).then(() => {
+        const table = document.querySelector('.el-table') as HTMLElement;
+
+        if (table) {
+          const printWindow = window.open('', '', 'height=600,width=800');
+          if (printWindow) {
+            printWindow.document.write('<html><head><title>打印报销数据</title>');
+            printWindow.document.write('<style>table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #000; padding: 8px; text-align: left; }</style>');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write('<h2>报销数据</h2>');
+            printWindow.document.write(table.outerHTML);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+
+            setTimeout(() => {
+              printWindow.print();
+              printWindow.close();
+            }, 50000);
+          }
+        } else {
+          ElMessage({
+            type: 'error',
+            message: '无法获取表格数据'
+          });
+        }
+      }).catch(() => {
+        ElMessage({
+          type: 'info',
+          message: '已取消'
+        });
+      });
+    };
+
+    const onToExcel = () => {
+      ElMessageBox.confirm('确定要导出当前表格数据为 Excel 吗？', '温馨提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'info'
+      }).then(() => {
+        const data = state.tableData.map((item) => ({
+          报销编号: item.reimbursement_id,
+          提交用户ID: item.user_id,
+          金额: item.amount,
+          描述: item.description,
+          状态: item.status,
+          提交时间: item.submitted_at,
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, '报销数据');
+
+        XLSX.writeFile(workbook, '报销数据.xlsx');
+
+        ElMessage({
+          type: 'success',
+          message: 'Excel 文件已生成并下载'
+        });
+      }).catch(() => {
+        ElMessage({
+          type: 'info',
+          message: '已取消'
+        });
+      });
+    };
+
+    const onShowStatistics = () => {
+      state.statisticsVisible = true
+      let pass = 0, rej = 0, unfin = 0;
+      state.tableData.forEach(record => {
+        if(record.status == '已通过'){
+          pass++;
+        }else if(record.status == '未通过'){
+          rej++;
+        }else{
+          unfin++;
+        }
+      })
+      state.statistics.pass = pass;
+      state.statistics.unfin = unfin;
+      state.statistics.rej = rej;
+      const data = [
+        {
+          name: "已通过",
+          value: pass
+        },
+        {
+          name: "未通过",
+          value: rej
+        },
+        {
+          name: "未审核",
+          value: unfin
+        }];
+      nextTick(() => {
+        if (refAverageSales.value) {
+          useInitPieChart(refAverageSales.value, data)
+        } else {
+          console.log("refAverageSales not exist!")
+        }
+      })
+    }
 
     return {
       formInline,
@@ -630,7 +798,6 @@ export default defineComponent({
       ...toRefs(state),
       handleCurrentChange,
       handleSizeChange,
-      onSubmit,
       onAddReimbursement,
       handleEdit,
       handleDelete,
@@ -646,20 +813,23 @@ export default defineComponent({
       showNotifyReim,
       showAdminReim,
       isAdmin,
+      onDownload,
+      onToExcel,
+      onShowStatistics,
+      refAverageSales,
     }
   }
 })
 </script>
 <style lang="stylus" scoped>
 .table-container{
-    .form-inline{
-        margin:15px;
-        text-align:left;
-    }
-    .table-list{
-        margin:15px;
-    }
+  .form-inline{
+    margin:15px;
+    text-align:left;
+  }
+  .table-list{
+    margin:15px;
+  }
 
 }
 </style>
-

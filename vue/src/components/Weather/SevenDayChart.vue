@@ -8,8 +8,6 @@
     </el-tooltip>
     <div class="info">
       <span>当前位置：{{ city }}</span>
-      <span>天气情况：{{ weatherDescription }}</span>
-      <span>温度：{{ temperature }}°C</span>
       <div ref="chart" style="width: 400px; height: 300px;"></div>
     </div>
   </div>
