@@ -160,7 +160,7 @@ public class Auth {
                 } else if (roleName.equals("manager")) {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
-                            "/worker", "/todoList", "/reimbursement","/meetings","/leaveApproval","/file","/MyCalender","/personal");
+                            "/worker", "/todoList", "/reimbursement","/meetings","/leaveApproval","/file","/MyCalender","/personal","/personalAttendance");
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
                             0,
@@ -414,7 +414,7 @@ public class Auth {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
                             "space","service","conference","resource","question","property","user","worker",
-                            "apply","device","todo","meeting","reimbursement","leave"
+                            "apply","device","todo","meeting","reimbursement","leave","file"
                     );
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
@@ -428,7 +428,7 @@ public class Auth {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
                             "space","service","conference","resource","question","property","user","worker",
-                            "apply","device","todo","meeting","reimbursement","leave"
+                            "apply","device","todo","meeting","reimbursement","leave","file"
                     );
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
@@ -441,7 +441,7 @@ public class Auth {
                 } else {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
-                            "user","worker","todo","meeting","reimbursement","leave");
+                            "user","worker","todo","meeting","reimbursement","leave","file");
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
                             0,
