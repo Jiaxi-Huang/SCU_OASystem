@@ -12,6 +12,16 @@
                 <el-form-item label="请假原因">
                   <el-input v-model="sizeForm.leave_reason"></el-input>
                 </el-form-item>
+                <el-form-item label="请假类型">
+                  <el-select v-model="sizeForm.leave_type">
+                    <el-option
+                      v-for="item in leave_type_options"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    />
+                  </el-select>
+                </el-form-item>
                 <el-form-item label="开始时间">
                   <el-col :span="11">
                     <el-date-picker v-model="sizeForm.leave_start_time1"
@@ -116,6 +126,36 @@ import { lowerCase } from 'lodash';
         notified_user: 0,
       })
       const all_users = ref([]);
+      const leave_type_options= [
+        {
+          value: '事假',
+          label: '事假',
+        },
+        {
+          value: '病假',
+          label: '病假',
+        },
+        {
+          value: '年假',
+          label: '年假',
+        },
+        {
+          value: '调休',
+          label: '调休',
+        },
+        {
+          value: '婚假',
+          label: '婚假',
+        },
+        {
+          value: '产假',
+          label: '产假',
+        },
+        {
+          value: '陪产假',
+          label: '陪产假',
+        }
+      ];
 
       const activityForm = ref()
 
@@ -127,7 +167,7 @@ import { lowerCase } from 'lodash';
                 value: user.userId,
                 label: user.username || user.email,
               }));
-              // console.log("all_users updated:", JSON.stringify(all_users));
+              // console.log(" leave all_users updated:", JSON.stringify(all_users));
             })
             .catch((err) => {
               console.error("Failed to fetch users:", err);
@@ -223,7 +263,9 @@ import { lowerCase } from 'lodash';
       return {
         handleBack,
         sizeForm,
+        all_users,
         activityForm,
+        leave_type_options,
         submitForm,
         resetForm,
       }

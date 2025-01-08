@@ -57,10 +57,12 @@ class Service {
     })
   }
   static postGetAdminLeaveRecord() {
+    const data = {'accessToken':sessionStorage.getItem('accessToken')}
     return request({
       url: leaveApprovalApi.localHost + leaveApprovalApi.getAdminLeaveRecord,
       method: 'POST',
       json: true,
+      data: data,
     }).then((res) => {
       if (res.status === 0) {
         return res

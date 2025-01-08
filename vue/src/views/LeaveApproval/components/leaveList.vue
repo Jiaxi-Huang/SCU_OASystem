@@ -17,6 +17,15 @@
         <el-form-item>
           <el-button type="primary" @click="showAdminLeave" v-if="isAdmin">所有请假申请</el-button>
         </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onDownload" :icon="Download">打印</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onToExcel" :icon="Download">导出</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onShowStatistics()" :icon="Odometer">统计信息</el-button>
+        </el-form-item>
       </el-form>
       <!---------------------------------------管理员所有请假列表--------------------------------------->
       <el-table ref="filterTableRef"
@@ -26,7 +35,7 @@
                 :data="adminData"
                 style="width: 100%"
                 v-show="isAdminLeaveShow">
-        <el-table-column prop="leave_submit_at" label="提交日期" sortable width="180" column-key="leave_submit_at"></el-table-column>
+        <el-table-column prop="leave_submitted_at" label="提交日期" sortable width="180" column-key="leave_submitted_at"></el-table-column>
         <el-table-column prop="leave_start_time" label="开始时间" width="180" truncated> </el-table-column>
         <el-table-column prop="leave_end_time" label="结束时间" truncated> </el-table-column>
         <el-table-column prop="leave_reason" label="原因" truncated> </el-table-column>
@@ -57,8 +66,11 @@
           filter-placement="bottom-end"
         >
           <template #default="scope">
-            <el-tag :type="scope.row.status === '已完成' ? 'primary' : 'success'" disable-transitions>{{ scope.row.status }}</el-tag>
-          </template>
+            <el-tag
+                :type="scope.row.leave_status === '已通过' ? 'success' : (scope.row.leave_status === '未审核' ? 'primary' : 'danger')"
+                disable-transitions>
+              {{ scope.row.leave_status }}
+            </el-tag>           </template>
         </el-table-column>
       </el-table>
       <!---------------------------------------我的请假列表--------------------------------------->
@@ -69,7 +81,7 @@
                 :data="myData"
                 style="width: 100%"
                 v-show="isMyLeaveShow">
-        <el-table-column prop="leave_submit_at" label="提交日期" sortable width="180" column-key="leave_submit_at"></el-table-column>
+        <el-table-column prop="leave_submitted_at" label="提交日期" sortable width="180" column-key="leave_submitted_at"></el-table-column>
         <el-table-column prop="leave_start_time" label="开始时间" width="180" truncated> </el-table-column>
         <el-table-column prop="leave_end_time" label="结束时间" truncated> </el-table-column>
         <el-table-column prop="leave_reason" label="原因" truncated> </el-table-column>
@@ -99,8 +111,11 @@
             filter-placement="bottom-end"
         >
           <template #default="scope">
-            <el-tag :type="scope.row.status === '已完成' ? 'primary' : 'success'" disable-transitions>{{ scope.row.status }}</el-tag>
-          </template>
+            <el-tag
+                :type="scope.row.leave_status === '已通过' ? 'success' : (scope.row.leave_status === '未审核' ? 'primary' : 'danger')"
+                disable-transitions>
+              {{ scope.row.leave_status }}
+            </el-tag>           </template>
         </el-table-column>
       </el-table>
       <!---------------------------------------我处理的请假列表--------------------------------------->
@@ -111,7 +126,7 @@
                 :data="reviewData"
                 style="width: 100%"
                 v-show="isReviewLeaveShow">
-        <el-table-column prop="leave_submit_at" label="提交日期" sortable width="180" column-key="leave_submit_at"></el-table-column>
+        <el-table-column prop="leave_submitted_at" label="提交日期" sortable width="180" column-key="leave_submitted_at"></el-table-column>
         <el-table-column prop="leave_start_time" label="开始时间" width="180" truncated> </el-table-column>
         <el-table-column prop="leave_end_time" label="结束时间" truncated> </el-table-column>
         <el-table-column prop="leave_reason" label="原因" truncated> </el-table-column>
@@ -142,8 +157,11 @@
             filter-placement="bottom-end"
         >
           <template #default="scope">
-            <el-tag :type="scope.row.status === '已完成' ? 'primary' : 'success'" disable-transitions>{{ scope.row.status }}</el-tag>
-          </template>
+            <el-tag
+                :type="scope.row.leave_status === '已通过' ? 'success' : (scope.row.leave_status === '未审核' ? 'primary' : 'danger')"
+                disable-transitions>
+              {{ scope.row.leave_status }}
+            </el-tag>           </template>
         </el-table-column>
       </el-table>
       <!---------------------------------------抄送给我的请假列表--------------------------------------->
@@ -154,7 +172,7 @@
                 :data="notifyData"
                 style="width: 100%"
                 v-show="isNotifyLeaveShow">
-        <el-table-column prop="leave_submit_at" label="提交日期" sortable width="180" column-key="leave_submit_at"></el-table-column>
+        <el-table-column prop="leave_submitted_at" label="提交日期" sortable width="180" column-key="leave_submitted_at"></el-table-column>
         <el-table-column prop="leave_start_time" label="开始时间" width="180" truncated> </el-table-column>
         <el-table-column prop="leave_end_time" label="结束时间" truncated> </el-table-column>
         <el-table-column prop="leave_reason" label="原因" truncated> </el-table-column>
@@ -179,7 +197,11 @@
             filter-placement="bottom-end"
         >
           <template #default="scope">
-            <el-tag :type="scope.row.status === '已完成' ? 'primary' : 'success'" disable-transitions>{{ scope.row.status }}</el-tag>
+            <el-tag
+                :type="scope.row.leave_status === '已通过' ? 'success' : (scope.row.leave_status === '未审核' ? 'primary' : 'danger')"
+                disable-transitions>
+              {{ scope.row.leave_status }}
+            </el-tag>
           </template>
         </el-table-column>
       </el-table>
@@ -208,7 +230,7 @@
             <el-input v-model="form.leave_status"></el-input>
           </el-form-item>
           <el-form-item label="提交日期">
-            <el-input v-model="form.leave_submit_at" autocomplete="off"></el-input>
+            <el-input v-model="form.leave_submitted_at" autocomplete="off"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -241,14 +263,40 @@
             {{ form.leave_status }}
           </el-form-item>
           <el-form-item label="提交日期&nbsp;&nbsp;">
-            {{ form.leave_submit_at }}
+            {{ form.leave_submitted_at }}
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button type="primary" @click="detailFormVisible = false">确定</el-button>
         </div>
       </el-dialog>
-  
+
+      <el-dialog v-model="statisticsVisible" title="统计信息">
+        <el-card shadow="hover" class="card">
+          <p>
+            <span><i class="icon-square red"></i> 总记录数 </span> <span>{{ tableData.length }}</span>
+          </p>
+          <div class="e-chart" style="height: 201px; width: 100%">
+            <div ref="refAverageSales" style="width: inherit; height: inherit;"></div>
+          </div>
+          <div class="chart-widget-list">
+            <p>
+              <span><i class="icon-square green"></i> 已通过</span><span>{{ statistics.pass }}</span>
+            </p>
+            <p>
+              <span><i class="icon-square deep-blue"></i> 未审核 </span> <span>{{ statistics.unfin }}</span>
+            </p>
+            <p>
+              <span><i class="icon-square red"></i> 未通过 </span> <span>{{ statistics.rej }}</span>
+            </p>
+          </div>
+        </el-card>
+
+        <div slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="statisticsVisible = false">确认</el-button>
+        </div>
+      </el-dialog>
+
       <el-pagination
         :hide-on-single-page="true"
         :current-page="currentPage"
@@ -265,14 +313,26 @@
   </div>
   </template>
   <script lang="ts">
-  import {computed, defineComponent, onMounted, reactive, ref, toRefs, watch} from 'vue'
+  import {computed, defineComponent, nextTick, onMounted, reactive, ref, toRefs, watch} from 'vue'
   import { useRouter } from 'vue-router'
   import permission from '@/directive/permission'
   import Service from '../api/index'
   import {ElMessage} from "element-plus";
-  
+  import {Download, Odometer} from "@element-plus/icons-vue";
+  import * as XLSX from 'xlsx';
+  import {ElMessageBox} from "element-plus/es";
+  import {useInitPieChart} from "./useInitPieCharts";
+
   export default defineComponent({
     name: 'leaveList',
+    computed: {
+      Download() {
+        return Download
+      },
+      Odometer() {
+        return Odometer
+      }
+    },
     directives: {
       permission
     },
@@ -280,6 +340,8 @@
   
       const router = useRouter()
       const filterTableRef = ref()
+      const refAverageSales = ref<HTMLElement | null>(null)
+
       const state = reactive({
         loading: false,
         tableData: [
@@ -299,7 +361,9 @@
         search: '',
         modifyFormVisible: false,
         detailFormVisible: false,
+        statisticsVisible: false,
         form: {},
+        statistics: {pass:0, rej:0, unfin:0},
         record_cnt: 0,
         filters: {
           status: ''
@@ -563,7 +627,7 @@
       };
       watch(() => state.search, watchSearch);
 
-      const filterStatus = (value: any, row: { status: any }) => row.status === value
+      const filterStatus = (value: any, row: { status: any }) => row.leave_status === value
 
       const modifyPop = (row) => {
         state.modifyFormVisible = true
@@ -632,6 +696,117 @@
         router.replace('/leaveApproval/leaveRequest')
       }
 
+      const onDownload = () => {
+        ElMessageBox.confirm('确定要打印当前表格数据吗？', '温馨提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'info'
+        }).then(() => {
+          const table = document.querySelector('.el-table') as HTMLElement;
+
+          if (table) {
+            const printWindow = window.open('', '', 'height=600,width=800');
+            if (printWindow) {
+              printWindow.document.write('<html><head><title>打印请假数据</title>');
+              printWindow.document.write('<style>table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #000; padding: 8px; text-align: left; }</style>');
+              printWindow.document.write('</head><body>');
+              printWindow.document.write('<h2>请假数据</h2>');
+              printWindow.document.write(table.outerHTML);
+              printWindow.document.write('</body></html>');
+              printWindow.document.close();
+
+              setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+              }, 50000);
+            }
+          } else {
+            ElMessage({
+              type: 'error',
+              message: '无法获取表格数据'
+            });
+          }
+        }).catch(() => {
+          ElMessage({
+            type: 'info',
+            message: '已取消'
+          });
+        });
+      };
+
+      const onToExcel = () => {
+        ElMessageBox.confirm('确定要导出当前表格数据为 Excel 吗？', '温馨提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'info'
+        }).then(() => {
+          const data = state.tableData.map((item) => ({
+            leave_id: item.leave_id,
+            leave_user_id: item.leave_user_id,
+            leave_start_time: item.leave_start_time,
+            leave_end_time: item.leave_end_time,
+            leave_type: item.leave_type,
+            leave_reason: item.leave_reason,
+            leave_status: item.leave_status,
+            leave_submitted_at: item.leave_submitted_at,
+          }));
+
+          const worksheet = XLSX.utils.json_to_sheet(data);
+          const workbook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workbook, worksheet, '请假数据');
+
+          XLSX.writeFile(workbook, '请假数据.xlsx');
+
+          ElMessage({
+            type: 'success',
+            message: 'Excel 文件已生成并下载'
+          });
+        }).catch(() => {
+          ElMessage({
+            type: 'info',
+            message: '已取消'
+          });
+        });
+      };
+
+      const onShowStatistics = () => {
+        state.statisticsVisible = true
+        let pass = 0, rej = 0, unfin = 0;
+        state.tableData.forEach(record => {
+          if(record.leave_status == '已通过'){
+            pass++;
+          }else if(record.leave_status == '未通过'){
+            rej++;
+          }else{
+            unfin++;
+          }
+        })
+        state.statistics.pass = pass;
+        state.statistics.unfin = unfin;
+        state.statistics.rej = rej;
+        const data = [
+          {
+            name: "已通过",
+            value: pass
+          },
+          {
+            name: "未通过",
+            value: rej
+          },
+          {
+            name: "未审核",
+            value: unfin
+          }];
+        nextTick(() => {
+          if (refAverageSales.value) {
+            useInitPieChart(refAverageSales.value, data)
+          } else {
+            console.log("refAverageSales not exist!")
+          }
+        })
+      }
+
+
       return {
         formInline,
         total,
@@ -653,6 +828,10 @@
         showNotifyLeave,
         showAdminLeave,
         isAdmin,
+        onDownload,
+        onToExcel,
+        onShowStatistics,
+        refAverageSales,
       }
     }
   })
