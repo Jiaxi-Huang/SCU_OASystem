@@ -12,6 +12,7 @@
           <el-button type="primary" size="medium" @click="onCheckOut">下班打卡</el-button>
           <el-button type="info" size="medium" @click="onExport"><el-icon><download /></el-icon>导出列表</el-button>
           <el-button type="info" size="medium" @click="onPrint"><el-icon><printer /></el-icon>打印列表</el-button>
+          <el-button type="success" size="medium" @click="onStatistic"><el-icon><odometer /></el-icon>统计信息</el-button>
         </el-col>
         <el-col :span="14" style="text-align: right">
           <el-input
@@ -63,15 +64,18 @@
     <el-dialog v-model="detail_visible" center title="考勤详情">
       <personal-attendance-detail :current-row="posted.userRow"></personal-attendance-detail>
     </el-dialog>
+    <el-dialog v-model="statistic_visible" center title="统计信息">
+      <attendance-statistic :data="data"></attendance-statistic>
+    </el-dialog>
   </div>
 </template>
 <script lang="ts">
 import {defineComponent, reactive, toRefs, computed, onMounted, watch} from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import {Download, Edit, InfoFilled, Minus, Plus, Printer, Refresh, Search} from '@element-plus/icons-vue'
+import {Download, Edit, InfoFilled, Minus, Odometer, Plus, Printer, Refresh, Search} from '@element-plus/icons-vue'
 import PersonalAttendanceDetail from "@/views/attendance/personalAttendanceDetail.vue";
 import Service from './api/index'
-
+import AttendanceStatistic from "./attendanceStatistic.vue"
 
 export default defineComponent({
   name: 'Attendance',
@@ -84,10 +88,12 @@ export default defineComponent({
     }
   },
   components: {
+    Odometer,
     InfoFilled,
     Printer,
     Download,
     PersonalAttendanceDetail,
+    AttendanceStatistic,
     Edit,
     Minus,
     Plus,
@@ -118,6 +124,7 @@ export default defineComponent({
       add_visible: false,
       edit_visible: false,
       detail_visible: false,
+      statistic_visible: false,
       posted: {
         userRow: {
           id: null,
@@ -219,7 +226,9 @@ export default defineComponent({
           })
     }
 
-
+    const onStatistic = async()=>{
+      state.statistic_visible = true
+    }
 
     /**
      * @description 对数据进行排序
@@ -388,6 +397,7 @@ export default defineComponent({
       handleSelectionChange,
       onCurrentChange,
       onSizeChange,
+      onStatistic,
       onDetail,
       onSearch,
       onExport,

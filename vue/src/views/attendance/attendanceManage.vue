@@ -19,6 +19,7 @@
           <el-button type="primary" size="medium" @click="onCreate"><el-icon><plus /></el-icon>新增考勤</el-button>
           <el-button type="info" size="medium" @click="onExport"><el-icon><download /></el-icon>导出列表</el-button>
           <el-button type="info" size="medium" @click="onPrint"><el-icon><printer /></el-icon>打印列表</el-button>
+          <el-button type="success" size="medium" @click="onStatistic"><el-icon><odometer /></el-icon>统计信息</el-button>
         </el-col>
         <el-col :span="14" style="text-align: right">
           <el-input
@@ -102,17 +103,21 @@
     <el-dialog v-model="add_visible" title="新增考勤">
       <attendance-new @success="onCreateSuccess"></attendance-new>
     </el-dialog>
+    <el-dialog v-model="statistic_visible" center title="统计信息">
+      <attendance-statistic :data="data"></attendance-statistic>
+    </el-dialog>
   </div>
 </template>
 <script lang="ts">
 import {defineComponent, reactive, toRefs, computed, onMounted, watch} from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import {Download, Edit, InfoFilled, Minus, Plus, Printer, Refresh, Search} from '@element-plus/icons-vue'
+import {Download, Edit, InfoFilled, Minus, Odometer, Plus, Printer, Refresh, Search} from '@element-plus/icons-vue'
 import AttendanceDetail from './attendanceDetail.vue'
 import AttendanceEdit from './attendanceEdit.vue'
 import AttendanceNew from './attendanceNew.vue'
 import Service from './api/index'
-import {AnyObject} from "@/views/File/packages/vue-vuecmf-fileexplorer/src/typings/vuecmf";
+import AttendanceStatistic from "./attendanceStatistic.vue"
+
 
 
 export default defineComponent({
@@ -126,12 +131,14 @@ export default defineComponent({
     }
   },
   components: {
+    Odometer,
     AttendanceDetail,
     InfoFilled,
     Printer,
     Download,
     AttendanceEdit,
     AttendanceNew,
+    AttendanceStatistic,
     Edit,
     Minus,
     Plus,
@@ -157,6 +164,7 @@ export default defineComponent({
           userName:'',
           department:'',
           role:'',
+          userRole:''
         },
       ],
       filteredData: [],
@@ -165,6 +173,7 @@ export default defineComponent({
       add_visible: false,
       edit_visible: false,
       detail_visible: false,
+      statistic_visible: false,
       posted: {
         userRow: {
           id: null,
@@ -397,7 +406,9 @@ export default defineComponent({
         });
       });
     }
-
+    const onStatistic = async()=>{
+      state.statistic_visible = true
+    }
 
     const filterStatus = (value: any, row: { status: any }) => row.status === value
 
@@ -420,6 +431,7 @@ export default defineComponent({
       onCreateSuccess,
       onEditSuccess,
       onDetail,
+      onStatistic,
       onEdit,
       onDelete,
       onSearch,
