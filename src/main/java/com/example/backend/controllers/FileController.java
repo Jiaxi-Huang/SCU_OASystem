@@ -18,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/api/file")
 public class FileController {
@@ -150,7 +152,8 @@ public class FileController {
     public ResponseEntity<ResponseBase> uploadFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam("folder_id") String folderId,  // 接收 folder_id
-            @RequestParam("accessToken") String accessToken
+            @RequestParam("accessToken") String accessToken,
+            @RequestParam("fileName") String fileName
             ) {  // 获取 accessToken) {        // 接收 user
 
         ResponseBase response = new ResponseBase();
@@ -191,9 +194,14 @@ public class FileController {
 
             record.setFilePath(filePath);
             int dotIndex = allFileName.lastIndexOf('.');
-
+            System.out.println(fileName);
             // 分离文件名和扩展名
-            String fileName = allFileName.substring(0, dotIndex);
+            if (Objects.isNull(fileName) || fileName.isEmpty()) {
+                fileName = allFileName.substring(0, dotIndex);
+                System.out.println(fileName);
+            }
+            //区分web和wechat
+
             String ext = allFileName.substring(dotIndex + 1);
             System.out.println(fileName);
             System.out.println(ext);

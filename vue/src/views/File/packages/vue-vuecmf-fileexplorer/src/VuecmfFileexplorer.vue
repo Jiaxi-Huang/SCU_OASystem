@@ -312,7 +312,7 @@
             :auto-upload="false"
             :multiple="true"
             :headers="headers"
-            :data="Object.assign(additionalParams,{folder_id: folder.current_select_key})"
+            :data="Object.assign(additionalParams,{folder_id: folder.current_select_key},{fileName:''})"
             :on-success="service.onUploadSuccess"
             :on-error="service.onUploadError"
             :before-upload="service.beforeUpload"
