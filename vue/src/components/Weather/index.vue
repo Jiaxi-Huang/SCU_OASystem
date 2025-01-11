@@ -51,9 +51,16 @@ const getWeatherIcon = (weather: string) => {
       return qingIcon; // 默认返回晴天的图标
   }
 };
+const getLocalDate = () => {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从 0 开始，需要加 1
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 const getWeather = async (cityName: string) => {
-  const today = new Date().toISOString().split('T')[0];
+  const today = getLocalDate(); // 使用本地时区的日期
   try {
     const response = await axios.get(`http://localhost:8080/api/weather?city=${cityName}&date=${today}`);
     console.log("Request URL:", `http://localhost:8080/api/weather?city=${cityName}&date=${today}`);
