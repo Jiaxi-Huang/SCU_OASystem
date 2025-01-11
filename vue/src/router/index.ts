@@ -600,7 +600,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
         component: () => import('@/views/LeaveApproval/components/leaveList.vue'),
         meta: {
           title: {
-            '/zh-CN': '请假',
+            '/zh-CN': '请假管理',
             '/en-US': 'Leave list'
           },
           icon: 'ic ic-barrage-fill'

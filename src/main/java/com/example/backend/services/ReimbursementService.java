@@ -46,6 +46,11 @@ public class ReimbursementService extends ServiceImpl<ReimbursementMapper, Reimb
                 record.getStatus(), record.getSubmitted_at(), record.getReview_user_id());
     }
 
+    public void addNotification(ReimJoinNotifyRecord record) {
+        // 这里假设你有一个 NotificationMapper 来处理通知的插入
+        ReimbursementMapper.insertNotification(record);
+    }
+
 
     public int deleteReimbursementRecord(ReimbursementRecord record) {
         int res_code = ReimbursementMapper.deleteReimbursementRecord(record.getReimbursement_id());
