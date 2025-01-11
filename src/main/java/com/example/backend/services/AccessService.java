@@ -1,13 +1,16 @@
 package com.example.backend.services;
 
-import com.example.backend.annotation.LogOperation;
 import com.example.backend.annotation.LogOperationWithId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 @Service
 public class AccessService {
@@ -25,8 +28,22 @@ public class AccessService {
         redisTemplate.opsForValue().set(accessToken,authenticatedId, 24, TimeUnit.HOURS);
         return true;
     }
-    @LogOperation("Token获取ID")
     public Integer getAuthenticatedId(String accessToken) {
         return redisTemplate.opsForValue().get(accessToken);
+    }
+    public Integer getOnlineUsers(){
+        Set<Integer> userIds = new HashSet<>();
+        // 使用 scan 迭代所有匹配模式的键
+        try (Cursor<String> cursor = redisTemplate.scan(ScanOptions.scanOptions().match("*").count(1000).build())) {
+            while (cursor.hasNext()) {
+                String key = cursor.next();
+                Integer userId = redisTemplate.opsForValue().get(key);
+                if (userId != null) {
+                    userIds.add(userId);
+                }
+            }
+        }
+
+        return userIds.size();
     }
 }

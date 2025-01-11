@@ -9,8 +9,8 @@
 </template>
 
 <script setup>
-import { deepClone, deepMerge } from '~/utils'
-import {reactive} from "vue";
+import { deepClone, deepMerge } from '@/utils'
+import {onMounted, reactive, watch} from "vue";
 
 const props = defineProps({
   config: {
@@ -34,7 +34,7 @@ const state = reactive({
          * @default colors = ['#00baff', '#3de7c9', '#fff', '#ffc530', '#469f4b']
          * @example colors = ['#666', 'rgb(0, 0, 0)', 'rgba(0, 0, 0, 1)', 'red']
          */
-    colors: ['#00baff', '#3de7c9', '#fff', '#ffc530', '#469f4b'],
+    colors: ['#00baff', '#3de7c9', '#ffc530', '#469f4b'],
   },
 
   mergedConfig:  {

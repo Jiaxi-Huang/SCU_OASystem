@@ -6,6 +6,7 @@ import com.example.backend.entity.authedRoutes.AuthedRoutesResponse;
 import com.example.backend.entity.userInfo.adminUserInfoRequest;
 import com.example.backend.entity.userInfo.adminUserInfoResponse;
 import com.example.backend.entity.userInfo.userInfoResponse;
+import com.example.backend.entity.userInfo.userStatisticResponse;
 import com.example.backend.services.AccessService;
 import com.example.backend.services.MenuService;
 import com.example.backend.services.UserService;
@@ -33,6 +34,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -381,6 +384,55 @@ public class Admin {
         }
         catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+    @PostMapping("/user/statistic")
+    public ResponseEntity<userStatisticResponse> userStatistic(@RequestBody adminUserInfoRequest request) {
+        try {
+            String accessToken = request.getAccessToken();
+            int userId = accessService.getAuthenticatedId(accessToken);
+            String role = userService.getById(userId).getRole();
+            if(role.equals("admin")) {
+                List<User> userInfo = userService.adminUserInfo(userId);
+                Integer onlineUsers = accessService.getOnlineUsers();
+                Map<String, Long> userRoleCounts = userInfo.stream()
+                        .collect(Collectors.groupingBy(User::getRole, Collectors.counting()));
+                List<userStatisticResponse.Data> data = userRoleCounts.entrySet().stream()
+                        .map(entry -> {
+                            userStatisticResponse.Data dataEntry = new userStatisticResponse.Data();
+                            dataEntry.setName(entry.getKey());
+                            dataEntry.setValue(entry.getValue().intValue());
+                            return dataEntry;
+                        }).toList();
+                userStatisticResponse response = new userStatisticResponse(
+                        0,
+                        "获取用户统计信息成功",
+                        true,
+                        onlineUsers,
+                        data
+                );
+                return ResponseEntity.status(HttpStatus.OK).body(response);
+            }
+            else{
+                userStatisticResponse response = new userStatisticResponse(
+                        1,
+                        "权限不足",
+                        false,
+                        0,
+                        null
+                );
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+        }
+        catch (Exception e) {
+            userStatisticResponse response = new userStatisticResponse(
+                    2,
+                    "获取用户统计信息失败",
+                    false,
+                    0,
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
     @PostMapping("/menu/update")

@@ -2,33 +2,33 @@
   <div class="center-cmp">
     <div class="cc-header">
       <decoration-1 style="width:200px;height:50px;" />
-      <div>机电设备总数</div>
+      <div>用户总数</div>
       <decoration-1 style="width:200px;height:50px;" />
     </div>
 
     <div class="cc-details">
-      <div>设备总数</div>
+      <div>在线用户总数</div>
       <div class="card">
-        2
+        {{state.config.onlineUsers[0]}}
       </div>
       <div class="card">
-        1
+        {{state.config.onlineUsers[1]}}
       </div>
       <div class="card">
-        3
+        {{state.config.onlineUsers[2]}}
       </div>
       <div class="card">
-        7
+        {{state.config.onlineUsers[3]}}
       </div>
     </div>
 
     <div class="cc-main-container">
       <div class="ccmc-left">
         <div class="station-info">
-          收费站<span>1315</span>
+          用户总数<span>{{state.config.allUsers}}</span>
         </div>
         <div class="station-info">
-          监控中心<span>415</span>
+          管理员<span>{{state.config.data[0].value}}</span>
         </div>
       </div>
 
@@ -36,52 +36,83 @@
 
       <div class="ccmc-right">
         <div class="station-info">
-          <span>90</span>道路外场
+          <span>{{state.config.data[1].value}}</span>部门经理
         </div>
         <div class="station-info">
-          <span>317</span>其他
+          <span>{{state.config.data[2].value}}</span>员工
         </div>
       </div>
 
-      <LabelTag :config="state.labelConfig" />
+      <Label-Tag :config="state.labelConfig" />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import {ActiveRingChart,Decoration1} from "@kjgl77/datav-vue3";
-import {reactive} from "vue";
+import {onMounted, reactive} from "vue";
+import LabelTag from "./LabelTag.vue";
+import Service from "../api/index";
 
 const state = reactive({
   config: {
+    onlineUsers: [null,null,null,null],
+    allUsers: 0,
     data: [
       {
-        name: '收费站',
-        value: 1315,
-      },
-      {
-        name: '监控中心',
+        name: '管理员',
         value: 415,
       },
       {
-        name: '道路外场',
+        name: '部门经理',
         value: 90,
       },
       {
-        name: '其他',
+        name: '员工',
         value: 317,
       },
     ],
-    color: ['#00baff', '#3de7c9', '#fff', '#ffc530', '#469f4b'],
+    roleMap : {
+      manager: '部门经理',
+      admin: '管理员',
+      worker: '员工'
+    },
+    color: ['#00baff', '#3de7c9', '#ffc530', '#469f4b'],
     lineWidth: 30,
     radius: '55%',
     activeRadius: '60%',
   },
-
   labelConfig: {
-    data: ['收费站', '监控中心', '道路外场', '其他'],
+    data: ['管理员', '部门经理', '员工'],
   },
+
 })
+
+const processUserData = (users: any[]) => {
+  state.config.data=users.map(item => ({
+    name: state.config.roleMap[item.name] || item.name, // 如果没有找到匹配，则保留原名
+    value: item.value
+  }));
+  // 计算所有 value 的总和
+  state.config.allUsers = users.reduce((sum, item) => sum + item.value, 0);
+}
+onMounted(async () => {
+  try {
+    const data ={accessToken: sessionStorage.getItem('accessToken')}
+    const res = await Service.getAdminUserStatistic(data);
+    if (res) {
+      let onlineUsersArray = res.onlineUsers.toString().split('').map(Number);
+      // 如果数组长度小于指定长度，则在前面填充0
+      while (onlineUsersArray.length < 4) {
+        onlineUsersArray.unshift(0);
+      }
+      state.config.onlineUsers = onlineUsersArray;
+      processUserData(res.data);
+    }
+  } catch(error) {
+      console.error("获取用户数据失败:", error);
+    }
+});
 </script>
 
 <style lang="less">

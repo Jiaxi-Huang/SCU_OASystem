@@ -7,7 +7,7 @@
       <active-ring-chart :config="state.config1" />
       <Label-Tag :config="state.labelConfig" />
     </div>
-    <dv-decoration-2 class="decoration-1" :reverse="true" style="width:5px;" />
+    <decoration-2 class="decoration-1" :reverse="true" style="width:5px;" />
 
     <div class="bc-chart-item">
       <div class="bcci-header">
@@ -43,6 +43,7 @@
 
 import {reactive} from "vue";
 import {Decoration2,ActiveRingChart} from "@kjgl77/datav-vue3";
+import LabelTag from "./LabelTag.vue";
 
 const state = reactive({
   config1: {
