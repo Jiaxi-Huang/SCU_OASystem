@@ -13,7 +13,6 @@ public interface LeaveApprovalMapper extends BaseMapper<LeaveApprovalRecord> {
     @Select("""
         SELECT lr.leave_id,
                lr.user_id,
-               lr.review_user_id,
                lr.start_date,
                lr.end_date,
                lr.type,
@@ -48,10 +47,16 @@ public interface LeaveApprovalMapper extends BaseMapper<LeaveApprovalRecord> {
     int updateLeaveApprovalRecord(int leave_id, int user_id, String start_date, String end_date,
                                   String reason, String status, String submitted_at);
 
-    @Insert("INSERT INTO leave_requests (leave_id, user_id, start_date, end_date, reason, status, submitted_at)" +
-            " VALUES(#{leave_id}, #{user_id}, #{start_date}, #{end_date}, #{reason}, #{status}, #{submitted_at})")
-    int insertLeaveApprovalRecord(int leave_id, int user_id, String start_date, String end_date,
-                                 String reason, String status, String submitted_at);
+    @Insert("INSERT INTO leave_requests (leave_id, user_id, review_user_id, start_date, end_date, type, reason, status, submitted_at)" +
+            " VALUES(#{leave_id}, #{user_id}, #{review_user_id}, #{start_date}, #{end_date}, #{type}, #{reason}, #{status}, #{submitted_at})")
+    @Options(useGeneratedKeys = true, keyProperty = "leave_id", keyColumn = "leave_id")
+    int insertLeaveApprovalRecord(int leave_id, int user_id, int review_user_id, String start_date, String end_date, String type,
+                                  String reason, String status, String submitted_at);
+
+    @Insert("INSERT INTO notification_chain (notified_user_id, request_type, request_id, notified_at, cc_user_id) " +
+            "VALUES (#{notified_user_id}, #{request_type}, #{request_id}, #{notified_at}, #{cc_user_id})")
+    @Options(useGeneratedKeys = true, keyProperty = "notification_id", keyColumn = "notification_id")
+    int insertNotification(LeaveJoinNotifyRecord record);
 
     @Delete("DELETE FROM leave_requests WHERE leave_id = #{leave_id}")
     int deleteRecord(int leave_id);

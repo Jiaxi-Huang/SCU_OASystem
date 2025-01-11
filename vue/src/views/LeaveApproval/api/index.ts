@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 
 const leaveApprovalApi = {
-  localHost:'http://localhost:8080',
+  localHost: 'http://localhost:8080',
   getMyLeaveRecord: '/api/leaveApproval/getMyLeaveRecord',
   getNotifyLeaveRecord: '/api/leaveApproval/getNotifyLeaveRecord',
   getReviewLeaveRecord: '/api/leaveApproval/getReviewLeaveRecord',
@@ -9,13 +9,13 @@ const leaveApprovalApi = {
   modifyLeaveApproval: '/api/leaveApproval/modifyLeaveRecord',
   addLeaveApproval: '/api/leaveApproval/addLeaveRecord',
   deleteLeaveApproval: '/api/leaveApproval/deleteLeaveRecord',
-  addNotification: '/api/notification/addNotification',
+  addNotification: '/api/notification/addNotification', // 新增的抄送通知接口
   getAllUsers: '/api/notification/getAllUsers',
 }
 
 class Service {
   static postGetMyLeaveRecord() {
-    const data = {'accessToken':sessionStorage.getItem('accessToken')}
+    const data = { 'accessToken': sessionStorage.getItem('accessToken') }
     return request({
       url: leaveApprovalApi.localHost + leaveApprovalApi.getMyLeaveRecord,
       method: 'POST',
@@ -28,8 +28,9 @@ class Service {
       return null
     })
   }
+
   static postGetNotifyLeaveRecord() {
-    const data = {'accessToken':sessionStorage.getItem('accessToken')}
+    const data = { 'accessToken': sessionStorage.getItem('accessToken') }
     return request({
       url: leaveApprovalApi.localHost + leaveApprovalApi.getNotifyLeaveRecord,
       method: 'POST',
@@ -42,8 +43,9 @@ class Service {
       return null
     })
   }
+
   static postGetReviewLeaveRecord() {
-    const data = {'accessToken':sessionStorage.getItem('accessToken')}
+    const data = { 'accessToken': sessionStorage.getItem('accessToken') }
     return request({
       url: leaveApprovalApi.localHost + leaveApprovalApi.getReviewLeaveRecord,
       method: 'POST',
@@ -56,8 +58,9 @@ class Service {
       return null
     })
   }
+
   static postGetAdminLeaveRecord() {
-    const data = {'accessToken':sessionStorage.getItem('accessToken')}
+    const data = { 'accessToken': sessionStorage.getItem('accessToken') }
     return request({
       url: leaveApprovalApi.localHost + leaveApprovalApi.getAdminLeaveRecord,
       method: 'POST',
@@ -71,15 +74,15 @@ class Service {
     })
   }
 
-  static postModifyLeaveApproval(record:any) {
+  static postModifyLeaveApproval(record: any) {
     let leaveApproval = {
-      leave_start_date: record.start_date ,
-      leave_end_date: record.end_date ,
-      leave_reason: record.reason ,
-      leave_status: record.status ,
-      leave_submitted_at: record.submitted_at ,
-      leave_id: record.leave_id ,
-      user_id: record.user_id ,
+      leave_start_date: record.start_date,
+      leave_end_date: record.end_date,
+      leave_reason: record.reason,
+      leave_status: record.status,
+      leave_submitted_at: record.submitted_at,
+      leave_id: record.leave_id,
+      user_id: record.user_id,
     }
     console.log(leaveApproval)
     return request({
@@ -95,7 +98,7 @@ class Service {
     })
   }
 
-  static deleteLeaveApproval(record:any) {
+  static deleteLeaveApproval(record: any) {
     return request({
       url: leaveApprovalApi.localHost + leaveApprovalApi.deleteLeaveApproval,
       method: 'POST',
@@ -109,7 +112,7 @@ class Service {
     })
   }
 
-  static addLeaveApproval(record:any) {
+  static addLeaveApproval(record: any) {
     return request({
       url: leaveApprovalApi.localHost + leaveApprovalApi.addLeaveApproval,
       method: 'POST',
@@ -122,6 +125,7 @@ class Service {
       return null
     })
   }
+
   static getAllUsers() {
     return request({
       url: leaveApprovalApi.localHost + leaveApprovalApi.getAllUsers,
@@ -134,5 +138,21 @@ class Service {
       return null
     })
   }
+
+  // 新增的 addNotification 方法
+  static addNotification(record: any) {
+    return request({
+      url: leaveApprovalApi.localHost + leaveApprovalApi.addNotification,
+      method: 'POST',
+      json: true,
+      data: record,
+    }).then((res) => {
+      if (res.status === 0) {
+        return res
+      }
+      return null
+    })
+  }
 }
+
 export default Service

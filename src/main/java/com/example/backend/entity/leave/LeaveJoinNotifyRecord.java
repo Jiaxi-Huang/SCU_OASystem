@@ -11,7 +11,6 @@ public class LeaveJoinNotifyRecord {
 
     private int leave_id;
     private int user_id;
-    private int review_user_id;
     private String start_date;
     private String end_date;
     private String type;
@@ -25,10 +24,9 @@ public class LeaveJoinNotifyRecord {
     private String request_type;
     private String notified_at;
 
-    public LeaveJoinNotifyRecord(int leave_id, int user_id, int review_user_id, String start_date, String end_date, String type, String reason, String status, String submitted_at, int notification_id, int cc_user_id, int notified_user_id, int request_id, String request_type, String notified_at) {
+    public LeaveJoinNotifyRecord(int leave_id, int user_id, String start_date, String end_date, String type, String reason, String status, String submitted_at, int notification_id, int cc_user_id, int notified_user_id, int request_id, String request_type, String notified_at) {
         this.leave_id = leave_id;
         this.user_id = user_id;
-        this.review_user_id = review_user_id;
         this.start_date = start_date;
         this.end_date = end_date;
         this.type = type;

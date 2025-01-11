@@ -19,8 +19,9 @@ public class LeaveApprovalRecordWithAccessToken {
     private String status;
     private String submitted_at;
     private String accessToken;
+    private int[] cc_user; // 抄送人数组
 
-    public LeaveApprovalRecordWithAccessToken(int leave_id, int user_id, int review_user_id, String start_date, String end_date, String type, String reason, String status, String submitted_at, String accessToken) {
+    public LeaveApprovalRecordWithAccessToken(int leave_id, int user_id, int review_user_id, String start_date, String end_date, String type, String reason, String status, String submitted_at, String accessToken, int[] cc_user) {
         this.leave_id = leave_id;
         this.user_id = user_id;
         this.review_user_id = review_user_id;
@@ -31,5 +32,6 @@ public class LeaveApprovalRecordWithAccessToken {
         this.status = status;
         this.submitted_at = submitted_at;
         this.accessToken = accessToken;
+        this.cc_user = cc_user;
     }
 }
