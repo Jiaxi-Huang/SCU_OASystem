@@ -58,6 +58,7 @@
     </el-row>
   </div>
 </template>
+
 <script lang="ts">
 import {defineComponent, onMounted, reactive, ref} from 'vue'
 import {useRouter} from 'vue-router'
@@ -84,7 +85,7 @@ export default defineComponent({
       description: '',
       status: [],
       submitted_at: '',
-      cc_user: [],
+      cc_user: [], // 抄送人数组
       notified_user: 0,
     })
 
@@ -100,7 +101,6 @@ export default defineComponent({
               value: user.userId,
               label: user.username || user.email,
             }));
-            // console.log("all_users updated:", JSON.stringify(all_users));
           })
           .catch((err) => {
             console.error("Failed to fetch users:", err);
@@ -111,14 +111,14 @@ export default defineComponent({
     onMounted(() => {
       getAllUsers();
     })
-    // methods
+
     const submitForm = () => {
       activityForm.value.validate((valid: any): boolean => {
         if (valid) {
           const currentDateTime = new Date();
           function formatDate(date: any) {
             const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从 0 开始，+1
+            const month = String(date.getMonth() + 1).padStart(2, '0');
             const day = String(date.getDate()).padStart(2, '0');
             const hours = String(date.getHours()).padStart(2, '0');
             const minutes = String(date.getMinutes()).padStart(2, '0');
@@ -127,7 +127,7 @@ export default defineComponent({
             return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
           }
           const formattedDate = formatDate(currentDateTime);
-          // 添加报销记录
+
           let record = {
             accessToken: sessionStorage.getItem('accessToken'),
             amount: sizeForm.amount,
@@ -135,44 +135,42 @@ export default defineComponent({
             status: '未审核',
             submitted_at: formattedDate,
             review_user_id: sizeForm.notified_user,
+            cc_user: sizeForm.cc_user, // 传递抄送人数组
           }
+
           console.log("Submission form:", JSON.stringify(record))
           try {
             Service.addReimbursement(record).then((res) => {
               sizeForm.reimbursement_id = res.data.reimbursement_id
               console.log("Reimbursement ID:", sizeForm.reimbursement_id)
+
+              // 创建抄送记录
+              if (sizeForm.cc_user && sizeForm.cc_user.length > 0) {
+                sizeForm.cc_user.forEach((ccUserId: number) => {
+                  let ccRecord = {
+                    notified_user_id: ccUserId,
+                    request_type: 'reimbursement',
+                    request_id: sizeForm.reimbursement_id,
+                    submitted_at: currentDateTime,
+                  }
+                  Service.addNotification(ccRecord).then((res) => {
+                    console.log("CC Notification added:", res.data);
+                  });
+                });
+              }
+
+              ElMessage({
+                type: 'success',
+                message: '提交成功'
+              })
             });
-            ElMessage({
-              type: 'success',
-              message: '提交成功'
-            })
           } catch (err) {
             ElMessage({
               type: 'warning',
               message: err.message
             })
           }
-          let notify_record = {
-            notified_user_id: sizeForm.notified_user,
-            request_type: 'reimbursement',
-            request_id: sizeForm.reimbursement_id,
-            submitted_at: currentDateTime,
-          }
-          try {
-            Service.addNotification(notify_record).then((res) => {
-            });
-            ElMessage({
-              type: 'success',
-              message: '提交成功'
-            })
-          } catch (err) {
-            ElMessage({
-              type: 'warning',
-              message: err.message
-            })
-            console.log('submit error')
-            return false
-          }
+
           sizeForm.reimbursement_id = 0
           sizeForm.user_id = 0
           sizeForm.amount = ''
@@ -191,17 +189,8 @@ export default defineComponent({
     const resetForm = () => {
       activityForm.value.resetFields()
     }
-    const handleBack = () => {
-      router.go(-1)
-    }
-    /**
-     * @description  useXXX写法,代替mixin有待改进的地方
-     * */
-    const checkEmpty = (row: any) => {
-      return Object.keys(row).some((key) => row[key] === '')
-    }
+
     return {
-      handleBack,
       sizeForm,
       all_users,
       activityForm,
@@ -211,46 +200,3 @@ export default defineComponent({
   }
 })
 </script>
-
-<style lang="stylus" scoped>
-.FormInfo{
-    margin-top:20px;
-    .demo-ruleForm{
-        text-align :left;
-    }
-    .info{
-        text-align: left;
-    padding-left: 20px;
-    margin-bottom: 20px;
-    font-size: 12px;
-    }
-     .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-  }
-
-  .text {
-    font-size: 14px;
-  }
-
-  .item {
-    margin-bottom: 18px;
-  }
-
-  .box-card {
-    width:100%;
-  }
-
-  .el-row {
-    margin-bottom: 20px;
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
-  .el-col {
-    padding: 0 10px;
-  }
-
-}
-</style>

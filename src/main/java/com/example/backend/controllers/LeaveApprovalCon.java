@@ -108,10 +108,38 @@ public class LeaveApprovalCon {
     }
 
     @PostMapping("/addLeaveRecord")
-    public ResponseEntity<ResponseBase> addLeaveRecord(@RequestBody LeaveApprovalRecord record) {
-        ResponseBase response = new ResponseBase();
-        int res_code = leave_service.insertLeaveApprovalRecord(record);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    public ResponseBase addLeaveRecord(@RequestBody LeaveApprovalRecordWithAccessToken request) {
+        System.out.println("addLeaveRecord: " + (request).toString());
+        ResponseBase res = new ResponseBase();
+        try {
+            String accessToken = request.getAccessToken();
+            int userId = accessService.getAuthenticatedId(accessToken);
+            request.setUser_id(userId);
+
+            // 插入请假记录
+            int leave_id = leave_service.insertLeaveApprovalRecord(request);
+            res.setStatus(200);
+            res.setMessage("Leave record added successfully.");
+            res.pushData(leave_id);
+
+            // 处理抄送人
+            if (request.getCc_user() != null) {
+                for (int ccUserId : request.getCc_user()) {
+                    LeaveJoinNotifyRecord ccRecord = new LeaveJoinNotifyRecord(
+                            0, userId, request.getStart_date(), request.getEnd_date(),
+                            request.getType(), request.getReason(), request.getStatus(),
+                            request.getSubmitted_at(), 0, userId, ccUserId, leave_id, "leave", request.getSubmitted_at()
+                    );
+                    leave_service.addNotification(ccRecord);
+                }
+            }
+
+        } catch (Exception e) {
+            res.setStatus(-1);
+            res.setMessage(e.getMessage());
+        }
+
+        return res;
     }
 
 

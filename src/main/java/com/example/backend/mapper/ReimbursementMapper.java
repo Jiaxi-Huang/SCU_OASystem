@@ -29,6 +29,11 @@ public interface ReimbursementMapper extends BaseMapper<ReimbursementRecord> {
     int addReimbursementRecord(int user_id, BigDecimal amount, String description,
                                 String status, String submitted_at, int review_user_id);
 
+    @Insert("INSERT INTO notification_chain (notified_user_id, request_type, request_id, notified_at, cc_user_id) " +
+            "VALUES (#{notified_user_id}, #{request_type}, #{request_id}, #{notified_at}, #{cc_user_id})")
+    @Options(useGeneratedKeys = true, keyProperty = "notification_id", keyColumn = "notification_id")
+    int insertNotification(ReimJoinNotifyRecord record);
+
 
     @Delete("DELETE from reimbursement_requests WHERE reimbursement_id = #{reimbursement_id}")
     int deleteReimbursementRecord(int reimbursement_id);

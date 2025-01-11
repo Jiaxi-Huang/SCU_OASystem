@@ -2,6 +2,7 @@ package com.example.backend.services;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.backend.entity.leave.LeaveApprovalRecord;
+import com.example.backend.entity.leave.LeaveApprovalRecordWithAccessToken;
 import com.example.backend.entity.leave.LeaveJoinNotifyRecord;
 import com.example.backend.mapper.LeaveApprovalMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,12 +35,14 @@ public class LeaveApprovalService extends ServiceImpl<LeaveApprovalMapper, Leave
         return res_code;
     }
 
-    public int insertLeaveApprovalRecord(LeaveApprovalRecord record) {
-        int res_code = leaveApprovalMapper.insertLeaveApprovalRecord(
-                record.getLeave_id(),record.getUser_id(),record.getStart_date(), 
-                record.getEnd_date(), record.getReason(),
-                record.getStatus(), record.getSubmitted_at());
-        return res_code;
+    public int insertLeaveApprovalRecord(LeaveApprovalRecordWithAccessToken record) {
+        return leaveApprovalMapper.insertLeaveApprovalRecord(
+                record.getLeave_id(), record.getUser_id(), record.getReview_user_id(), record.getStart_date(),
+                record.getEnd_date(), record.getType(),record.getReason(), record.getStatus(), record.getSubmitted_at());
+    }
+
+    public void addNotification(LeaveJoinNotifyRecord record) {
+        leaveApprovalMapper.insertNotification(record);
     }
 
 

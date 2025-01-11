@@ -209,6 +209,7 @@
         </template>
       </el-table-column>
     </el-table>
+
     <el-dialog v-model="modifyFormVisible" title="修改报销内容">
       <el-form :model="form">
         <el-form-item label="报销编号">
@@ -272,20 +273,24 @@
     <el-dialog v-model="statisticsVisible" title="统计信息">
       <el-card shadow="hover" class="card">
         <p>
-          <span><i class="icon-square red"></i> 总记录数 </span> <span>{{ tableData.length }}</span>
+          <span><i class="icon-square red"></i> 总记录数 </span>
+          <span>{{ getCurrentTableData().length }}</span> <!-- 动态计算当前表格的总记录数 -->
         </p>
         <div class="e-chart" style="height: 201px; width: 100%">
           <div ref="refAverageSales" style="width: inherit; height: inherit;"></div>
         </div>
         <div class="chart-widget-list">
           <p>
-            <span><i class="icon-square green"></i> 已通过</span><span>{{ statistics.pass }}</span>
+            <span><i class="icon-square green"></i> 已通过</span>
+            <span>{{ statistics.pass }}</span>
           </p>
           <p>
-            <span><i class="icon-square deep-blue"></i> 未审核 </span> <span>{{ statistics.unfin }}</span>
+            <span><i class="icon-square deep-blue"></i> 未审核 </span>
+            <span>{{ statistics.unfin }}</span>
           </p>
           <p>
-            <span><i class="icon-square red"></i> 未通过 </span> <span>{{ statistics.rej }}</span>
+            <span><i class="icon-square red"></i> 未通过 </span>
+            <span>{{ statistics.rej }}</span>
           </p>
         </div>
       </el-card>
@@ -338,16 +343,7 @@ export default defineComponent({
     const filterTableRef = ref()
     const refAverageSales = ref<HTMLElement | null>(null)
     const state = reactive({
-      tableData: [
-        {
-          reimbursement_id: '0231554651',
-          user_id: '1',
-          amount: '1000',
-          description: '差旅',
-          status: '未完成',
-          submitted_at: new Date(),
-        },
-      ],
+      tableData: [], // 不再使用
       currentPage: 1,
       pageSize: 5,
       search: '',
@@ -355,70 +351,31 @@ export default defineComponent({
       detailFormVisible: false,
       statisticsVisible: false,
       form: {},
-      statistics: {pass: 0, rej: 0, unfin: 0},
+      statistics: { pass: 0, rej: 0, unfin: 0 },
       record_cnt: 0,
       status_options: [
-        {
-          value:'未审核',
-          label:'未审核',
-        },
-        {
-          value:'已通过',
-          label:'已通过',
-        },
-        {
-          value:'未通过',
-          label:'未通过',
-        }
+        { value: '未审核', label: '未审核' },
+        { value: '已通过', label: '已通过' },
+        { value: '未通过', label: '未通过' },
       ],
       filters: {
-        status: ''
+        status: '',
       },
-      paginatedMyData: [
-        {
-          reimbursement_id: '0231554651',
-          user_id: '1',
-          amount: '1000',
-          description: '我的报销未打开后台',
-          status: '未完成',
-          submitted_at: new Date(),
-        },
-      ],
-      paginatedReviewData: [
-        {
-          reimbursement_id: '0231554651',
-          user_id: '1',
-          amount: '1000',
-          description: '审核报销未打开后台',
-          status: '未完成',
-          submitted_at: new Date(),
-        },
-      ],
-      paginatedNotifyData: [
-        {
-          reimbursement_id: '0231554651',
-          user_id: '1',
-          amount: '1000',
-          description: '抄送报销未打开后台',
-          status: '未完成',
-          submitted_at: new Date(),
-        },
-      ],
-      paginatedAdminData: [
-        {
-          reimbursement_id: '0231554651',
-          user_id: '1',
-          amount: '1000',
-          description: '管理员报销后台未打开',
-          status: '未完成',
-          submitted_at: new Date(),
-        },
-      ],
+      // 原始数据
+      myReimData: [], // 我的报销申请原始数据
+      reviewReimData: [], // 我处理的报销申请原始数据
+      notifyReimData: [], // 抄送给我的报销申请原始数据
+      adminReimData: [], // 所有报销申请原始数据
+      // 分页数据
+      paginatedMyData: [], // 我的报销申请分页数据
+      paginatedReviewData: [], // 我处理的报销申请分页数据
+      paginatedNotifyData: [], // 抄送给我的报销申请分页数据
+      paginatedAdminData: [], // 所有报销申请分页数据
       isMyReimShow: true,
       isReviewReimShow: false,
       isNotifyReimShow: false,
       isAdminReimShow: false,
-    })
+    });
 
     const formInline = reactive({
       user: '',
@@ -431,34 +388,31 @@ export default defineComponent({
       state.isReviewReimShow = false;
       state.isNotifyReimShow = false;
       state.isAdminReimShow = false;
-      state.tableData = state.paginatedMyData; // 设置当前表格的数据为 "我的报销申请" 数据
-      updatePaginatedData();
+      updatePaginatedData();  // 更新分页数据
     };
-    // 显示 "我处理的报销申请" 表格
+
     const showReviewReim = () => {
       state.isMyReimShow = false;
       state.isReviewReimShow = true;
       state.isNotifyReimShow = false;
       state.isAdminReimShow = false;
-      state.tableData = state.paginatedReviewData; // 设置当前表格的数据为 "我处理的报销申请" 数据
-      updatePaginatedData();
+      updatePaginatedData();  // 更新分页数据
     };
-    // 显示 "抄送给我的报销申请" 表格
+
     const showNotifyReim = () => {
       state.isMyReimShow = false;
       state.isReviewReimShow = false;
       state.isNotifyReimShow = true;
       state.isAdminReimShow = false;
-      state.tableData = state.paginatedNotifyData; // 设置当前表格的数据为 "抄送给我的报销申请" 数据
-      updatePaginatedData();
+      updatePaginatedData();  // 更新分页数据
     };
+
     const showAdminReim = () => {
       state.isMyReimShow = false;
       state.isReviewReimShow = false;
       state.isNotifyReimShow = false;
       state.isAdminReimShow = true;
-      state.tableData = state.paginatedAdminData; // 设置当前表格的数据为 "抄送给我的报销申请" 数据
-      updatePaginatedData();
+      updatePaginatedData();  // 更新分页数据
     };
 
     onMounted(() => {
@@ -483,28 +437,57 @@ export default defineComponent({
     }
 
     const updatePaginatedData = () => {
-      let recordsToFilter = state.tableData;
+      let recordsToFilter = [];
+
+      // 根据当前显示的表格类型，选择对应的原始数据
+      if (state.isMyReimShow) {
+        recordsToFilter = state.myReimData; // 使用原始数据
+      } else if (state.isReviewReimShow) {
+        recordsToFilter = state.reviewReimData; // 使用原始数据
+      } else if (state.isNotifyReimShow) {
+        recordsToFilter = state.notifyReimData; // 使用原始数据
+      } else if (state.isAdminReimShow) {
+        recordsToFilter = state.adminReimData; // 使用原始数据
+      }
+
+      // 根据搜索条件过滤数据
       if (state.search) {
         recordsToFilter = recordsToFilter.filter((record) =>
             record.reimbursement_id.toLowerCase().includes(state.search.toLowerCase())
         );
       }
-      if (state.filters.status === '未审核') {
+
+      // 根据状态过滤数据
+      if (state.filters.status) {
         recordsToFilter = recordsToFilter.filter((record) =>
             record.status === state.filters.status
         );
       }
+
+      // 更新总记录数
+      state.record_cnt = recordsToFilter.length;
+
+      // 计算分页数据的起始和结束位置
       const start = (state.currentPage - 1) * state.pageSize;
       const end = state.currentPage * state.pageSize;
-      state.tableData = recordsToFilter.slice(start, end);  // 更新分页数据
-      state.record_cnt = recordsToFilter.length;  // 更新总记录数
+
+      // 根据当前显示的表格类型，更新对应的分页数据
+      if (state.isMyReimShow) {
+        state.paginatedMyData = recordsToFilter.slice(start, end); // 从原始数据中切分
+      } else if (state.isReviewReimShow) {
+        state.paginatedReviewData = recordsToFilter.slice(start, end); // 从原始数据中切分
+      } else if (state.isNotifyReimShow) {
+        state.paginatedNotifyData = recordsToFilter.slice(start, end); // 从原始数据中切分
+      } else if (state.isAdminReimShow) {
+        state.paginatedAdminData = recordsToFilter.slice(start, end); // 从原始数据中切分
+      }
     };
 
     const getReimbursementList = () => {
       try {
         // 获取“我的报销申请”
         Service.getMyReimbursementList().then((res) => {
-          console.log("getReimbursementList: ", res)
+          console.log("getReimbursementList: ", res);
           if (res) {
             const myReimData = [];
             var data = res.data;
@@ -519,11 +502,13 @@ export default defineComponent({
               };
               myReimData.push(record);
             }
-            state.paginatedMyData = myReimData;  // 更新“我的报销申请”数据
+            state.myReimData = myReimData; // 保存到原始数据
+            updatePaginatedData(); // 更新分页数据
           } else {
             console.log('获取“我的报销申请”数据失败');
           }
         });
+
         // 获取“我处理的报销申请”
         Service.getReviewReimbursementList().then((res) => {
           if (res) {
@@ -540,11 +525,13 @@ export default defineComponent({
               };
               reviewReimData.push(record);
             }
-            state.paginatedReviewData = reviewReimData;  // 更新“我处理的报销申请”数据
+            state.reviewReimData = reviewReimData; // 保存到原始数据
+            updatePaginatedData(); // 更新分页数据
           } else {
             console.log('获取“我处理的报销申请”数据失败');
           }
         });
+
         // 获取“抄送给我的报销申请”
         Service.getNotifyReimbursementList().then((res) => {
           if (res) {
@@ -561,7 +548,8 @@ export default defineComponent({
               };
               notifyReimData.push(record);
             }
-            state.paginatedNotifyData = notifyReimData;  // 更新“抄送给我的报销申请”数据
+            state.notifyReimData = notifyReimData; // 保存到原始数据
+            updatePaginatedData(); // 更新分页数据
           } else {
             console.log('获取“抄送给我的报销申请”数据失败');
           }
@@ -569,11 +557,12 @@ export default defineComponent({
       } catch (err) {
         ElMessage({
           type: 'warning',
-          message: err.message
+          message: err.message,
         });
       }
+
       // 管理员角色，获取所有报销申请
-      if(isAdmin) {
+      if (isAdmin.value) {
         try {
           Service.getAdminReimbursementList().then((res) => {
             if (res) {
@@ -589,9 +578,9 @@ export default defineComponent({
                   submitted_at: data[i].submitted_at,
                 };
                 adminReimData.push(record);
-                // console.log("adminReimData:", JSON.stringify(adminReimData))
               }
-              state.paginatedAdminData = adminReimData;  //
+              state.adminReimData = adminReimData; // 保存到原始数据
+              updatePaginatedData(); // 更新分页数据
             } else {
               console.log('获取管理员报销申请数据失败');
             }
@@ -599,10 +588,23 @@ export default defineComponent({
         } catch (err) {
           ElMessage({
             type: 'warning',
-            message: err.message
+            message: err.message,
           });
         }
       }
+    };
+
+    const getCurrentTableData = () => {
+      if (state.isMyReimShow) {
+        return state.myReimData; // 我的报销申请原始数据
+      } else if (state.isReviewReimShow) {
+        return state.reviewReimData; // 我处理的报销申请原始数据
+      } else if (state.isNotifyReimShow) {
+        return state.notifyReimData; // 抄送给我的报销申请原始数据
+      } else if (state.isAdminReimShow) {
+        return state.adminReimData; // 所有报销申请原始数据
+      }
+      return [];
     };
 
     const clearFilter = () => {
@@ -665,15 +667,15 @@ export default defineComponent({
       state.tableData.splice(index, 1)
     }
     const handleSizeChange = (val: any) => {
-      console.log(`每页 ${val} 条`)
-      state.pageSize = val
-      updatePaginatedData();  // 更新分页数据
-    }
+      state.pageSize = val;
+      state.currentPage = 1; // 重置为第一页
+      updatePaginatedData(); // 更新分页数据
+    };
+
     const handleCurrentChange = (val: any) => {
-      console.log(`当前页: ${val}`)
-      state.currentPage = val
-      updatePaginatedData();  // 更新分页数据
-    }
+      state.currentPage = val;
+      updatePaginatedData(); // 更新分页数据
+    };
 
     const handleFilterChange = (filters: any) => {
       state.filters.status = filters.status;
@@ -690,28 +692,62 @@ export default defineComponent({
         cancelButtonText: '取消',
         type: 'info'
       }).then(() => {
-        const table = document.querySelector('.el-table') as HTMLElement;
+        const recordsToPrint = getCurrentTableData(); // 获取当前表格的数据
 
-        if (table) {
-          const printWindow = window.open('', '', 'height=600,width=800');
-          if (printWindow) {
-            printWindow.document.write('<html><head><title>打印报销数据</title>');
-            printWindow.document.write('<style>table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #000; padding: 8px; text-align: left; }</style>');
-            printWindow.document.write('</head><body>');
-            printWindow.document.write('<h2>报销数据</h2>');
-            printWindow.document.write(table.outerHTML);
-            printWindow.document.write('</body></html>');
-            printWindow.document.close();
+        // 创建打印内容
+        const printContent = `
+      <html>
+        <head>
+          <title>打印报销数据</title>
+          <style>
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+          </style>
+        </head>
+        <body>
+          <h2>报销数据</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>报销编号</th>
+                <th>提交用户ID</th>
+                <th>金额</th>
+                <th>描述</th>
+                <th>状态</th>
+                <th>提交时间</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${recordsToPrint.map(record => `
+                <tr>
+                  <td>${record.reimbursement_id}</td>
+                  <td>${record.user_id}</td>
+                  <td>${record.amount}</td>
+                  <td>${record.description}</td>
+                  <td>${record.status}</td>
+                  <td>${record.submitted_at}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </body>
+      </html>
+    `;
 
-            setTimeout(() => {
-              printWindow.print();
-              printWindow.close();
-            }, 50000);
-          }
+        // 打开新窗口并打印
+        const printWindow = window.open('', '', 'height=600,width=800');
+        if (printWindow) {
+          printWindow.document.write(printContent);
+          printWindow.document.close();
+
+          setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+          }, 500);
         } else {
           ElMessage({
             type: 'error',
-            message: '无法获取表格数据'
+            message: '无法打开打印窗口'
           });
         }
       }).catch(() => {
@@ -728,7 +764,10 @@ export default defineComponent({
         cancelButtonText: '取消',
         type: 'info'
       }).then(() => {
-        const data = state.tableData.map((item) => ({
+        const recordsToExport = getCurrentTableData(); // 获取当前表格的数据
+
+        // 将数据转换为 Excel 格式
+        const data = recordsToExport.map((item) => ({
           报销编号: item.reimbursement_id,
           提交用户ID: item.user_id,
           金额: item.amount,
@@ -741,6 +780,7 @@ export default defineComponent({
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, '报销数据');
 
+        // 导出 Excel 文件
         XLSX.writeFile(workbook, '报销数据.xlsx');
 
         ElMessage({
@@ -756,41 +796,44 @@ export default defineComponent({
     };
 
     const onShowStatistics = () => {
-      state.statisticsVisible = true
+      state.statisticsVisible = true;
+
+      // 获取当前表格的原始数据
+      const recordsToCount = getCurrentTableData();
+
+      // 统计通过、未通过和未审核的记录数
       let pass = 0, rej = 0, unfin = 0;
-      state.tableData.forEach(record => {
-        if(record.status == '已通过'){
+      recordsToCount.forEach(record => {
+        if (record.status === '已通过') {
           pass++;
-        }else if(record.status == '未通过'){
+        } else if (record.status === '未通过') {
           rej++;
-        }else{
+        } else if (record.status === '未审核') {
           unfin++;
         }
-      })
+      });
+
+      // 更新统计数据
       state.statistics.pass = pass;
-      state.statistics.unfin = unfin;
       state.statistics.rej = rej;
+      state.statistics.unfin = unfin;
+
+      // 更新图表数据
       const data = [
-        {
-          name: "已通过",
-          value: pass
-        },
-        {
-          name: "未通过",
-          value: rej
-        },
-        {
-          name: "未审核",
-          value: unfin
-        }];
+        { name: "已通过", value: pass },
+        { name: "未通过", value: rej },
+        { name: "未审核", value: unfin },
+      ];
+
+      // 渲染饼图
       nextTick(() => {
         if (refAverageSales.value) {
-          useInitPieChart(refAverageSales.value, data)
+          useInitPieChart(refAverageSales.value, data);
         } else {
-          console.log("refAverageSales not exist!")
+          console.log("refAverageSales not exist!");
         }
-      })
-    }
+      });
+    };
 
     return {
       formInline,
@@ -803,6 +846,7 @@ export default defineComponent({
       handleDelete,
       filterTableRef,
       resetDateFilter,
+      getCurrentTableData,
       clearFilter,
       modifyPop,
       detailPop,

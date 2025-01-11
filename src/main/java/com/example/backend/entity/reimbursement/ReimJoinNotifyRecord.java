@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
-
 public class ReimJoinNotifyRecord {
     private int reimbursement_id;
     private int user_id;

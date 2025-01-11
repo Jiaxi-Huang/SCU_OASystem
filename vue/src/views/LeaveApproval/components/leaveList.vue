@@ -32,7 +32,7 @@
                 class="table-list"
                 row-key="date"
                 v-loading="loading"
-                :data="adminData"
+                :data="paginatedAdminData"
                 style="width: 100%"
                 v-show="isAdminLeaveShow">
         <el-table-column prop="leave_submitted_at" label="提交日期" sortable width="180" column-key="leave_submitted_at"></el-table-column>
@@ -54,16 +54,16 @@
           </template>
         </el-table-column>
         <el-table-column
-          prop="leave_status"
-          label="处理状态"
-          width="100"
-          :filters="[
+            prop="leave_status"
+            label="处理状态"
+            width="100"
+            :filters="[
             { text: '已通过', value: '已通过' },
             { text: '未通过', value: '未通过' },
             { text: '未审核', value: '未审核' },
           ]"
-          :filter-method="filterStatus"
-          filter-placement="bottom-end"
+            :filter-method="filterStatus"
+            filter-placement="bottom-end"
         >
           <template #default="scope">
             <el-tag
@@ -78,7 +78,7 @@
                 class="table-list"
                 row-key="date"
                 v-loading="loading"
-                :data="myData"
+                :data="paginatedMyData"
                 style="width: 100%"
                 v-show="isMyLeaveShow">
         <el-table-column prop="leave_submitted_at" label="提交日期" sortable width="180" column-key="leave_submitted_at"></el-table-column>
@@ -123,7 +123,7 @@
                 class="table-list"
                 row-key="date"
                 v-loading="loading"
-                :data="reviewData"
+                :data="paginatedReviewData"
                 style="width: 100%"
                 v-show="isReviewLeaveShow">
         <el-table-column prop="leave_submitted_at" label="提交日期" sortable width="180" column-key="leave_submitted_at"></el-table-column>
@@ -169,7 +169,7 @@
                 class="table-list"
                 row-key="date"
                 v-loading="loading"
-                :data="notifyData"
+                :data="paginatedNotifyData"
                 style="width: 100%"
                 v-show="isNotifyLeaveShow">
         <el-table-column prop="leave_submitted_at" label="提交日期" sortable width="180" column-key="leave_submitted_at"></el-table-column>
@@ -205,7 +205,7 @@
           </template>
         </el-table-column>
       </el-table>
-      
+
       <el-dialog v-model="modifyFormVisible" title="修改请假申请">
         <el-form :model="form">
           <el-form-item label="请假记录ID">
@@ -238,7 +238,7 @@
           <el-button type="primary" @click="handleEdit()">确定</el-button>
         </div>
       </el-dialog>
-  
+
       <el-dialog v-model="detailFormVisible" title="待办事项详情">
         <el-form :model="form">
           <el-form-item label="请假记录ID&nbsp;&nbsp;">
@@ -274,7 +274,7 @@
       <el-dialog v-model="statisticsVisible" title="统计信息">
         <el-card shadow="hover" class="card">
           <p>
-            <span><i class="icon-square red"></i> 总记录数 </span> <span>{{ tableData.length }}</span>
+            <span><i class="icon-square red"></i> 总记录数 </span> <span>{{ getCurrentTableData().length }}</span>
           </p>
           <div class="e-chart" style="height: 201px; width: 100%">
             <div ref="refAverageSales" style="width: inherit; height: inherit;"></div>
@@ -298,554 +298,589 @@
       </el-dialog>
 
       <el-pagination
-        :hide-on-single-page="true"
-        :current-page="currentPage"
-        :page-sizes="[5, 10, 15, 20, 25]"
-        :page-size="pageSize"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="total"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
+          :current-page="currentPage"
+          :page-sizes="[5, 10, 15, 20, 25]"
+          :page-size="pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="record_cnt"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
       >
       </el-pagination>
-  
+
     </div>
   </div>
-  </template>
-  <script lang="ts">
-  import {computed, defineComponent, nextTick, onMounted, reactive, ref, toRefs, watch} from 'vue'
-  import { useRouter } from 'vue-router'
-  import permission from '@/directive/permission'
-  import Service from '../api/index'
-  import {ElMessage} from "element-plus";
-  import {Download, Odometer} from "@element-plus/icons-vue";
-  import * as XLSX from 'xlsx';
-  import {ElMessageBox} from "element-plus/es";
-  import {useInitPieChart} from "./useInitPieCharts";
+</template>
+<script lang="ts">
+import {computed, defineComponent, nextTick, onMounted, reactive, ref, toRefs, watch} from 'vue'
+import { useRouter } from 'vue-router'
+import permission from '@/directive/permission'
+import Service from '../api/index'
+import {ElMessage} from "element-plus";
+import {Download, Odometer} from "@element-plus/icons-vue";
+import * as XLSX from 'xlsx';
+import {ElMessageBox} from "element-plus/es";
+import {useInitPieChart} from "./useInitPieCharts";
 
-  export default defineComponent({
-    name: 'leaveList',
-    computed: {
-      Download() {
-        return Download
+export default defineComponent({
+  name: 'leaveList',
+  computed: {
+    Download() {
+      return Download
+    },
+    Odometer() {
+      return Odometer
+    }
+  },
+  directives: {
+    permission
+  },
+  setup() {
+
+    const router = useRouter()
+    const filterTableRef = ref()
+    const refAverageSales = ref<HTMLElement | null>(null)
+
+    const state = reactive({
+      loading: false,
+      currentPage: 1,
+      pageSize: 5,
+      search: '',
+      modifyFormVisible: false,
+      detailFormVisible: false,
+      statisticsVisible: false,
+      form: {},
+      statistics: {pass:0, rej:0, unfin:0},
+      record_cnt: 0,
+      filters: {
+        status: ''
       },
-      Odometer() {
-        return Odometer
-      }
-    },
-    directives: {
-      permission
-    },
-    setup() {
-  
-      const router = useRouter()
-      const filterTableRef = ref()
-      const refAverageSales = ref<HTMLElement | null>(null)
-
-      const state = reactive({
-        loading: false,
-        tableData: [
-          {
-            leave_id: 231554651,
-            leave_user_id: 1,
-            leave_start_time: new Date().toDateString(),
-            leave_end_time: new Date().toDateString(),
-            leave_reason: '后台没打开',
-            leave_type: '事假',
-            leave_status: '未处理',
-            leave_submitted_at: new Date().toDateString(),
-          },
-        ],
-        currentPage: 1,
-        pageSize: 5,
-        search: '',
-        modifyFormVisible: false,
-        detailFormVisible: false,
-        statisticsVisible: false,
-        form: {},
-        statistics: {pass:0, rej:0, unfin:0},
-        record_cnt: 0,
-        filters: {
-          status: ''
+      status_options: [
+        {
+          value:'未审核',
+          label:'未审核',
         },
-        status_options: [
-          {
-            value:'未审核',
-            label:'未审核',
-          },
-          {
-            value:'已通过',
-            label:'已通过',
-          },
-          {
-            value:'未通过',
-            label:'未通过',
-          }
-        ],
-        myData: [
-          {
-            leave_id: 231554651,
-            leave_user_id: 1,
-            leave_start_time: new Date().toDateString(),
-            leave_end_time: new Date().toDateString(),
-            leave_reason: '我的后台没打开',
-            leave_type: '事假',
-            leave_status: '未处理',
-            leave_submitted_at: new Date().toDateString(),
-          },
-        ],
-        reviewData: [
-          {
-            leave_id: 231554651,
-            leave_user_id:1,
-            leave_start_time: new Date().toDateString(),
-            leave_end_time: new Date().toDateString(),
-            leave_reason: '审核后台没打开',
-            leave_type: '事假',
-            leave_status: '未处理',
-            leave_submitted_at: new Date().toDateString(),
-          },
-        ],
-        notifyData: [
-          {
-            leave_id: 31554651,
-            leave_user_id: 1,
-            leave_start_time: new Date().toDateString(),
-            leave_end_time: new Date().toDateString(),
-            leave_reason: '抄送后台没打开',
-            leave_type: '事假',
-            leave_status: '未处理',
-            leave_submitted_at: new Date().toDateString(),
-          },
-        ],
-        adminData: [
-          {
-            leave_id: 31554651,
-            leave_user_id: 1,
-            leave_start_time: new Date().toDateString(),
-            leave_end_time: new Date().toDateString(),
-            leave_reason: '管理员后台没打开',
-            leave_type: '事假',
-            leave_status: '未处理',
-            leave_submitted_at: new Date().toDateString(),
-          },
-        ],
-        isMyLeaveShow: true,
-        isReviewLeaveShow: false,
-        isNotifyLeaveShow: false,
-        isAdminLeaveShow: false,
-      })
-      const formInline = reactive({
-        user: '',
-        region: ''
-      })
-      const total = 1
+        {
+          value:'已通过',
+          label:'已通过',
+        },
+        {
+          value:'未通过',
+          label:'未通过',
+        }
+      ],
+      // 原始数据
+      myData: [], // 我的请假申请原始数据
+      reviewData: [], // 我处理的请假申请原始数据
+      notifyData: [], // 抄送给我的请假申请原始数据
+      adminData: [], // 所有请假申请原始数据
+      // 分页数据
+      paginatedMyData: [], // 我的请假申请分页数据
+      paginatedReviewData: [], // 我处理的请假申请分页数据
+      paginatedNotifyData: [], // 抄送给我的请假申请分页数据
+      paginatedAdminData: [], // 所有请假申请分页数据
+      isMyLeaveShow: true,
+      isReviewLeaveShow: false,
+      isNotifyLeaveShow: false,
+      isAdminLeaveShow: false,
+    })
+    const formInline = reactive({
+      user: '',
+      region: ''
+    })
+    const total = 1
 
-      const showMyLeave = () => {
-        state.isMyLeaveShow = true;
-        state.isReviewLeaveShow = false;
-        state.isNotifyLeaveShow = false;
-        state.isAdminLeaveShow = false;
-        state.tableData = state.myData; // 设置当前表格的数据为 "我的报销申请" 数据
-        updatePaginatedData();
-      };
-      // 显示 "我处理的报销申请" 表格
-      const showReviewLeave = () => {
-        state.isMyLeaveShow = false;
-        state.isReviewLeaveShow = true;
-        state.isNotifyLeaveShow = false;
-        state.isAdminLeaveShow = false;
-        state.tableData = state.reviewData; // 设置当前表格的数据为 "我处理的报销申请" 数据
-        updatePaginatedData();
-      };
-      // 显示 "抄送给我的报销申请" 表格
-      const showNotifyLeave = () => {
-        state.isMyLeaveShow = false;
-        state.isReviewLeaveShow = false;
-        state.isNotifyLeaveShow = true;
-        state.isAdminLeaveShow = false;
-        state.tableData = state.notifyData; // 设置当前表格的数据为 "抄送给我的报销申请" 数据
-        updatePaginatedData();
-      };
-      const showAdminLeave = () => {
-        state.isMyLeaveShow = false;
-        state.isReviewLeaveShow = false;
-        state.isNotifyLeaveShow = false;
-        state.isAdminLeaveShow = true;
-        state.tableData = state.adminData; // 设置当前表格的数据为 "抄送给我的报销申请" 数据
-        updatePaginatedData();
-      };
-  
-      onMounted(() => {
-        getLeaveRecord()
-        filterLeaveStatus()
-        updatePaginatedData()
-      })
-      const resetDateFilter = () => {
-        filterTableRef.value.clearFilter('date')
+    const showMyLeave = () => {
+      state.isMyLeaveShow = true;
+      state.isReviewLeaveShow = false;
+      state.isNotifyLeaveShow = false;
+      state.isAdminLeaveShow = false;
+      updatePaginatedData();  // 更新分页数据
+    };
+    // 显示 "我处理的请假申请" 表格
+    const showReviewLeave = () => {
+      state.isMyLeaveShow = false;
+      state.isReviewLeaveShow = true;
+      state.isNotifyLeaveShow = false;
+      state.isAdminLeaveShow = false;
+      updatePaginatedData();  // 更新分页数据
+    };
+    // 显示 "抄送给我的请假申请" 表格
+    const showNotifyLeave = () => {
+      state.isMyLeaveShow = false;
+      state.isReviewLeaveShow = false;
+      state.isNotifyLeaveShow = true;
+      state.isAdminLeaveShow = false;
+      updatePaginatedData();  // 更新分页数据
+    };
+    const showAdminLeave = () => {
+      state.isMyLeaveShow = false;
+      state.isReviewLeaveShow = false;
+      state.isNotifyLeaveShow = false;
+      state.isAdminLeaveShow = true;
+      updatePaginatedData();  // 更新分页数据
+    };
+
+    onMounted(() => {
+      getLeaveRecord()
+      filterLeaveStatus()
+      updatePaginatedData()
+    })
+    const resetDateFilter = () => {
+      filterTableRef.value.clearFilter('date')
+    }
+    const isAdmin = computed(() => {
+      const role = localStorage.getItem("role");
+      return role === "admin";
+    });
+    const filterLeaveStatus = () => {
+      if (sessionStorage.getItem("showPendingLeave") === '1') {
+        state.filters.status = "未审核";
       }
-      const isAdmin = computed(() => {
-        const role = localStorage.getItem("role");
-        return role === "admin";
-      });
-      const filterLeaveStatus = () => {
-        if (sessionStorage.getItem("showPendingLeave") === '1') {
-          state.filters.status = "未审核";
-        }
-        sessionStorage.setItem("showPendingLeavebursement", String(0));
+      sessionStorage.setItem("showPendingLeavebursement", String(0));
+    }
+
+    const updatePaginatedData = () => {
+      let recordsToFilter = [];
+
+      // 根据当前显示的表格类型，选择对应的原始数据
+      if (state.isMyLeaveShow) {
+        recordsToFilter = state.myData; // 使用原始数据
+      } else if (state.isReviewLeaveShow) {
+        recordsToFilter = state.reviewData; // 使用原始数据
+      } else if (state.isNotifyLeaveShow) {
+        recordsToFilter = state.notifyData; // 使用原始数据
+      } else if (state.isAdminLeaveShow) {
+        recordsToFilter = state.adminData; // 使用原始数据
       }
-      const updatePaginatedData = () => {
-        let recordsToFilter = state.tableData;
-        if (state.search) {
-          recordsToFilter = recordsToFilter.filter((record) =>
-              record.leave_id.toString().includes(state.search.toLowerCase())
-          );
-        }
-        if (state.filters.status === '未审核') {
-          recordsToFilter = recordsToFilter.filter((record) =>
-              record.leave_status === state.filters.status
-          );
-        }
-        const start = (state.currentPage - 1) * state.pageSize;
-        const end = state.currentPage * state.pageSize;
-        state.tableData = recordsToFilter.slice(start, end);  // 更新分页数据
-        state.record_cnt = recordsToFilter.length;  // 更新总记录数
-      };
-      const getLeaveRecord = () => {
-        try {
-          Service.postGetMyLeaveRecord().then((res) => {
-            if (res) {
-              state.myData = []
-              var data = res.data
-              for (let i = 0; i < data.length; i++) {
-                var record = {
-                  leave_id: data[i].leave_id,
-                  leave_user_id: data[i].user_id,
-                  leave_review_user_id: data[i].review_user_id,
-                  leave_start_time: data[i].start_date,
-                  leave_end_time: data[i].end_date,
-                  leave_type: data[i].type,
-                  leave_reason: data[i].reason,
-                  leave_status: data[i].status,
-                  leave_submitted_at: data[i].submitted_at,
-                }
-                state.myData.push(record)
+
+      // 根据搜索条件过滤数据
+      if (state.search) {
+        recordsToFilter = recordsToFilter.filter((record) =>
+            record.leave_id.toString().includes(state.search.toLowerCase())
+        );
+      }
+
+      // 根据状态过滤数据
+      if (state.filters.status) {
+        recordsToFilter = recordsToFilter.filter((record) =>
+            record.leave_status === state.filters.status
+        );
+      }
+
+      // 更新总记录数
+      state.record_cnt = recordsToFilter.length;
+
+      // 计算分页数据的起始和结束位置
+      const start = (state.currentPage - 1) * state.pageSize;
+      const end = state.currentPage * state.pageSize;
+
+      // 根据当前显示的表格类型，更新对应的分页数据
+      if (state.isMyLeaveShow) {
+        state.paginatedMyData = recordsToFilter.slice(start, end); // 从原始数据中切分
+      } else if (state.isReviewLeaveShow) {
+        state.paginatedReviewData = recordsToFilter.slice(start, end); // 从原始数据中切分
+      } else if (state.isNotifyLeaveShow) {
+        state.paginatedNotifyData = recordsToFilter.slice(start, end); // 从原始数据中切分
+      } else if (state.isAdminLeaveShow) {
+        state.paginatedAdminData = recordsToFilter.slice(start, end); // 从原始数据中切分
+      }
+    };
+
+    const getLeaveRecord = () => {
+      try {
+        Service.postGetMyLeaveRecord().then((res) => {
+          if (res) {
+            state.myData = []
+            var data = res.data
+            for (let i = 0; i < data.length; i++) {
+              var record = {
+                leave_id: data[i].leave_id,
+                leave_user_id: data[i].user_id,
+                leave_review_user_id: data[i].review_user_id,
+                leave_start_time: data[i].start_date,
+                leave_end_time: data[i].end_date,
+                leave_type: data[i].type,
+                leave_reason: data[i].reason,
+                leave_status: data[i].status,
+                leave_submitted_at: data[i].submitted_at,
               }
-            } else {
-              console.log('postGetLeaveApproval RES MISS')
+              state.myData.push(record)
             }
-          });
-          Service.postGetReviewLeaveRecord().then((res) => {
-            if (res) {
-              state.reviewData = []
-              var data = res.data
-              for (let i = 0; i < data.length; i++) {
-                var record = {
-                  leave_id: data[i].leave_id,
-                  leave_user_id: data[i].user_id,
-                  leave_review_user_id: data[i].review_user_id,
-                  leave_start_time: data[i].start_date,
-                  leave_end_time: data[i].end_date,
-                  leave_type: data[i].type,
-                  leave_reason: data[i].reason,
-                  leave_status: data[i].status,
-                  leave_submitted_at: data[i].submitted_at,
-                }
-                state.reviewData.push(record)
-              }
-            } else {
-              console.log('postGetLeaveApproval RES MISS')
-            }
-          });
-          Service.postGetNotifyLeaveRecord().then((res) => {
-            if (res) {
-              state.notifyData = []
-              var data = res.data
-              for (let i = 0; i < data.length; i++) {
-                var record = {
-                  leave_id: data[i].leave_id,
-                  leave_user_id: data[i].user_id,
-                  leave_review_user_id: data[i].review_user_id,
-                  leave_start_time: data[i].start_date,
-                  leave_end_time: data[i].end_date,
-                  leave_type: data[i].type,
-                  leave_reason: data[i].reason,
-                  leave_status: data[i].status,
-                  leave_submitted_at: data[i].submitted_at,
-                }
-                state.notifyData.push(record)
-              }
-            } else {
-              console.log('postGetLeaveApproval RES MISS')
-            }
-          });
-        } catch (err) {
-          ElMessage({
-            type: 'warning',
-            message: err.message
-          })
-        }
-        if (isAdmin) {
-          try {
-            Service.postGetAdminLeaveRecord().then((res) => {
-              if (res) {
-                state.adminData = []
-                var data = res.data
-                for (let i = 0; i < data.length; i++) {
-                  var record = {
-                    leave_id: data[i].leave_id,
-                    leave_user_id: data[i].user_id,
-                    leave_review_user_id: data[i].review_user_id,
-                    leave_start_time: data[i].start_date,
-                    leave_end_time: data[i].end_date,
-                    leave_type: data[i].type,
-                    leave_reason: data[i].reason,
-                    leave_status: data[i].status,
-                    leave_submitted_at: data[i].submitted_at,
-                  }
-                  state.adminData.push(record)
-                }
-              } else {
-                console.log('postGetLeaveApproval RES MISS')
-              }
-            });
-          } catch (err) {
-            ElMessage({
-              type: 'warning',
-              message: err.message
-            })
-          }
-        }
-      }
-
-      const clearFilter = () => {
-        filterTableRef.value.clearFilter()
-      }
-
-      const watchSearch = () => {
-        updatePaginatedData();  // 过滤数据并更新分页
-      };
-      watch(() => state.search, watchSearch);
-
-      const filterStatus = (value: any, row: { status: any }) => row.leave_status === value
-
-      const modifyPop = (row) => {
-        state.modifyFormVisible = true
-        state.form = row
-      }
-
-      const detailPop = (row) => {
-        state.detailFormVisible = true
-        state.form = row
-      }
-
-      const handleEdit = () => {
-        // eslint-disable-next-line no-console
-        state.modifyFormVisible = false
-        let record = state.form
-        state.form = {}
-        try {
-          Service.postModifyLeaveApproval(record).then((res) => {
-            if (res) {
-            } else {
-            }
-          });
-        } catch (err) {
-          ElMessage({
-            type: 'warning',
-            message: err.message
-          })
-        }
-      }
-      const handleDelete = (index: any, row: any) => {
-        // eslint-disable-next-line no-console
-        console.log(index, row)
-        let record = {
-          leave_id: row.leave_id
-        }
-        try {
-          Service.deleteLeaveApproval(record).then((res) => {
-            if (res) {
-              // console.log(res)
-            } else {
-            }
-          });
-        } catch (err) {
-          ElMessage({
-            type: 'warning',
-            message: err.message
-          })
-        }
-        state.tableData.splice(index, 1)
-      }
-      const handleSizeChange = (val: any) => {
-        // eslint-disable-next-line no-console
-        console.log(`每页 ${val} 条`)
-        state.pageSize = val
-        // request api to change tableData
-      }
-
-      const handleCurrentChange = (val: any) => {
-        console.log(`当前页: ${val}`)
-        state.currentPage = val
-      }
-
-
-      const onLeaveRequest = () => {
-        // eslint-disable-next-line no-console
-        router.replace('/leaveApproval/leaveRequest')
-      }
-
-      const onDownload = () => {
-        ElMessageBox.confirm('确定要打印当前表格数据吗？', '温馨提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'info'
-        }).then(() => {
-          const table = document.querySelector('.el-table') as HTMLElement;
-
-          if (table) {
-            const printWindow = window.open('', '', 'height=600,width=800');
-            if (printWindow) {
-              printWindow.document.write('<html><head><title>打印请假数据</title>');
-              printWindow.document.write('<style>table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #000; padding: 8px; text-align: left; }</style>');
-              printWindow.document.write('</head><body>');
-              printWindow.document.write('<h2>请假数据</h2>');
-              printWindow.document.write(table.outerHTML);
-              printWindow.document.write('</body></html>');
-              printWindow.document.close();
-
-              setTimeout(() => {
-                printWindow.print();
-                printWindow.close();
-              }, 50000);
-            }
+            updatePaginatedData(); // 更新分页数据
           } else {
-            ElMessage({
-              type: 'error',
-              message: '无法获取表格数据'
-            });
+            console.log('postGetLeaveApproval RES MISS')
           }
-        }).catch(() => {
-          ElMessage({
-            type: 'info',
-            message: '已取消'
-          });
         });
-      };
-
-      const onToExcel = () => {
-        ElMessageBox.confirm('确定要导出当前表格数据为 Excel 吗？', '温馨提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'info'
-        }).then(() => {
-          const data = state.tableData.map((item) => ({
-            leave_id: item.leave_id,
-            leave_user_id: item.leave_user_id,
-            leave_start_time: item.leave_start_time,
-            leave_end_time: item.leave_end_time,
-            leave_type: item.leave_type,
-            leave_reason: item.leave_reason,
-            leave_status: item.leave_status,
-            leave_submitted_at: item.leave_submitted_at,
-          }));
-
-          const worksheet = XLSX.utils.json_to_sheet(data);
-          const workbook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workbook, worksheet, '请假数据');
-
-          XLSX.writeFile(workbook, '请假数据.xlsx');
-
-          ElMessage({
-            type: 'success',
-            message: 'Excel 文件已生成并下载'
-          });
-        }).catch(() => {
-          ElMessage({
-            type: 'info',
-            message: '已取消'
-          });
-        });
-      };
-
-      const onShowStatistics = () => {
-        state.statisticsVisible = true
-        let pass = 0, rej = 0, unfin = 0;
-        state.tableData.forEach(record => {
-          if(record.leave_status == '已通过'){
-            pass++;
-          }else if(record.leave_status == '未通过'){
-            rej++;
-          }else{
-            unfin++;
-          }
-        })
-        state.statistics.pass = pass;
-        state.statistics.unfin = unfin;
-        state.statistics.rej = rej;
-        const data = [
-          {
-            name: "已通过",
-            value: pass
-          },
-          {
-            name: "未通过",
-            value: rej
-          },
-          {
-            name: "未审核",
-            value: unfin
-          }];
-        nextTick(() => {
-          if (refAverageSales.value) {
-            useInitPieChart(refAverageSales.value, data)
+        Service.postGetReviewLeaveRecord().then((res) => {
+          if (res) {
+            state.reviewData = []
+            var data = res.data
+            for (let i = 0; i < data.length; i++) {
+              var record = {
+                leave_id: data[i].leave_id,
+                leave_user_id: data[i].user_id,
+                leave_review_user_id: data[i].review_user_id,
+                leave_start_time: data[i].start_date,
+                leave_end_time: data[i].end_date,
+                leave_type: data[i].type,
+                leave_reason: data[i].reason,
+                leave_status: data[i].status,
+                leave_submitted_at: data[i].submitted_at,
+              }
+              state.reviewData.push(record)
+            }
+            updatePaginatedData(); // 更新分页数据
           } else {
-            console.log("refAverageSales not exist!")
+            console.log('postGetLeaveApproval RES MISS')
           }
+        });
+        Service.postGetNotifyLeaveRecord().then((res) => {
+          if (res) {
+            state.notifyData = []
+            var data = res.data
+            for (let i = 0; i < data.length; i++) {
+              var record = {
+                leave_id: data[i].leave_id,
+                leave_user_id: data[i].user_id,
+                leave_review_user_id: data[i].review_user_id,
+                leave_start_time: data[i].start_date,
+                leave_end_time: data[i].end_date,
+                leave_type: data[i].type,
+                leave_reason: data[i].reason,
+                leave_status: data[i].status,
+                leave_submitted_at: data[i].submitted_at,
+              }
+              state.notifyData.push(record)
+            }
+            updatePaginatedData(); // 更新分页数据
+          } else {
+            console.log('postGetLeaveApproval RES MISS')
+          }
+        });
+      } catch (err) {
+        ElMessage({
+          type: 'warning',
+          message: err.message
         })
       }
-
-
-      return {
-        formInline,
-        total,
-        ...toRefs(state),
-        handleCurrentChange,
-        handleSizeChange,
-        onLeaveRequest,
-        handleEdit,
-        handleDelete,
-        filterTableRef,
-        resetDateFilter,
-        clearFilter,
-        filterStatus,
-        modifyPop,
-        detailPop,
-        filterLeaveStatus,
-        showMyLeave,
-        showReviewLeave,
-        showNotifyLeave,
-        showAdminLeave,
-        isAdmin,
-        onDownload,
-        onToExcel,
-        onShowStatistics,
-        refAverageSales,
+      if (isAdmin) {
+        try {
+          Service.postGetAdminLeaveRecord().then((res) => {
+            if (res) {
+              state.adminData = []
+              var data = res.data
+              for (let i = 0; i < data.length; i++) {
+                var record = {
+                  leave_id: data[i].leave_id,
+                  leave_user_id: data[i].user_id,
+                  leave_review_user_id: data[i].review_user_id,
+                  leave_start_time: data[i].start_date,
+                  leave_end_time: data[i].end_date,
+                  leave_type: data[i].type,
+                  leave_reason: data[i].reason,
+                  leave_status: data[i].status,
+                  leave_submitted_at: data[i].submitted_at,
+                }
+                state.adminData.push(record)
+              }
+              updatePaginatedData(); // 更新分页数据
+            } else {
+              console.log('postGetLeaveApproval RES MISS')
+            }
+          });
+        } catch (err) {
+          ElMessage({
+            type: 'warning',
+            message: err.message
+          })
+        }
       }
     }
-  })
-  </script>
-  <style lang="stylus" scoped>
-  .table-container{
-      .form-inline{
-          margin:15px;
-          text-align:left;
+
+    const getCurrentTableData = () => {
+      if (state.isMyLeaveShow) {
+        return state.myData; // 我的请假申请原始数据
+      } else if (state.isReviewLeaveShow) {
+        return state.reviewData; // 我处理的请假申请原始数据
+      } else if (state.isNotifyLeaveShow) {
+        return state.notifyData; // 抄送给我的请假申请原始数据
+      } else if (state.isAdminLeaveShow) {
+        return state.adminData; // 所有请假申请原始数据
       }
-      .table-list{
-          margin:15px;
+      return [];
+    };
+
+    const clearFilter = () => {
+      filterTableRef.value.clearFilter()
+    }
+
+    const watchSearch = () => {
+      updatePaginatedData();  // 过滤数据并更新分页
+    };
+    watch(() => state.search, watchSearch);
+
+    const filterStatus = (value: any, row: { status: any }) => row.leave_status === value
+
+    const modifyPop = (row) => {
+      state.modifyFormVisible = true
+      state.form = row
+    }
+
+    const detailPop = (row) => {
+      state.detailFormVisible = true
+      state.form = row
+    }
+
+    const handleEdit = () => {
+      // eslint-disable-next-line no-console
+      state.modifyFormVisible = false
+      let record = state.form
+      state.form = {}
+      try {
+        Service.postModifyLeaveApproval(record).then((res) => {
+          if (res) {
+          } else {
+          }
+        });
+      } catch (err) {
+        ElMessage({
+          type: 'warning',
+          message: err.message
+        })
       }
-  
+    }
+    const handleDelete = (index: any, row: any) => {
+      // eslint-disable-next-line no-console
+      console.log(index, row)
+      let record = {
+        leave_id: row.leave_id
+      }
+      try {
+        Service.deleteLeaveApproval(record).then((res) => {
+          if (res) {
+            // console.log(res)
+          } else {
+          }
+        });
+      } catch (err) {
+        ElMessage({
+          type: 'warning',
+          message: err.message
+        })
+      }
+      state.tableData.splice(index, 1)
+    }
+    const handleSizeChange = (val: any) => {
+      state.pageSize = val;
+      state.currentPage = 1; // 重置为第一页
+      updatePaginatedData(); // 更新分页数据
+    };
+
+    const handleCurrentChange = (val: any) => {
+      state.currentPage = val;
+      updatePaginatedData(); // 更新分页数据
+    };
+
+    const onLeaveRequest = () => {
+      // eslint-disable-next-line no-console
+      router.replace('/leaveApproval/leaveRequest')
+    }
+
+    const onDownload = () => {
+      ElMessageBox.confirm('确定要打印当前表格数据吗？', '温馨提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'info'
+      }).then(() => {
+        const recordsToPrint = getCurrentTableData(); // 获取当前表格的数据
+
+        // 创建打印内容
+        const printContent = `
+      <html>
+        <head>
+          <title>打印请假数据</title>
+          <style>
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+          </style>
+        </head>
+        <body>
+          <h2>请假数据</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>请假编号</th>
+                <th>提交用户ID</th>
+                <th>开始时间</th>
+                <th>结束时间</th>
+                <th>请假类型</th>
+                <th>请假原因</th>
+                <th>状态</th>
+                <th>提交时间</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${recordsToPrint.map(record => `
+                <tr>
+                  <td>${record.leave_id}</td>
+                  <td>${record.leave_user_id}</td>
+                  <td>${record.leave_start_time}</td>
+                  <td>${record.leave_end_time}</td>
+                  <td>${record.leave_type}</td>
+                  <td>${record.leave_reason}</td>
+                  <td>${record.leave_status}</td>
+                  <td>${record.leave_submitted_at}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </body>
+      </html>
+    `;
+
+        // 打开新窗口并打印
+        const printWindow = window.open('', '', 'height=600,width=800');
+        if (printWindow) {
+          printWindow.document.write(printContent);
+          printWindow.document.close();
+
+          setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+          }, 500);
+        } else {
+          ElMessage({
+            type: 'error',
+            message: '无法打开打印窗口'
+          });
+        }
+      }).catch(() => {
+        ElMessage({
+          type: 'info',
+          message: '已取消'
+        });
+      });
+    };
+
+    const onToExcel = () => {
+      ElMessageBox.confirm('确定要导出当前表格数据为 Excel 吗？', '温馨提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'info'
+      }).then(() => {
+        const recordsToExport = getCurrentTableData(); // 获取当前表格的数据
+
+        // 将数据转换为 Excel 格式
+        const data = recordsToExport.map((item) => ({
+          请假编号: item.leave_id,
+          提交用户ID: item.leave_user_id,
+          开始时间: item.leave_start_time,
+          结束时间: item.leave_end_time,
+          请假类型: item.leave_type,
+          请假原因: item.leave_reason,
+          状态: item.leave_status,
+          提交时间: item.leave_submitted_at,
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, '请假数据');
+
+        // 导出 Excel 文件
+        XLSX.writeFile(workbook, '请假数据.xlsx');
+
+        ElMessage({
+          type: 'success',
+          message: 'Excel 文件已生成并下载'
+        });
+      }).catch(() => {
+        ElMessage({
+          type: 'info',
+          message: '已取消'
+        });
+      });
+    };
+
+    const onShowStatistics = () => {
+      state.statisticsVisible = true;
+
+      // 获取当前表格的原始数据
+      const recordsToCount = getCurrentTableData();
+
+      // 统计通过、未通过和未审核的记录数
+      let pass = 0, rej = 0, unfin = 0;
+      recordsToCount.forEach(record => {
+        if (record.leave_status === '已通过') {
+          pass++;
+        } else if (record.leave_status === '未通过') {
+          rej++;
+        } else if (record.leave_status === '未审核') {
+          unfin++;
+        }
+      });
+
+      // 更新统计数据
+      state.statistics.pass = pass;
+      state.statistics.rej = rej;
+      state.statistics.unfin = unfin;
+
+      // 更新图表数据
+      const data = [
+        { name: "已通过", value: pass },
+        { name: "未通过", value: rej },
+        { name: "未审核", value: unfin },
+      ];
+
+      // 渲染饼图
+      nextTick(() => {
+        if (refAverageSales.value) {
+          useInitPieChart(refAverageSales.value, data);
+        } else {
+          console.log("refAverageSales not exist!");
+        }
+      });
+    };
+
+    return {
+      formInline,
+      total,
+      ...toRefs(state),
+      handleCurrentChange,
+      handleSizeChange,
+      onLeaveRequest,
+      handleEdit,
+      handleDelete,
+      filterTableRef,
+      resetDateFilter,
+      clearFilter,
+      getCurrentTableData,
+      filterStatus,
+      modifyPop,
+      detailPop,
+      filterLeaveStatus,
+      showMyLeave,
+      showReviewLeave,
+      showNotifyLeave,
+      showAdminLeave,
+      isAdmin,
+      onDownload,
+      onToExcel,
+      onShowStatistics,
+      refAverageSales,
+    }
   }
-  </style>
-  
+})
+</script>
+<style lang="stylus" scoped>
+.table-container{
+  .form-inline{
+    margin:15px;
+    text-align:left;
+  }
+  .table-list{
+    margin:15px;
+  }
+
+}
+</style>

@@ -140,6 +140,19 @@ public class ReimbursementCon {
             res.setMessage("Reimbursement record added successfully.");
             res.pushData(reimbursement_id);
             System.out.println("addRec reimbursement_id: " + reimbursement_id);
+
+            // 处理抄送人
+            if (request.getCc_user() != null && request.getCc_user().length > 0) {
+                for (int ccUserId : request.getCc_user()) {
+                    ReimJoinNotifyRecord ccRecord = new ReimJoinNotifyRecord(
+                            0, userId, request.getAmount(), request.getDescription(),
+                            request.getStatus(), request.getSubmitted_at(), 0, ccUserId,
+                            "reimbursement", reimbursement_id, request.getSubmitted_at(), 0
+                    );
+                    reimbursementService.addNotification(ccRecord);
+                }
+            }
+
         } catch (Exception e) {
             res.setStatus(-1);
             res.setMessage(e.getMessage());
