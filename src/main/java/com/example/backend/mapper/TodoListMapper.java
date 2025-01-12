@@ -38,4 +38,19 @@ public interface TodoListMapper extends BaseMapper<TodoRecord> {
 
     @SelectProvider(type = SelectorProviderGy.class, method = "buildTodoSearchQuery")
     List<TodoRecord> searchByFieldAndKeyPersonal(String field, String key, int user_id);
+
+    @Select("SELECT count(*) FROM usertodo")
+    Integer getTotal();
+
+    @Select("SELECT count(*) FROM usertodo WHERE todo_fin = '未完成' and adder_id = user_id")
+    Integer getUnfinSelf();
+
+    @Select("SELECT count(*) FROM usertodo WHERE todo_fin = '已完成' and adder_id = user_id")
+    Integer getFinishedSelf();
+
+    @Select("SELECT count(*) FROM usertodo WHERE todo_fin = '未完成' and adder_id != user_id")
+    Integer getUnfinMana();
+
+    @Select("SELECT count(*) FROM usertodo WHERE todo_fin = '已完成' and adder_id != user_id")
+    Integer getFinishedMana();
 }

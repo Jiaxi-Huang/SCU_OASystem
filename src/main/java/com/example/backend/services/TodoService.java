@@ -59,4 +59,24 @@ public class TodoService extends ServiceImpl<TodoListMapper, TodoRecord> {
         int res_code = todoListMapper.deleteRecord(record.getTodo_id());
         return res_code;
     }
+
+    public Integer getTotal() {
+        return todoListMapper.getTotal();
+    }
+
+    public Integer getUnfinSelf() {
+        return todoListMapper.getUnfinSelf();
+    }
+
+    public Integer getFinishedSelf() {
+        return todoListMapper.getFinishedSelf();
+    }
+
+    public Integer getFinishedMana() {
+        return todoListMapper.getFinishedMana();
+    }
+
+    public Integer getUnfinMana() {
+        return todoListMapper.getUnfinMana();
+    }
 }
