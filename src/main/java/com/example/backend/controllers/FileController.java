@@ -195,11 +195,14 @@ public class FileController {
 
             record.setFilePath(filePath);
             int dotIndex = allFileName.lastIndexOf('.');
+            int dotIndex1 = fileName.lastIndexOf('.');
             System.out.println(fileName);
             // 分离文件名和扩展名
             if (Objects.isNull(fileName) || fileName.isEmpty()) {
                 fileName = allFileName.substring(0, dotIndex);
                 System.out.println(fileName);
+            }else{
+                fileName = fileName.substring(0,dotIndex1);
             }
             //区分web和wechat
 
