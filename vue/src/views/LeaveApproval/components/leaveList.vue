@@ -35,6 +35,8 @@
                 :data="paginatedAdminData"
                 style="width: 100%"
                 v-show="isAdminLeaveShow">
+        <el-table-column prop="leave_user_id" label="提交用户id" width="180" truncated> </el-table-column>
+        <el-table-column prop="username" label="提交用户" width="180" truncated> </el-table-column>
         <el-table-column prop="leave_submitted_at" label="提交日期" sortable width="180" column-key="leave_submitted_at"></el-table-column>
         <el-table-column prop="leave_start_time" label="开始时间" width="180" truncated> </el-table-column>
         <el-table-column prop="leave_end_time" label="结束时间" truncated> </el-table-column>
@@ -81,6 +83,8 @@
                 :data="paginatedMyData"
                 style="width: 100%"
                 v-show="isMyLeaveShow">
+        <el-table-column prop="leave_user_id" label="提交用户id" width="180" truncated> </el-table-column>
+        <el-table-column prop="username" label="提交用户" width="180" truncated> </el-table-column>
         <el-table-column prop="leave_submitted_at" label="提交日期" sortable width="180" column-key="leave_submitted_at"></el-table-column>
         <el-table-column prop="leave_start_time" label="开始时间" width="180" truncated> </el-table-column>
         <el-table-column prop="leave_end_time" label="结束时间" truncated> </el-table-column>
@@ -126,6 +130,8 @@
                 :data="paginatedReviewData"
                 style="width: 100%"
                 v-show="isReviewLeaveShow">
+        <el-table-column prop="leave_user_id" label="提交用户id" width="180" truncated> </el-table-column>
+        <el-table-column prop="username" label="提交用户" width="180" truncated> </el-table-column>
         <el-table-column prop="leave_submitted_at" label="提交日期" sortable width="180" column-key="leave_submitted_at"></el-table-column>
         <el-table-column prop="leave_start_time" label="开始时间" width="180" truncated> </el-table-column>
         <el-table-column prop="leave_end_time" label="结束时间" truncated> </el-table-column>
@@ -172,6 +178,8 @@
                 :data="paginatedNotifyData"
                 style="width: 100%"
                 v-show="isNotifyLeaveShow">
+        <el-table-column prop="leave_user_id" label="提交用户id" width="180" truncated> </el-table-column>
+        <el-table-column prop="username" label="提交用户" width="180" truncated> </el-table-column>
         <el-table-column prop="leave_submitted_at" label="提交日期" sortable width="180" column-key="leave_submitted_at"></el-table-column>
         <el-table-column prop="leave_start_time" label="开始时间" width="180" truncated> </el-table-column>
         <el-table-column prop="leave_end_time" label="结束时间" truncated> </el-table-column>
@@ -214,6 +222,9 @@
           <el-form-item label="提交用户ID">
             <el-input v-model="form.leave_user_id" disabled></el-input>
           </el-form-item>
+          <el-form-item label="提交用户">
+            <el-input v-model="form.username" disabled></el-input>
+          </el-form-item>
           <el-form-item label="开始时间">
             <el-input v-model="form.leave_start_time" autocomplete="on"></el-input>
           </el-form-item>
@@ -246,6 +257,9 @@
           </el-form-item>
           <el-form-item label="提交用户ID&nbsp;&nbsp;">
             {{ form.leave_user_id }}
+          </el-form-item>
+          <el-form-item label="提交用户&nbsp;&nbsp;">
+            {{ form.username }}
           </el-form-item>
           <el-form-item label="开始时间&nbsp;&nbsp;">
             {{ form.leave_start_time }}
@@ -504,6 +518,7 @@ export default defineComponent({
                 leave_reason: data[i].reason,
                 leave_status: data[i].status,
                 leave_submitted_at: data[i].submitted_at,
+                username: data[i].username,
               }
               state.myData.push(record)
             }
@@ -527,6 +542,7 @@ export default defineComponent({
                 leave_reason: data[i].reason,
                 leave_status: data[i].status,
                 leave_submitted_at: data[i].submitted_at,
+                username: data[i].username,
               }
               state.reviewData.push(record)
             }
@@ -550,6 +566,7 @@ export default defineComponent({
                 leave_reason: data[i].reason,
                 leave_status: data[i].status,
                 leave_submitted_at: data[i].submitted_at,
+                username: data[i].username,
               }
               state.notifyData.push(record)
             }
@@ -581,6 +598,7 @@ export default defineComponent({
                   leave_reason: data[i].reason,
                   leave_status: data[i].status,
                   leave_submitted_at: data[i].submitted_at,
+                  username: data[i].username,
                 }
                 state.adminData.push(record)
               }

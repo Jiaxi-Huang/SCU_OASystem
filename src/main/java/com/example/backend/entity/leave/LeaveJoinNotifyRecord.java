@@ -23,8 +23,9 @@ public class LeaveJoinNotifyRecord {
     private int request_id;
     private String request_type;
     private String notified_at;
+    private String username;
 
-    public LeaveJoinNotifyRecord(int leave_id, int user_id, String start_date, String end_date, String type, String reason, String status, String submitted_at, int notification_id, int cc_user_id, int notified_user_id, int request_id, String request_type, String notified_at) {
+    public LeaveJoinNotifyRecord(int leave_id, int user_id, String start_date, String end_date, String type, String reason, String status, String submitted_at, int notification_id, int cc_user_id, int notified_user_id, int request_id, String request_type, String notified_at, String username) {
         this.leave_id = leave_id;
         this.user_id = user_id;
         this.start_date = start_date;
@@ -39,5 +40,6 @@ public class LeaveJoinNotifyRecord {
         this.request_id = request_id;
         this.request_type = request_type;
         this.notified_at = notified_at;
+        this.username = username;
     }
 }

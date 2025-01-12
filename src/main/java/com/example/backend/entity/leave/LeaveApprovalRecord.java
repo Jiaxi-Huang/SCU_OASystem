@@ -21,8 +21,9 @@ public class LeaveApprovalRecord {
     private String reason; 
     private String status; 
     private String submitted_at;
+    private String username;
 
-    public LeaveApprovalRecord(int leave_id, int user_id, int review_user_id, String start_date, String end_date, String type, String reason, String status, String submitted_at) {
+    public LeaveApprovalRecord(int leave_id, int user_id, int review_user_id, String start_date, String end_date, String type, String reason, String status, String submitted_at, String username) {
         this.leave_id = leave_id;
         this.user_id = user_id;
         this.review_user_id = review_user_id;
@@ -32,5 +33,6 @@ public class LeaveApprovalRecord {
         this.reason = reason;
         this.status = status;
         this.submitted_at = submitted_at;
+        this.username = username;
     }
 }

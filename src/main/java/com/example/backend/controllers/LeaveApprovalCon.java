@@ -1,5 +1,6 @@
 package com.example.backend.controllers;
 
+import com.example.backend.entity.User;
 import com.example.backend.entity.leave.LeaveApprovalRecord;
 import com.example.backend.entity.ResponseBase;
 import com.example.backend.entity.leave.LeaveApprovalRecordWithAccessToken;
@@ -9,6 +10,7 @@ import com.example.backend.entity.reimbursement.ReimbursementRecord;
 import com.example.backend.entity.reimbursement.ReimbursementRecordWithAccessToken;
 import com.example.backend.services.AccessService;
 import com.example.backend.services.LeaveApprovalService;
+import com.example.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,9 @@ public class LeaveApprovalCon {
     @Autowired
     private AccessService accessService;
 
+    @Autowired
+    private UserService userService;
+
     @PostMapping("/getMyLeaveRecord")
     public ResponseBase getMyLeaveRecord(@RequestBody LeaveApprovalRecordWithAccessToken request) {
         ResponseBase res = new ResponseBase();
@@ -41,6 +46,7 @@ public class LeaveApprovalCon {
             for (LeaveApprovalRecord record : records) {
                 res.pushData(record);
             }
+//            System.out.println("111111111111111111111111111111111111111111111111111"+records);
         } catch (Exception e) {
             res.setStatus(-1);
             res.setMessage(e.getMessage());
@@ -122,13 +128,15 @@ public class LeaveApprovalCon {
             res.setMessage("Leave record added successfully.");
             res.pushData(leave_id);
 
+            User user = userService.userInfo(userId);
+
             // 处理抄送人
             if (request.getCc_user() != null) {
                 for (int ccUserId : request.getCc_user()) {
                     LeaveJoinNotifyRecord ccRecord = new LeaveJoinNotifyRecord(
                             0, userId, request.getStart_date(), request.getEnd_date(),
                             request.getType(), request.getReason(), request.getStatus(),
-                            request.getSubmitted_at(), 0, userId, ccUserId, leave_id, "leave", request.getSubmitted_at()
+                            request.getSubmitted_at(), 0, userId, ccUserId, leave_id, "leave", request.getSubmitted_at(), user.getUsername()
                     );
                     leave_service.addNotification(ccRecord);
                 }

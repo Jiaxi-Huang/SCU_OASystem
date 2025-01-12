@@ -24,20 +24,63 @@ public interface LeaveApprovalMapper extends BaseMapper<LeaveApprovalRecord> {
                nc.notified_user_id,
                nc.request_id,
                nc.request_type,
-               nc.notified_at
+               nc.notified_at,
+               ui.username
         FROM leave_requests lr
         JOIN notification_chain nc ON lr.leave_id = nc.request_id
+        JOIN user_infos ui ON lr.user_id = ui.user_id
         WHERE nc.notified_user_id = #{userId} AND nc.request_type = 'leave'
        """)
     List<LeaveJoinNotifyRecord> getNotifyLeaveRecord(int userId);
 
-    @Select("SELECT * FROM leave_requests")
+    @Select("""
+            SELECT lr.leave_id,
+               lr.user_id,
+               lr.review_user_id,
+               lr.start_date,
+               lr.end_date,
+               lr.type,
+               lr.reason,
+               lr.status,
+               lr.submitted_at,
+               ui.username
+               FROM leave_requests lr
+               JOIN user_infos ui ON lr.user_id = ui.user_id
+            """)
     List<LeaveApprovalRecord> getAll();
 
-    @Select("SELECT * FROM leave_requests WHERE user_id = #{userId}")
+    @Select("""
+            SELECT lr.leave_id,
+               lr.user_id,
+               lr.review_user_id,
+               lr.start_date,
+               lr.end_date,
+               lr.type,
+               lr.reason,
+               lr.status,
+               lr.submitted_at,
+               ui.username
+               FROM leave_requests lr
+               JOIN user_infos ui ON lr.user_id = ui.user_id
+               WHERE lr.user_id = #{userId}
+            """)
     List<LeaveApprovalRecord> getMyLeaveRecord(int userId);
 
-    @Select("SELECT * FROM leave_requests WHERE review_user_id = #{userId}")
+    @Select("""
+            SELECT lr.leave_id,
+               lr.user_id,
+               lr.review_user_id,
+               lr.start_date,
+               lr.end_date,
+               lr.type,
+               lr.reason,
+               lr.status,
+               lr.submitted_at,
+               ui.username
+               FROM leave_requests lr
+               JOIN user_infos ui ON lr.user_id = ui.user_id
+               WHERE lr.review_user_id = #{userId}
+            """)
     List<LeaveApprovalRecord> getReviewLeaveRecord(int userId);
 
     @Update("UPDATE leave_requests " +
