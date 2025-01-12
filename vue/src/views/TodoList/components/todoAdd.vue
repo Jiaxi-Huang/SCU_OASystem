@@ -8,11 +8,11 @@
               <span>待办事项添加</span>
               <el-divider></el-divider>
             </div>
-            <el-form ref="activityForm" style="text-align: left" :model="sizeForm" label-width="80px" size="mini">
-              <el-form-item label="标题">
+            <el-form ref="activityForm" style="text-align: left" :model="sizeForm" label-width="80px" size="mini" :rules="rules">
+              <el-form-item label="标题" prop="todo_title" >
                 <el-input v-model="sizeForm.todo_title"></el-input>
               </el-form-item>
-              <el-form-item label="内容" :label-width="formLabelWidth">
+              <el-form-item label="内容" :label-width="formLabelWidth" prop="todo_ctnt">
                 <el-input v-model="sizeForm.todo_ctnt" autosize type="textarea"/>
               </el-form-item>
               <el-form-item label="截止时间">
@@ -31,17 +31,6 @@
                   </el-col>
                 </div>
               </el-form-item>
-<!--              <el-form-item label="从属">-->
-<!--                <el-checkbox-group v-model="sizeForm.type">-->
-<!--                  <el-checkbox-button label="为自己添加"></el-checkbox-button>-->
-<!--                  <el-checkbox-button label="为他人添加"></el-checkbox-button>-->
-<!--                </el-checkbox-group>-->
-<!--              </el-form-item>-->
-
-<!--              <el-form-item label="自己的ID" v-show="forSelf">-->
-<!--                <el-input v-model="sizeForm.adder_id" placeholder="暂时这样，以后会自动填入且无法修改"></el-input>-->
-<!--              </el-form-item>-->
-
               <el-form-item label="别人的ID" v-show="forOther">
                 <el-input v-model="sizeForm.user_id" placeholder="这个地方先禁用了不要填东西"></el-input>
               </el-form-item>
@@ -88,12 +77,51 @@ export default defineComponent({
     // const forSelf = computed(() => sizeForm.type.includes('为自己添加'));
     const forOther = computed(() => sizeForm.type.includes('为他人添加'));
 
+
+
+    // 校验规则
+    const rules = reactive({
+      todo_title: [
+        {
+          required: true,
+          message: '标题不能为空',
+          trigger: 'change',
+        },
+        {
+          validator: (rule, value, callback) => {
+            if (value.length > 20) {
+              callback(new Error('标题不能超过20个字'));
+            } else {
+              callback();
+            }
+          },
+          trigger: 'blur',
+        },
+      ],
+      todo_ctnt: [
+        {
+          required: true,
+          message: '内容不能为空',
+          trigger: 'blur',
+        },
+        {
+          validator: (rule, value, callback) => {
+            if (value.length > 120) {
+              callback(new Error('内容不能超过120个字'));
+            } else {
+              callback();
+            }
+          },
+          trigger: 'blur',
+        },
+      ],
+    });
+
     const activityForm = ref()
 
     onMounted(() => {
-      // eslint-disable-next-line no-console
-      console.log('show sizeFormRef.value', activityForm.value)
     })
+
     // methods
     const submitForm = () => {
       activityForm.value.validate((valid: any): boolean => {
@@ -117,7 +145,7 @@ export default defineComponent({
               type: 'warning',
               message: err.message
             })
-            console.log('submit error')
+            // console.log('submit error')
             return false
           }
           sizeForm.todo_title = ''
@@ -128,11 +156,17 @@ export default defineComponent({
           sizeForm.adder_id = ''
           sizeForm.user_id = ''
           return true
+        } else {
+          ElMessage({
+            icon:'warning',
+            message:'请检查您的输入！'
+          })
         }
-        console.log('submit error')
+        // console.log('submit error')
         return false
       })
     }
+
     const resetForm = () => {
       activityForm.value.resetFields()
     }
@@ -141,7 +175,7 @@ export default defineComponent({
     }
     const handleEdit = (index: any, row: any) => {
       // eslint-disable-next-line no-console
-      console.log(index, row)
+      // console.log(index, row)
       tableData[index].edit = true
     }
     /**
@@ -153,7 +187,7 @@ export default defineComponent({
     }
     const handleSave = (index: any, row: any): Boolean => {
       // eslint-disable-next-line no-console
-      console.log(index, row)
+      // console.log(index, row)
       if (checkEmpty(row)) {
         ElMessage.warning('保存前请完善信息！')
         return false
@@ -169,7 +203,7 @@ export default defineComponent({
     }
     const handleDelete = (index: any, row: any) => {
       // eslint-disable-next-line no-console
-      console.log(index, row)
+      // console.log(index, row)
       tableData.splice(index, 1)
     }
     // 新增一条记录
@@ -192,6 +226,7 @@ export default defineComponent({
       activityForm,
       submitForm,
       resetForm,
+      rules,
       // forSelf,
       forOther,
     }

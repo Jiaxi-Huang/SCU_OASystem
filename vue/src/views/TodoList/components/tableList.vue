@@ -130,11 +130,11 @@
 
     <!--    V-MODEL!!!!!-->
     <el-dialog v-model="modifyFormVisible" title="修改待办事项">
-      <el-form :model="form">
-        <el-form-item label="标题" :label-width="formLabelWidth">
+      <el-form :model="form" ref="activityForm" :rules="rules">
+        <el-form-item label="标题" :label-width="formLabelWidth" prop="todo_title">
           <el-input v-model="form.todo_title" autocomplete="on"></el-input>
         </el-form-item>
-        <el-form-item label="内容" :label-width="formLabelWidth">
+        <el-form-item label="内容" :label-width="formLabelWidth" prop="todo_ctnt">
           <el-input v-model="form.todo_ctnt" autosize type="textarea"/>
         </el-form-item>
         <el-form-item label="截止日期" :label-width="formLabelWidth">
@@ -354,6 +354,46 @@ export default defineComponent({
       filterPresetTest()
       getPersonalTodoList()
     })
+
+    // 校验规则
+    const rules = reactive({
+      todo_title: [
+        {
+          required: true,
+          message: '标题不能为空',
+          trigger: 'change',
+        },
+        {
+          validator: (rule, value, callback) => {
+            // console.log(rule, value)
+            if (value.length > 20) {
+              callback(new Error('标题不能超过20个字'));
+            } else {
+              callback();
+            }
+          },
+          trigger: 'blur',
+        },
+      ],
+      todo_ctnt: [
+        {
+          required: true,
+          message: '内容不能为空',
+          trigger: 'blur',
+        },
+        {
+          validator: (rule, value, callback) => {
+            if (value.length > 120) {
+              callback(new Error('内容不能超过120个字'));
+            } else {
+              callback();
+            }
+          },
+          trigger: 'blur',
+        },
+      ],
+    });
+
     // methods
     const resetDateFilter = () => {
       filterTableRef.value.clearFilter('date')
@@ -379,7 +419,7 @@ export default defineComponent({
 
     const handleSelectionChange = (selection:any[]) => {
       state.selectionRows = selection.map(item => item.todo_id)
-      console.log("SelectionRows",state.selectionRows)
+      // console.log("SelectionRows",state.selectionRows)
     }
 
     const getPersonalTodoList = () => {
@@ -395,7 +435,7 @@ export default defineComponent({
             state.tableData = data
             updatePaginatedData()  // 更新分页数据
           } else {
-            console.log('getPersonalTodoList RES MISS')
+            // console.log('getPersonalTodoList RES MISS')
           }
         });
       } catch (err) {
@@ -463,26 +503,40 @@ export default defineComponent({
       state.form = row
     }
 
+    const activityForm = ref()
+
     const handleEdit = () => {
       // eslint-disable-next-line no-console
-      state.modifyFormVisible = false
-      let record = state.form
-      record.todo_ddl = [record.ddl_date, record.ddl_time].join(" ")
-      record.todo_crt = [record.crt_date, record.crt_time].join(" ")
-      state.form = {}
-      try {
-        Service.postModifyTodo(record).then((res) => {
-          if (res) {
-            // console.log(res)
-          } else {
+      activityForm.value.validate((valid: any): boolean => {
+        if (valid) {
+          state.modifyFormVisible = false
+          let record = state.form
+          record.todo_ddl = [record.ddl_date, record.ddl_time].join(" ")
+          record.todo_crt = [record.crt_date, record.crt_time].join(" ")
+          state.form = {}
+          try {
+            Service.postModifyTodo(record).then((res) => {
+              if (res) {
+                // console.log(res)
+              } else {
+              }
+            });
+          } catch (err) {
+            ElMessage({
+              type: 'error',
+              message: err.message
+            })
           }
-        });
-      } catch (err) {
-        ElMessage({
-          type: 'warning',
-          message: err.message
-        })
-      }
+
+        } else {
+          ElMessage({
+            type: 'error',
+            message: '请检查您的输入！'
+          })
+          return false
+        }
+      })
+
     }
     const handleDelete = (index: any, row: any) => {
       // eslint-disable-next-line no-console
@@ -539,7 +593,7 @@ export default defineComponent({
 
     const onSubmit = () => {
       // eslint-disable-next-line no-console
-      console.log('submit!')
+      // console.log('submit!')
     }
 
     const onAddTodo = () => {
@@ -549,8 +603,8 @@ export default defineComponent({
 
     const handleFilterChange = (filters: any) => {
       state.filters.todo_fin = filters.todo_fin;   // 只有一个条件在 `filters` 中
-      console.log(state.filters.todo_fin);
-      console.log(filters.todo_fin);
+      // console.log(state.filters.todo_fin);
+      // console.log(filters.todo_fin);
       updatePaginatedData(); // 更新分页数据
     }
 
@@ -673,7 +727,7 @@ export default defineComponent({
         if (refAverageSales.value) {
           useInitPieChart(refAverageSales.value, data)
         } else {
-          console.log("refAverageSales not exist!")
+          // console.log("refAverageSales not exist!")
         }
       })
     }
@@ -712,6 +766,8 @@ export default defineComponent({
       onSearchSubmit,
       onRefresh,
       onShowStatistics,
+      rules,
+      activityForm,
     }
   }
 })

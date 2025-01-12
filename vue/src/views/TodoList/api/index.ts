@@ -25,7 +25,7 @@ class Service {
       data: data,
     }).then((res) => {
       if (res.status === 0) {
-        console.log("postGetTodoList success")
+        // console.log("postGetTodoList success")
         return res
       }
       return null
@@ -40,10 +40,10 @@ class Service {
       json: true,
       data: record,
     }).then((res) => {
-      console.log("searchBy return")
+      // console.log("searchBy return")
       // console.log(res)
       if (res.status === 0 || res.status === 1) {
-        console.log("searchBy success")
+        // console.log("searchBy success")
         return res
       }
       return null
@@ -52,7 +52,7 @@ class Service {
 
   static postModifyTodo(record:any) {
     let todoList = record
-    console.log(todoList)
+    // console.log(todoList)
     return request({
       url: todolistApi.localHost + todolistApi.modifyTodolist,
       method: 'POST',

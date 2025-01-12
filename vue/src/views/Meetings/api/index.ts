@@ -27,7 +27,7 @@ class Service {
       data: data,
     }).then((res) => {
       if (res.status === 0) {
-        console.log("postGetTodoList success")
+        // console.log("postGetTodoList success")
         return res
       }
       return null
@@ -42,10 +42,10 @@ class Service {
       json: true,
       data: record,
     }).then((res) => {
-      console.log("searchBy return")
+      // console.log("searchBy return")
       // console.log(res)
       if (res.status === 0 || res.status === 1) {
-        console.log("searchBy success")
+        // console.log("searchBy success")
         return res
       }
       return null
@@ -122,10 +122,10 @@ class Service {
       data: record,
     }).then((res) => {
       if (res.status === 0) {
-        console.log("addMeetingPersonally success")
+        // console.log("addMeetingPersonally success")
         return res
       } else {
-        console.log(res.message)
+        // console.log(res.message)
       }
       return null
     })
@@ -143,10 +143,10 @@ class Service {
       data: record,
     }).then((res) => {
       if (res.status === 0) {
-        console.log("deleteMeetingPersonaly success")
+        // console.log("deleteMeetingPersonaly success")
         return res
       } else {
-        console.log(res.message)
+        // console.log(res.message)
       }
       return null
     })
@@ -154,7 +154,7 @@ class Service {
 
   static updateMeeting(meeting :any) {
     meeting.acsTkn = sessionStorage.getItem('accessToken')
-    console.log(meeting)
+    // console.log(meeting)
     return request({
       url: meetingApi.localHost + meetingApi.updateMeeting,
       method: 'POST',
@@ -200,7 +200,7 @@ class Service {
 
   static search_by_mtin_id(mtin_id: any) {
     const data = {data:[Number(mtin_id)]}
-    console.log(data)
+    // console.log(data)
     return request({
       url: meetingApi.localHost + meetingApi.search_by_mtin_id,
       method: 'POST',

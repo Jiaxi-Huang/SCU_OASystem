@@ -498,11 +498,11 @@
           </el-dialog>
 
           <el-dialog v-model="task.modifyFormVisible" title="修改会议详情">
-            <el-form :model="task.modifyForm">
-              <el-form-item label="会议标题&nbsp;&nbsp;" :label-width="formLabelWidth">
+            <el-form :model="task.modifyForm"  ref="activityForm" :rules="rules">
+              <el-form-item label="会议标题&nbsp;&nbsp;" :label-width="formLabelWidth" prop="mtin_title">
                 <el-input v-model="task.modifyForm.mtin_title" autocomplete="on"></el-input>
               </el-form-item>
-              <el-form-item label="会议内容&nbsp;&nbsp;" :label-width="formLabelWidth">
+              <el-form-item label="会议内容&nbsp;&nbsp;" :label-width="formLabelWidth" prop="mtin_ctnt">
                 <el-input v-model="task.modifyForm.mtin_ctnt" autosize type="textarea"/>
               </el-form-item>
               <el-form-item label="会议开始时间&nbsp;&nbsp;" :label-width="formLabelWidth">
@@ -521,39 +521,23 @@
                   </el-col>
                 </div>
               </el-form-item>
-              <el-form-item label="会议长度&nbsp;&nbsp;" :label-width="formLabelWidth">
+              <el-form-item label="会议长度&nbsp;&nbsp;" :label-width="formLabelWidth" prop="mtin_len">
                 <el-input v-model="task.modifyForm.mtin_len" autocomplete="off"></el-input>
               </el-form-item>
-              <el-form-item label="会议地点&nbsp;&nbsp;" :label-width="formLabelWidth">
+              <el-form-item label="会议地点&nbsp;&nbsp;" :label-width="formLabelWidth" prop="mtin_loc">
                 <el-input v-model="task.modifyForm.mtin_loc" autocomplete="off"></el-input>
               </el-form-item>
-              <el-form-item label="会议主持人ID&nbsp;&nbsp;" :label-width="formLabelWidth">
+              <el-form-item label="会议主持人ID&nbsp;&nbsp;" :label-width="formLabelWidth" prop="mtin_host">
                 <el-input v-model="task.modifyForm.mtin_host" autocomplete="off"></el-input>
               </el-form-item>
               <el-form-item label="会议ID&nbsp;&nbsp;" :label-width="formLabelWidth">
                 {{ task.modifyForm.mtin_id }}
               </el-form-item>
-              <el-form-item label="会议状态&nbsp;&nbsp;" :label-width="formLabelWidth">
-                <el-input v-model="task.modifyForm.mtin_fin" autocomplete="off"></el-input>
-              </el-form-item>
               <el-form-item label="会议创建时间&nbsp;&nbsp;" :label-width="formLabelWidth">
-                <div>
-                  <el-col :span="11">
-                    <el-date-picker v-model="task.mtin_crt_date"
-                                    type="date" placeholder="选择日期" style="width: 100%"
-                                    value-format="YYYY-MM-DD"
-                    ></el-date-picker>
-                  </el-col>
-                  <el-col class="line" :span="1">&nbsp;&nbsp;&nbsp;&nbsp;</el-col>
-                  <el-col :span="12">
-                    <el-time-picker v-model="task.mtin_crt_time" placeholder="选择时间" style="width: 100%"
-                                    format="HH:mm" value-format="HH:mm"
-                    ></el-time-picker>
-                  </el-col>
-                </div>
+                {{task.mtin_crt_date}}&nbsp;&nbsp;{{task.mtin_crt_time}}
               </el-form-item>
               <el-form-item label="为我添加会议者ID&nbsp;&nbsp;" :label-width="formLabelWidth">
-                <el-input v-model="task.modifyForm.adder_id" autocomplete="off"></el-input>
+                {{task.modifyForm.adder_id}}
               </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -730,6 +714,81 @@ onMounted(() => {
   getPersonalMeetingList()
 })
 
+const rules = reactive({
+  mtin_title: [
+    {
+      required: true,
+      message: '标题不能为空',
+      trigger: 'blur',
+    },
+    {
+      validator: (rule, value, callback) => {
+        if (value.length > 20) {
+          callback(new Error('标题不能超过20个字'));
+        } else {
+          callback();
+        }
+      },
+      trigger: 'blur',
+    },
+  ],
+  mtin_ctnt: [
+    {
+      required: true,
+      message: '内容不能为空',
+      trigger: 'blur',
+    },
+    {
+      validator: (rule, value, callback) => {
+        if (value.length > 120) {
+          callback(new Error('内容不能超过120个字'));
+        } else {
+          callback();
+        }
+      },
+      trigger: 'blur',
+    },
+  ],
+  mtin_loc: [
+    {
+      validator: (rule, value, callback) => {
+        if (value && value.length > 20) {
+          callback(new Error('地点不能超过20个字'));
+        } else {
+          callback();
+        }
+      },
+      trigger: 'blur',
+    },
+  ],
+  mtin_host: [
+    {
+      validator: (rule, value, callback) => {
+        if (!/^\d+$/.test(value)) {
+          callback(new Error('主持人ID必须是全数字'));
+        } else {
+          callback();
+        }
+      },
+      trigger: 'blur',
+    },
+  ],
+  mtin_len: [
+    {
+      validator: (rule, value, callback) => {
+        if (value && !/^\d+min$/.test(value)) {
+          callback(new Error('会议长度必须以 "min" 结尾'));
+        } else {
+          callback();
+        }
+      },
+      trigger: 'blur',
+    },
+  ],
+});
+
+const activityForm = ref()
+
 // 组件卸载时销毁实例
 onUnmounted(() => {
 })
@@ -743,7 +802,7 @@ const buttonClickTest = () => {
 const showMeetingDetails = (row:any) => {
   // console.log("Detail Shows!")
   task.detailForm = row
-  console.log(task.detailForm)
+  // console.log(task.detailForm)
   task.detailFormVisible = true
 }
 
@@ -767,14 +826,14 @@ const onShowStatistics = () => {
     if (refAverageSales.value) {
       useInitPieChart(refAverageSales.value, data)
     } else {
-      console.log("refAverageSales not exist!")
+      // console.log("refAverageSales not exist!")
     }
   })
 
 }
 
 const onModifyClicked = (item: any) => {
-  console.log("Modify a Meeting!")
+  // console.log("Modify a Meeting!")
   task.modifyForm = item
   task.mtin_st_date = item.mtin_st.split(' ')[0]
   task.mtin_st_time = item.mtin_st.split(' ')[1]
@@ -793,7 +852,7 @@ const onDelete = (item: any) => {
         })
         getPersonalMeetingList()
       } else {
-        console.log('deleteMeeting error!')
+        // console.log('deleteMeeting error!')
       }
     });
   } catch (err) {
@@ -805,32 +864,45 @@ const onDelete = (item: any) => {
 }
 
 const handleEdit = () => {
-  task.modifyFormVisible = false
-  let meeting = task.modifyForm
-  meeting.mtin_st = [task.mtin_st_date, task.mtin_st_time].join(" ")
-  meeting.mtin_crt = [task.mtin_crt_date, task.mtin_crt_time].join(" ")
-  try {
-    Service.updateMeeting(meeting).then((res) => {
-      if (res) {
+
+  activityForm.value.validate((valid: any): boolean => {
+    if (valid) {
+      task.modifyFormVisible = false
+      let meeting = task.modifyForm
+      meeting.mtin_st = [task.mtin_st_date, task.mtin_st_time].join(" ")
+      meeting.mtin_crt = [task.mtin_crt_date, task.mtin_crt_time].join(" ")
+      try {
+        Service.updateMeeting(meeting).then((res) => {
+          if (res) {
+            ElMessage({
+              type: 'success',
+              message: "修改成功"
+            })
+            getPersonalMeetingList()
+          } else {
+            // console.log('updateMeeting error!')
+          }
+        });
+      } catch (err) {
         ElMessage({
-          type: 'success',
-          message: "修改成功"
+          type: 'warning',
+          message: err.message
         })
-        getPersonalMeetingList()
-      } else {
-        console.log('updateMeeting error!')
       }
-    });
-  } catch (err) {
-    ElMessage({
-      type: 'warning',
-      message: err.message
-    })
-  }
+
+    } else {
+      ElMessage({
+        type: 'error',
+        message: '请检查您的输入！'
+      })
+      return false
+    }
+  })
+
 }
 
 const getPersonalMeetingList = () => {
-  console.log("getPersonalMeetingList exc")
+  // console.log("getPersonalMeetingList exc")
   try {
     Service.getPersonalMeetingList().then((res) => {
       if (res) {
@@ -838,7 +910,7 @@ const getPersonalMeetingList = () => {
         task.progressing = res.data[1]
         task.passed = res.data[2]
       } else {
-        console.log('getPersonalMeetingList error!')
+        // console.log('getPersonalMeetingList error!')
       }
     });
   } catch (err) {

@@ -8,18 +8,25 @@
               <span>新建会议</span>
               <el-divider></el-divider>
             </div>
-            <el-form ref="activityForm" style="text-align: left" :model="sizeForm" label-width="80px" size="mini">
-              <el-form-item label="标题">
+            <el-form ref="activityForm" style="text-align: left" :model="sizeForm" label-width="80px" size="mini" :rules="rules">
+              <el-form-item label="标题"  prop="mtin_title">
                 <el-input v-model="sizeForm.mtin_title"></el-input>
               </el-form-item>
-              <el-form-item label="内容">
+              <el-form-item label="内容"  prop="mtin_ctnt">
                 <el-input v-model="sizeForm.mtin_ctnt" autosize type="textarea"/>
               </el-form-item>
-              <el-form-item label="地点">
+              <el-form-item label="地点" prop="mtin_loc">
                 <el-input v-model="sizeForm.mtin_loc" autosize type="textarea"/>
               </el-form-item>
               <el-form-item label="持续时间">
-                <el-input v-model="sizeForm.mtin_len" autosize type="textarea"/>
+                <el-select v-model="sizeForm.mtin_len" placeholder="Select" style="width: 240px">
+                  <el-option
+                      v-for="item in time_options"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                  />
+                </el-select>
               </el-form-item>
               <el-form-item label="开始时间">
                 <div>
@@ -84,9 +91,64 @@ export default defineComponent({
     })
     const activityForm = ref()
 
+    // 校验规则
+    const rules = reactive({
+      mtin_title: [
+        {
+          required: true,
+          message: '标题不能为空',
+          trigger: 'change',
+        },
+        {
+          validator: (rule, value, callback) => {
+            if (value.length > 20) {
+              callback(new Error('标题不能超过20个字'));
+            } else {
+              callback();
+            }
+          },
+          trigger: 'blur',
+        },
+      ],
+      mtin_loc: [
+        {
+          required: true,
+          message: '地点不能为空',
+          trigger: 'change',
+        },
+        {
+          validator: (rule, value, callback) => {
+            if (value.length > 20) {
+              callback(new Error('标题不能超过20个字'));
+            } else {
+              callback();
+            }
+          },
+          trigger: 'blur',
+        },
+      ],
+      mtin_ctnt: [
+        {
+          required: true,
+          message: '内容不能为空',
+          trigger: 'blur',
+        },
+        {
+          validator: (rule, value, callback) => {
+            if (value.length > 120) {
+              callback(new Error('内容不能超过120个字'));
+            } else {
+              callback();
+            }
+          },
+          trigger: 'blur',
+        },
+      ],
+    });
+
     onMounted(() => {
       // eslint-disable-next-line no-console
-      console.log('show sizeFormRef.value', activityForm.value)
+      // console.log('show sizeFormRef.value', activityForm.value)
     })
     // methods
     const submitForm = () => {
@@ -125,12 +187,37 @@ export default defineComponent({
       router.go(-1)
     }
 
+    const time_options = [
+      {
+        value:'15min',
+        text:'15min',
+      },
+      {
+        value:'30min',
+        text:'30min',
+      },
+      {
+        value:'45min',
+        text:'45min',
+      },
+      {
+        value:'60min',
+        text:'60min',
+      },
+      {
+        value:'90min',
+        text:'90min',
+      },
+    ]
+
     return {
       handleBack,
       sizeForm,
       activityForm,
       submitForm,
       resetForm,
+      time_options,
+      rules,
     }
   }
 })
