@@ -145,9 +145,8 @@ public class Auth {
                 if (roleName.equals("admin")) {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
-                            "/dashboard", "/guide", "/menu","/dragable", "/calendar", "/menu", "/upload", "/personal",
-                            "/copy","/zip", "/excel", "/table", "/projectboard","/qrcode","/cropper", "/editor","/log",
-                            "/role","/worker","/leaveApproval","/reimbursement","/todoList", "/meetings","/file","/MyCalender","/attendance"
+                            "/dashboard", "/menu", "/department", "/upload", "/log", "/role","/worker","/leaveApproval","/reimbursement",
+                            "/todoList", "/meetings","/file","/MyCalender","/attendance", "/personal"
                     );
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
@@ -160,7 +159,7 @@ public class Auth {
                 } else if (roleName.equals("manager")) {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
-                            "/worker", "/todoList", "/reimbursement","/meetings","/leaveApproval","/file","/MyCalender","/personal","/personalAttendance");
+                            "/worker", "/todoList", "/reimbursement","/meetings","/leaveApproval","/file","/MyCalender","/personalAttendance","/personal");
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
                             0,
@@ -172,11 +171,11 @@ public class Auth {
                 } else {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
-                            "/meetings","/todoList","/leaveApproval","/reimbursement","/file", "/MyCalender","/personal","/personalAttendance");
+                            "/meetings","/todoList","/leaveApproval","/reimbursement","/file", "/MyCalender","/personalAttendance","/personal");
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
                             0,
-                            "获取职位���息成功",
+                            "获取职位信息成功",
                             true,
                             data
                     );

@@ -4,10 +4,6 @@
       <el-row>
         <el-col>
           <el-col>
-            <el-button type="primary" size="small" @click="onCreate">
-              <el-icon><plus /></el-icon>
-              新增</el-button
-            >
             <el-button type="success" size="small" @click="onRefresh">
               <el-icon><refresh /></el-icon>
 
@@ -40,11 +36,6 @@
             <el-table-column label="操作" align="center">
               <template #default="scope">
                 <template v-if="scope.row.state != 0">
-                  <el-tooltip class="item" effect="dark" content="修改" placement="bottom">
-                    <el-button circle plain type="primary" size="mini" @click="onEdit(scope.$index, scope.row)">
-                      <el-icon><edit /></el-icon>
-                    </el-button>
-                  </el-tooltip>
                   <el-tooltip class="item" effect="dark" content="删除" placement="bottom">
                     <el-button circle plain type="danger" size="mini" @click="onDelete(scope.$index, scope.row)">
                       <el-icon><minus /></el-icon>
@@ -70,12 +61,6 @@
         </el-col>
       </el-row>
     </el-card>
-    <el-dialog v-model="addVisible" width="632px" title="新增菜单">
-      <menu-new @success="onAddSuccess"></menu-new>
-    </el-dialog>
-    <el-dialog v-model="editVisible" center width="632px" :title="posted.menu.meta.title[lang]">
-      <menu-edit :current-menu="posted.menu" @success="onEditSuccess"></menu-edit>
-    </el-dialog>
   </div>
 </template>
 <script lang="ts">
@@ -85,12 +70,10 @@ import { Edit, Minus, Plus, Refresh } from '@element-plus/icons-vue'
 
 import { RouteRecordRaw } from 'vue-router'
 import { useStore } from '@/store'
-import MenuNew from './menuNew.vue'
-import MenuEdit from './menuEdits.vue'
 
 const useConfirmDelete = (index: any) => {
   console.log(index)
-  ElMessageBox.confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+  ElMessageBox.confirm('此操作将隐藏该菜单, 是否继续?', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
@@ -132,7 +115,7 @@ interface stateTypes {
 }
 export default defineComponent({
   name: 'Menu',
-  components: { MenuNew, MenuEdit, Plus, Refresh, Edit, Minus },
+  components: {Plus, Refresh, Edit, Minus },
   setup() {
     const store = useStore()
     const lang = computed(() => store.getters['settingsModule/getLangState'])

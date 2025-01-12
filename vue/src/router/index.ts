@@ -298,6 +298,32 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
     ]
   },
   {
+    path: '/department',
+    component: layout,
+    redirect: '/Department/departmentManage',
+    meta: {
+      title: {
+        '/zh-CN': '部门管理',
+        '/en-US': 'Department Manage'
+      },
+      icon: 'ic ic-group-fill'
+    },
+    children: [
+      {
+        path: '/Department/departmentManage',
+        name: 'departmentManage',
+        component: () => import('@/views/Department/departmentsManage.vue'),
+        meta: {
+          title: {
+            '/zh-CN': '部门管理',
+            '/en-US': 'Department Manage'
+          },
+          icon: 'ic ic-group-fill'
+        }
+      }
+    ]
+  },
+  {
     path: '/role',
     component: layout,
     redirect: '/Role/roleManage',
