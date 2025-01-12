@@ -38,16 +38,21 @@
       </el-table-column>
       <el-table-column prop="user_id" label="提交用户id" width="180" truncated> </el-table-column>
       <el-table-column prop="username" label="提交用户" width="180" truncated> </el-table-column>
-      <el-table-column prop="amount" label="金额" truncated> </el-table-column>
+      <el-table-column prop="amount" label="金额" width="180" truncated> </el-table-column>
       <el-table-column prop="description" label="描述" truncated> </el-table-column>
+      <el-table-column prop="submitted_at" label="提交时间" truncated> </el-table-column>
       <el-table-column
           prop="status"
           column-key="status"
           label="状态"
           width="100"
-          :filters="status_options"
-          :filtered-value="filters.status"
-          :filter-multiple="false"
+          :filters="[
+            { text: '已通过', value: '已通过' },
+            { text: '未通过', value: '未通过' },
+            { text: '未审核', value: '未审核' },
+          ]"
+          :filter-method="filterStatus"
+          :filter-multiple="true"
           filter-placement="bottom-end"
       >
         <template #default="scope">
@@ -55,9 +60,9 @@
               :type="scope.row.status === '已通过' ? 'success' : (scope.row.status === '未审核' ? 'primary' : 'danger')"
               disable-transitions>
             {{ scope.row.status }}
-          </el-tag>        </template>
+          </el-tag>
+        </template>
       </el-table-column>
-      <el-table-column prop="submitted_at" label="提交时间" truncated> </el-table-column>
       <el-table-column align="right">
         <template #header>
           <el-input v-model="search" size="mini" placeholder="输入标题字段关键字搜索" />
@@ -86,16 +91,21 @@
       </el-table-column>
       <el-table-column prop="user_id" label="提交用户id" width="180" truncated> </el-table-column>
       <el-table-column prop="username" label="提交用户" width="180" truncated> </el-table-column>
-      <el-table-column prop="amount" label="金额" truncated> </el-table-column>
+      <el-table-column prop="amount" label="金额" width="180" truncated> </el-table-column>
       <el-table-column prop="description" label="描述" truncated> </el-table-column>
+      <el-table-column prop="submitted_at" label="提交时间" truncated> </el-table-column>
       <el-table-column
           prop="status"
           column-key="status"
           label="状态"
           width="100"
-          :filters="status_options"
-          :filtered-value="filters.status"
-          :filter-multiple="false"
+          :filters="[
+            { text: '已通过', value: '已通过' },
+            { text: '未通过', value: '未通过' },
+            { text: '未审核', value: '未审核' },
+          ]"
+          :filter-method="filterStatus"
+          :filter-multiple="true"
           filter-placement="bottom-end"
       >
         <template #default="scope">
@@ -105,7 +115,6 @@
             {{ scope.row.status }}
           </el-tag>        </template>
       </el-table-column>
-      <el-table-column prop="submitted_at" label="提交时间" truncated> </el-table-column>
       <el-table-column align="right">
         <template #header>
           <el-input v-model="search" size="mini" placeholder="输入标题字段关键字搜索" />
@@ -134,16 +143,21 @@
       </el-table-column>
       <el-table-column prop="user_id" label="抄送用户id" width="180" truncated> </el-table-column>
       <el-table-column prop="username" label="抄送用户" width="180" truncated> </el-table-column>
-      <el-table-column prop="amount" label="金额" truncated> </el-table-column>
+      <el-table-column prop="amount" label="金额" width="180" truncated> </el-table-column>
       <el-table-column prop="description" label="描述" truncated> </el-table-column>
+      <el-table-column prop="submitted_at" label="提交时间" truncated> </el-table-column>
       <el-table-column
           prop="status"
           column-key="status"
           label="状态"
           width="100"
-          :filters="status_options"
-          :filtered-value="filters.status"
-          :filter-multiple="false"
+          :filters="[
+            { text: '已通过', value: '已通过' },
+            { text: '未通过', value: '未通过' },
+            { text: '未审核', value: '未审核' },
+          ]"
+          :filter-method="filterStatus"
+          :filter-multiple="true"
           filter-placement="bottom-end"
       >
         <template #default="scope">
@@ -153,7 +167,6 @@
             {{ scope.row.status }}
           </el-tag>        </template>
       </el-table-column>
-      <el-table-column prop="submitted_at" label="提交时间" truncated> </el-table-column>
       <el-table-column align="right">
         <template #header>
           <el-input v-model="search" size="mini" placeholder="输入标题字段关键字搜索" />
@@ -177,16 +190,21 @@
       </el-table-column>
       <el-table-column prop="user_id" label="提交用户id" width="180" truncated> </el-table-column>
       <el-table-column prop="username" label="提交用户" width="180" truncated> </el-table-column>
-      <el-table-column prop="amount" label="金额" truncated> </el-table-column>
+      <el-table-column prop="amount" label="金额" width="180" truncated> </el-table-column>
       <el-table-column prop="description" label="描述" truncated> </el-table-column>
+      <el-table-column prop="submitted_at" label="提交时间" truncated> </el-table-column>
       <el-table-column
           prop="status"
           column-key="status"
           label="状态"
           width="100"
-          :filters="status_options"
-          :filtered-value="filters.status"
-          :filter-multiple="false"
+          :filters="[
+            { text: '已通过', value: '已通过' },
+            { text: '未通过', value: '未通过' },
+            { text: '未审核', value: '未审核' },
+          ]"
+          :filter-method="filterStatus"
+          :filter-multiple="true"
           filter-placement="bottom-end"
       >
         <template #default="scope">
@@ -197,7 +215,6 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="submitted_at" label="提交时间" truncated> </el-table-column>
       <el-table-column align="right">
         <template #header>
           <el-input v-model="search" size="mini" placeholder="输入标题字段关键字搜索" />
@@ -228,18 +245,22 @@
         <el-form-item label="描述">
           <el-input v-model="form.description" autocomplete="off"></el-input>
         </el-form-item>
+        <el-form-item label="提交时间">
+          <el-input v-model="form.submitted_at" autocomplete="off"></el-input>
+        </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="form.status" placeholder="Select" style="width: 240px">
             <el-option
-                v-for="item in status_options"
+                v-for="item in [
+            { text: '已通过', value: '已通过' },
+            { text: '未通过', value: '未通过' },
+            { text: '未审核', value: '未审核' },
+          ]"
                 :key="item.value"
                 :label="item.label"
                 :value="item.value"
             />
           </el-select>
-        </el-form-item>
-        <el-form-item label="提交时间">
-          <el-input v-model="form.submitted_at" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -357,11 +378,6 @@ export default defineComponent({
       form: {},
       statistics: { pass: 0, rej: 0, unfin: 0 },
       record_cnt: 0,
-      status_options: [
-        { value: '未审核', label: '未审核' },
-        { value: '已通过', label: '已通过' },
-        { value: '未通过', label: '未通过' },
-      ],
       filters: {
         status: '',
       },
@@ -439,6 +455,8 @@ export default defineComponent({
       }
       sessionStorage.setItem("showPendingReimbursement", String(0));
     }
+
+    const filterStatus = (value: any, row: { status: any }) => row.status === value
 
     const updatePaginatedData = () => {
       let recordsToFilter = [];
@@ -686,7 +704,11 @@ export default defineComponent({
     };
 
     const handleFilterChange = (filters: any) => {
-      state.filters.status = filters.status;
+      if (filters.status && filters.status.length > 0) {
+        state.filters.status = filters.status[0]; // 取第一个筛选值
+      } else {
+        state.filters.status = ''; // 如果没有筛选值，清空状态
+      }
       updatePaginatedData();
     }
 
@@ -849,6 +871,7 @@ export default defineComponent({
       ...toRefs(state),
       handleCurrentChange,
       handleSizeChange,
+      filterStatus,
       onAddReimbursement,
       handleEdit,
       handleDelete,

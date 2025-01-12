@@ -94,7 +94,6 @@ public class LeaveApprovalCon {
         ResponseBase res = new ResponseBase();
         try {
             List<LeaveApprovalRecord> records = leave_service.getAllRecords();  // 获取所有记录
-            System.out.println("getAdminLeaveRecord: " + res);
             res.setStatus(0);
             for (LeaveApprovalRecord record : records) {
                 res.pushData(record);
