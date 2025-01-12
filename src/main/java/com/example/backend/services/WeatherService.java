@@ -14,13 +14,13 @@ public class WeatherService {
 
     public Weather getWeatherByCityAndDate(String city, LocalDate date) {
         String formattedDate = date.toString(); // 使用标准的日期格式 2024-12-18
-        System.out.println("Querying weather data for city: " + city + " on date: " + formattedDate); // 输出查询信息
+//        System.out.println("Querying weather data for city: " + city + " on date: " + formattedDate); // 输出查询信息
         Weather weather = weatherMapper.findByCityAndDate(city, formattedDate);
         if (weather != null) {
-            System.out.println("Fetched weather data: " + weather);
+//            System.out.println("Fetched weather data: " + weather);
             return weather;
         } else {
-            System.out.println("No weather data found for city: " + city + " on date: " + formattedDate);
+//            System.out.println("No weather data found for city: " + city + " on date: " + formattedDate);
             return null;
         }
     }
