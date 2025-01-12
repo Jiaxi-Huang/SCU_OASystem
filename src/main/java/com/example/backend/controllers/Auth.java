@@ -146,7 +146,7 @@ public class Auth {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
                             "/dashboard", "/menu", "/department", "/upload", "/log", "/role","/worker","/leaveApproval","/reimbursement",
-                            "/todoList", "/meetings","/file","/MyCalender","/attendance", "/personal"
+                            "/todoList", "/meetings","/file","/MyCalender","/attendance"
                     );
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
@@ -159,7 +159,7 @@ public class Auth {
                 } else if (roleName.equals("manager")) {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
-                            "/worker", "/todoList", "/reimbursement","/meetings","/leaveApproval","/file","/MyCalender","/personalAttendance","/personal");
+                            "/worker", "/todoList", "/reimbursement","/meetings","/leaveApproval","/file","/MyCalender","/personalAttendance");
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
                             0,
@@ -171,7 +171,7 @@ public class Auth {
                 } else {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
-                            "/meetings","/todoList","/leaveApproval","/reimbursement","/file", "/MyCalender","/personalAttendance","/personal");
+                            "/meetings","/todoList","/leaveApproval","/reimbursement","/file", "/MyCalender","/personalAttendance");
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
                             0,

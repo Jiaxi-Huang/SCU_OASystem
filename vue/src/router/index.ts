@@ -6,25 +6,37 @@ export const constantRoutes: Array<RouteRecordRaw> = [
   {
     path: '/',
     component: layout,
-    redirect: '/home',
+    redirect: '/personal/personalCenter',
     meta: {
       title: {
-        '/zh-CN': '首页',
-        '/en-US': 'Home Page'
+        '/zh-CN': '个人页',
+        '/en-US': 'Personal Page'
       },
-      icon: 'ic ic-homepage-fill'
+      icon: 'ic ic-people-fill'
     },
     children: [
       {
-        path: '/home',
-        name: 'home',
-        component: () => import(/* webpackChunkName: "home" */ '@/views/Home/home.vue'),
+        path: '/personal/personalCenter',
+        name: 'personalCenter',
+        component: () => import(/* webpackChunkName: "personalCenter" */ '@/views/Personal/personalCenter.vue'),
         meta: {
           title: {
-            '/zh-CN': '首页',
-            '/en-US': 'Home Page'
+            '/zh-CN': '个人中心',
+            '/en-US': 'PersonalCenter'
           },
-          icon: 'ic ic-homepage-fill'
+          icon: 'ic ic-people-fill'
+        }
+      },
+      {
+        path: '/personal/personalSetting',
+        name: 'personalSetting',
+        component: () => import(/* webpackChunkName: "personalSetting" */ '@/views/Personal/personalSetting.vue'),
+        meta: {
+          title: {
+            '/zh-CN': '个人设置',
+            '/en-US': 'PersonalSetting'
+          },
+          icon: 'ic ic-setup-fill'
         }
       }
     ]
@@ -781,44 +793,6 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
             '/en-US': 'Crop Image'
           },
           icon: 'ic ic-tailor'
-        }
-      }
-    ]
-  },
-  {
-    path: '/personal',
-    component: layout,
-    redirect: '/personal/personalCenter',
-    meta: {
-      title: {
-        '/zh-CN': '个人页',
-        '/en-US': 'Personal Page'
-      },
-      icon: 'ic ic-people-fill'
-    },
-    children: [
-      {
-        path: '/personal/personalCenter',
-        name: 'personalCenter',
-        component: () => import(/* webpackChunkName: "personalCenter" */ '@/views/Personal/personalCenter.vue'),
-        meta: {
-          title: {
-            '/zh-CN': '个人中心',
-            '/en-US': 'PersonalCenter'
-          },
-          icon: 'ic ic-people-fill'
-        }
-      },
-      {
-        path: '/personal/personalSetting',
-        name: 'personalSetting',
-        component: () => import(/* webpackChunkName: "personalSetting" */ '@/views/Personal/personalSetting.vue'),
-        meta: {
-          title: {
-            '/zh-CN': '个人设置',
-            '/en-US': 'PersonalSetting'
-          },
-          icon: 'ic ic-setup-fill'
         }
       }
     ]
