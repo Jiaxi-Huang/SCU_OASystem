@@ -1,13 +1,17 @@
 package com.example.backend.controllers;
 
+import com.example.backend.entity.Department;
 import com.example.backend.entity.User;
 import com.example.backend.entity.authedRoutes.AuthedRoutesRequest;
 import com.example.backend.entity.authedRoutes.AuthedRoutesResponse;
+import com.example.backend.entity.department.adminDepartmentInfoRequest;
+import com.example.backend.entity.department.adminDepartmentInfoResponse;
 import com.example.backend.entity.userInfo.adminUserInfoRequest;
 import com.example.backend.entity.userInfo.adminUserInfoResponse;
 import com.example.backend.entity.userInfo.userInfoResponse;
 import com.example.backend.entity.userInfo.userStatisticResponse;
 import com.example.backend.services.AccessService;
+import com.example.backend.services.DepartmentService;
 import com.example.backend.services.MenuService;
 import com.example.backend.services.UserService;
 import com.itextpdf.text.BaseColor;
@@ -43,9 +47,115 @@ public class Admin {
     @Autowired
     private UserService userService;
     @Autowired
+    private DepartmentService departmentService;
+    @Autowired
     private AccessService accessService;
     @Autowired
     private MenuService menuService;
+    @PostMapping("/department/list")
+    public ResponseEntity<adminDepartmentInfoResponse> departmentList(@RequestBody adminDepartmentInfoRequest request) {
+        try {
+            String accessToken = request.getAccessToken();
+            int userId = accessService.getAuthenticatedId(accessToken);
+            List<Department> departmentInfo = departmentService.adminDepartmentInfo(userId);
+            List<adminDepartmentInfoResponse.Data> data = new ArrayList<>();
+            for(Department department:departmentInfo){
+                adminDepartmentInfoResponse.Data temp = new adminDepartmentInfoResponse.Data();
+                temp.setDepartmentId(department.getDepartmentId());
+                temp.setDepartmentName(department.getDepartmentName());
+                data.add(temp);
+            }
+            adminDepartmentInfoResponse response = new adminDepartmentInfoResponse(
+                    0,
+                    "获取部门列表成功",
+                    true,
+                    data
+            );
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        catch (Exception e) {
+            adminDepartmentInfoResponse response = new adminDepartmentInfoResponse(
+                    1,
+                    "服务器内部错误",
+                    false,
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    @PostMapping("/department/add")
+    public ResponseEntity<adminDepartmentInfoResponse> departmentAdd(@RequestBody adminDepartmentInfoRequest request) {
+        try {
+            String accessToken = request.getAccessToken();
+            String departmentName = request.getDepartmentName();
+            int userId = accessService.getAuthenticatedId(accessToken);
+            int isSuccess = departmentService.adminDepartmentAdd(userId,departmentName);
+            if(isSuccess > 0) {
+                adminDepartmentInfoResponse response = new adminDepartmentInfoResponse(
+                        0,
+                        "获取部门列表成功",
+                        true,
+                        null
+                );
+                return ResponseEntity.status(HttpStatus.OK).body(response);
+            }
+            else{
+                adminDepartmentInfoResponse response = new adminDepartmentInfoResponse(
+                        1,
+                        "权限不足",
+                        false,
+                        null
+                );
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+        }
+        catch (Exception e) {
+            adminDepartmentInfoResponse response = new adminDepartmentInfoResponse(
+                    2,
+                    "服务器内部错误",
+                    false,
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    @PostMapping("/department/delete")
+    public ResponseEntity<adminDepartmentInfoResponse> departmentDelete(@RequestBody adminDepartmentInfoRequest request) {
+        try {
+            String accessToken = request.getAccessToken();
+            int departmentId = request.getDepartmentId();
+            int userId = accessService.getAuthenticatedId(accessToken);
+            int isSuccess = departmentService.adminDepartmentDelete(userId,departmentId);
+            if(isSuccess > 0) {
+                adminDepartmentInfoResponse response = new adminDepartmentInfoResponse(
+                        0,
+                        "获取部门列表成功",
+                        true,
+                        null
+                );
+                return ResponseEntity.status(HttpStatus.OK).body(response);
+            }
+            else{
+                adminDepartmentInfoResponse response = new adminDepartmentInfoResponse(
+                        1,
+                        "权限不足",
+                        false,
+                        null
+                );
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+        }
+        catch (Exception e) {
+            adminDepartmentInfoResponse response = new adminDepartmentInfoResponse(
+                    2,
+                    "服务器内部错误",
+                    false,
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
     @PostMapping("/user/list")
     public ResponseEntity<adminUserInfoResponse> userList(@RequestBody adminUserInfoRequest request) {
         try {

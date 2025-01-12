@@ -14,8 +14,7 @@
       </el-row>
       <br />
       <el-table v-loading="loading" :data="displayData()" stripe class="table">
-        <el-table-column prop="Department" label="部门名" align="center" sortable @sort-change="handleSortChange"></el-table-column>
-
+        <el-table-column prop="departmentName" label="部门名" align="center" sortable @sort-change="handleSortChange"></el-table-column>
         <el-table-column label="操作" align="center">
           <template #default="scope">
             <el-tooltip  class="item" effect="dark" content="删除" placement="bottom">
@@ -132,10 +131,7 @@ export default defineComponent({
     }
     const displayData = () => {
       return state.is_search ? sortData().filter(item =>
-          item.userName.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-          item.userRole.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-          item.userDepartment.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-          item.userPhone.toLowerCase().includes(state.searchKeyword.toLowerCase())
+          item.departmentName.toLowerCase().includes(state.searchKeyword.toLowerCase())
       ).slice((state.param.page-1)*state.param.size, state.param.page*state.param.size) : sortData().slice((state.param.page-1)*state.param.size, state.param.page*state.param.size);
     }
     const onSearch = () => {
@@ -143,10 +139,7 @@ export default defineComponent({
         state.is_search = true
         state.param.page = 1; // 重置页码为第一页
         state.filteredData = state.data.filter(item =>
-            item.userName.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-            item.userRole.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-            item.userDepartment.toLowerCase().includes(state.searchKeyword.toLowerCase()) ||
-            item.userPhone.toLowerCase().includes(state.searchKeyword.toLowerCase())
+            item.departmentName.toLowerCase().includes(state.searchKeyword.toLowerCase())
         );
         state.param.total = state.filteredData.length
       }
@@ -165,10 +158,10 @@ export default defineComponent({
             .then(async () => {
               // 此处执行接口异步删除员工
               const data = {
-                userId: row.userId,
+                departmentId: row.departmentId,
                 accessToken: sessionStorage.getItem('accessToken')
               }
-              const res = await Service.postAdminDeleteUser(data);
+              const res = await Service.postAdminDepartmentDelete(data);
               if (res.status === 0) {
                 ElMessage({
                   type: 'success',

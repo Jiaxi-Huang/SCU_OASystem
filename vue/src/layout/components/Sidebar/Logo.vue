@@ -14,7 +14,7 @@
 </template>
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs } from 'vue'
-import logo from '@/assets/logo.png'
+import logo from '@/assets/oa.png'
 import { useStore } from '../../../store/index'
 
 export default defineComponent({

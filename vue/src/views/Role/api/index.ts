@@ -129,6 +129,19 @@ class Service {
       throw err; // 抛出错误，前端捕获并显示
     });
   }
+  static postAdminQueryDepartmentList(data: any) {
+    return request({
+      url: 'http://localhost:8080/api/admin/department/list',
+      method: 'POST',
+      json: true,
+      data
+    }).then((res) => {
+      if (res.status === 0) {
+        return Promise.resolve(res)
+      }
+      return Promise.reject(res)
+    })
+  }
 }
 
 

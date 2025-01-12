@@ -6,7 +6,7 @@
       </el-form-item>
       <el-form-item label="员工部门" prop="userDepartment">
         <el-select v-model="form.userDepartment" placeholder="请选择部门">
-          <el-option v-for="department in departments" :key="department.value" :label="department.label" :value="department.value"></el-option>
+          <el-option v-for="department in departments" :key="department.value" :value="department.value"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="员工职位" prop="userRole">
@@ -21,7 +21,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, ref } from 'vue'
+import {defineComponent, reactive, toRefs, ref, onMounted} from 'vue'
 import Service from '../api'
 export default defineComponent({
   name: 'RoleNew',
@@ -38,11 +38,6 @@ export default defineComponent({
         { required: true, message: '请输入员工职能', trigger: 'change' },
       ]
     }
-    const departments = [
-      { value: 'IT', label: '技术部' },
-      { value: 'Market', label: '市场部' },
-      { value: 'HR', label: '人力资源部' }
-    ]
 
     const roles = [
     { value: 'admin', label: '管理员' },
@@ -79,6 +74,18 @@ export default defineComponent({
         }
       })
     }
+    const fetchDepartment = async() => {
+      const data ={
+        accessToken : sessionStorage.getItem('accessToken'),
+      }
+      const res = await Service.postAdminQueryDepartmentList(data)
+      if(res.status ===0) {
+        state.departments = res.data
+      }
+    }
+    onMounted(() => {
+      fetchDepartment()
+    })
     return {
       submitForm,
       rules,

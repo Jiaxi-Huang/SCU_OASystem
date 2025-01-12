@@ -412,8 +412,7 @@ public class Auth {
                 if (roleName.equals("admin")) {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
-                            "space","service","conference","resource","question","property","user","worker",
-                            "apply","device","todo","meeting","reimbursement","leave","file","attendance"
+                            "user","worker", "todo","meeting","reimbursement","leave","file","attendance"
                     );
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
@@ -426,8 +425,7 @@ public class Auth {
                 } else if (roleName.equals("manager")) {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
-                            "space","service","conference","resource","question","property","user","worker",
-                            "apply","device","todo","meeting","reimbursement","leave","file","attendance"
+                            "worker", "todo","meeting","reimbursement","leave","file","attendance"
                     );
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
@@ -440,11 +438,11 @@ public class Auth {
                 } else {
                     AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
                     List<String> authedRoutes = Arrays.asList(
-                            "user","worker","todo","meeting","reimbursement","leave","file","attendance");
+                            "todo","meeting","reimbursement","leave","file","attendance");
                     data.setAuthedRoutes(authedRoutes);
                     AuthedRoutesResponse response = new AuthedRoutesResponse(
                             0,
-                            "获取职位���息成功",
+                            "获取职位信息成功",
                             true,
                             data
                     );

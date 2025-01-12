@@ -1,8 +1,6 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 import { store } from '../store'
 import layout from '../layout/index.vue'
-import Todo from '@/views/Todo.vue'
-import LeaveApproval from "@/views/leaveApproval.vue";
 // 静态路由
 export const constantRoutes: Array<RouteRecordRaw> = [
   {
@@ -104,10 +102,10 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
   {
     path: '/dashboard',
     component: layout,
-    redirect: '/dashboard/workplace',
+    redirect: '/dashboard/analysis',
     meta: {
       title: {
-        '/zh-CN': '仪表盘',
+        '/zh-CN': '驾驶舱',
         '/en-US': 'Dashboard'
       },
       icon: 'ic ic-manage-fill'
@@ -119,24 +117,12 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
         component: () => import(/* webpackChunkName: "richText" */ '@/views/Dashboard/analysis.vue'),
         meta: {
           title: {
-            '/zh-CN': '分析页',
-            '/en-US': 'Analysis Page'
+            '/zh-CN': '驾驶舱',
+            '/en-US': 'Dashboard'
           },
-          icon: 'el-icon-data-analysis',
+          icon: 'ic ic-manage-fill',
           hidden: false,
           hiddenTab: false
-        }
-      },
-      {
-        path: '/dashboard/workplace',
-        name: 'workplace',
-        component: () => import(/* webpackChunkName: "richText" */ '@/views/Dashboard/workplace.vue'),
-        meta: {
-          title: {
-            '/zh-CN': '工作台',
-            '/en-US': 'Workplace'
-          },
-          icon: 'el-icon-data-analysis'
         }
       }
     ]
@@ -228,7 +214,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
         '/zh-CN': '日程管理',
         '/en-US': 'MyCalender'
       },
-      icon: 'ic ic-workbench'
+      icon: 'ic ic-workbench-fill'
     },
     children: [
       {
@@ -237,10 +223,10 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
         component: () => import(/* webpackChunkName: "personalCenter" */ '@/views/MyCalendar/index.vue'),
         meta: {
           title: {
-            '/zh-CN': '我的日程',
+            '/zh-CN': '日程管理',
             '/en-US': 'MyCalendar'
           },
-          icon: 'ic ic-workbench'
+          icon: 'ic ic-workbench-fill'
         }
       }
     ]
@@ -306,7 +292,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
         '/zh-CN': '部门管理',
         '/en-US': 'Department Manage'
       },
-      icon: 'ic ic-group-fill'
+      icon: 'ic ic-businesscard'
     },
     children: [
       {
@@ -318,7 +304,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
             '/zh-CN': '部门管理',
             '/en-US': 'Department Manage'
           },
-          icon: 'ic ic-group-fill'
+          icon: 'ic ic-businesscard-fill'
         }
       }
     ]
@@ -332,7 +318,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
         '/zh-CN': '人事管理',
         '/en-US': 'Role Manage'
       },
-      icon: 'ic ic-group-fill'
+      icon: 'ic ic-addpeople-fill'
     },
     children: [
       {
@@ -344,7 +330,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
             '/zh-CN': '人事管理',
             '/en-US': 'Role Manage'
           },
-          icon: 'ic ic-group-fill'
+          icon: 'ic ic-addpeople-fill'
         }
       }
     ]
@@ -358,7 +344,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
         '/zh-CN': '日志管理',
         '/en-US': 'Logs Manage'
       },
-      icon: 'ic ic-group-fill'
+      icon: 'ic ic-activity'
     },
     children: [
       {
@@ -370,7 +356,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
             '/zh-CN': '日志管理',
             '/en-US': 'Log Manage'
           },
-          icon: 'ic ic-group-fill'
+          icon: 'ic ic-activity-fill'
         }
       }
     ]
@@ -384,7 +370,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
         '/zh-CN': '员工管理',
         '/en-US': 'Worker Manage'
       },
-      icon: 'ic ic-group-fill'
+      icon: 'ic ic-group'
     },
     children: [
       {
@@ -396,7 +382,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
             '/zh-CN': '员工管理',
             '/en-US': 'Worker Manage'
           },
-          icon: 'ic ic-group-fill'
+          icon: 'ic ic-group'
         }
       }
     ]
@@ -500,7 +486,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
         '/zh-CN': '待办事项',
         '/en-US': 'Todolist'
       },
-      icon: 'ic ic-barrage-fill'
+      icon: 'ic ic-tasklist-fill'
     },
     children: [
       {
@@ -512,7 +498,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
             '/zh-CN': '待办事项',
             '/en-US': 'Todolist'
           },
-          icon: 'ic ic-barrage-fill'
+          icon: 'ic ic-tasklist-fill'
         }
       },
       {
@@ -524,7 +510,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
             '/zh-CN': '添加待办事项',
             '/en-US': 'Add Todo'
           },
-          icon: 'ic ic-stealth-fill',
+          icon: 'ic ic-tasklist',
           hidden: true,
         }
       }
@@ -551,7 +537,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
             '/zh-CN': '报销管理',
             '/en-US': 'Reimbursement'
           },
-          icon: 'ic ic-barrage-fill'
+          icon: 'ic ic-flag'
         }
       },
       {
@@ -563,7 +549,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
             '/zh-CN': '报销申请',
             '/en-US': 'Reimbursement Apply'
           },
-          icon: 'ic ic-stealth-fill',
+          icon: 'ic ic-flag-fill',
           hidden: true,
         }
       }
@@ -578,7 +564,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
         '/zh-CN': '我的会议',
         '/en-US': 'meetings'
       },
-      icon: 'ic ic-barrage-fill'
+      icon: 'ic ic-share-fill'
     },
     children: [
       {
@@ -590,7 +576,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
             '/zh-CN': '我的会议',
             '/en-US': 'meetingsList'
           },
-          icon: 'ic ic-barrage-fill'
+          icon: 'ic ic-share-fill'
         }
       },
       {
@@ -617,7 +603,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
         '/zh-CN': '请假审批',
         '/en-US': 'Leave approval'
       },
-      icon: 'ic ic-barrage-fill'
+      icon: 'ic ic-time'
     },
     children: [
       {
@@ -629,7 +615,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
             '/zh-CN': '请假管理',
             '/en-US': 'Leave list'
           },
-          icon: 'ic ic-barrage-fill'
+          icon: 'ic ic-time'
         }
       },
       {
@@ -846,7 +832,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
         '/zh-CN': '文件管理',
         '/en-US': 'File Manage'
       },
-      icon: 'ic ic-barrage-fill'
+      icon: 'ic ic-document-fill'
     },
     children: [
       {
@@ -858,7 +844,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
             '/zh-CN': '文件管理',
             '/en-US': 'FileManage'
           },
-          icon: 'ic ic-barrage-fill'
+          icon: 'ic ic-document-fill'
         }
       }
     ]
@@ -872,7 +858,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
                 '/zh-CN': '考勤管理',
                 '/en-US': 'Attendance Manage'
             },
-            icon: 'ic ic-barrage-fill'
+            icon: 'ic ic-clock-fill'
         },
         children: [
             {
@@ -884,7 +870,7 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
                         '/zh-CN': '考勤管理',
                         '/en-US': 'Attendance Manage'
                     },
-                    icon: 'ic ic-barrage-fill'
+                    icon: 'ic ic-clock-fill'
                 }
             }
         ]

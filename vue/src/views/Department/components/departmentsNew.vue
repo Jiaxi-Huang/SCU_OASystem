@@ -1,18 +1,8 @@
 <template>
   <div v-loading="loading" class="new">
-    <el-form ref="formRef" :model="form" :rules="rules" label-position="right" label-width="100px" title="新增员工">
-      <el-form-item label="员工名" prop="userName">
-        <el-input v-model="form.userName" placeholder="请输入员工名"></el-input>
-      </el-form-item>
-      <el-form-item label="员工部门" prop="userDepartment">
-        <el-select v-model="form.userDepartment" placeholder="请选择部门">
-          <el-option v-for="department in departments" :key="department.value" :label="department.label" :value="department.value"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="员工职位" prop="userRole">
-        <el-select v-model="form.userRole" placeholder="请选择职能">
-          <el-option v-for="role in roles" :key="role.value" :label="role.label" :value="role.value"></el-option>
-        </el-select>
+    <el-form ref="formRef" :model="form" :rules="rules" label-position="right" label-width="100px" title="新增部门">
+      <el-form-item label="部门名" prop="departmentName">
+        <el-input v-model="form.departmentName" placeholder="请输入部门名"></el-input>
       </el-form-item>
       <el-row class="btn-container">
         <el-button size="mini" type="primary" @click="submitForm()"> <i class="fa fa-plus"> </i> 新增 </el-button>
@@ -24,39 +14,19 @@
 import { defineComponent, reactive, toRefs, ref } from 'vue'
 import Service from '../api'
 export default defineComponent({
-  name: 'RoleNew',
+  name: 'DepartmentNew',
   emits: ['success'],
   setup(props, { emit }) {
     const rules = {
-      userName: [
-        { required: true, message: '请输入员工名', trigger: 'blur' },
+      departmentName: [
+        { required: true, message: '请输入部门名', trigger: 'blur' },
       ],
-      userDepartment: [
-        { required: true, message: '请选择部门', trigger: 'change' },
-      ],
-      userRole: [
-        { required: true, message: '请输入员工职能', trigger: 'change' },
-      ]
     }
-    const departments = [
-      { value: 'IT', label: '技术部' },
-      { value: 'Market', label: '市场部' },
-      { value: 'HR', label: '人力资源部' }
-    ]
-
-    const roles = [
-    { value: 'admin', label: '管理员' },
-    { value: 'manager', label: '部门经理' },
-    { value: 'worker', label: '员工' }
-    ]
-    const url = `/role/add`
     const formRef = ref()
     // 只将响应式数据进行响应式处理
     const state = reactive({
       form: {
-        userName: '',
-        userDepartment: '',
-        userRole: ''
+        departmentName: '',
       },
       loading: false
     })
@@ -68,11 +38,9 @@ export default defineComponent({
         if (valid) {
           const data ={
             accessToken : sessionStorage.getItem('accessToken'),
-            userName: state.form.userName,
-            userDepartment: state.form.userDepartment,
-            userRole: state.form.userRole
+            departmentName: state.form.departmentName,
           }
-          const res = await Service.postAdminAddUser(data)
+          const res = await Service.postAdminDepartmentAdd(data)
           if(res.status ===0) {
             emit('success')
           }
@@ -82,10 +50,7 @@ export default defineComponent({
     return {
       submitForm,
       rules,
-      departments,
-      roles,
       formRef,
-      url,
       ...toRefs(state)
     }
   }
