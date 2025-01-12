@@ -1,7 +1,7 @@
 <template>
   <div class="right-chart-1">
     <div class="rc1-header">
-      赵六收费站
+      各部门人数
     </div>
 
     <div class="rc1-chart-container">
@@ -9,7 +9,7 @@
         <div class="number">
           262
         </div>
-        <div>设备运行总数</div>
+        <div>各部门数</div>
       </div>
 
       <capsule-chart class="right" :config="state.config" />
@@ -25,19 +25,19 @@ const state = reactive({
   config: {
     data: [
       {
-        name: '收费系统',
+        name: 'HR',
         value: 25,
       },
       {
-        name: '通信系统',
+        name: 'IT',
         value: 66,
       },
       {
-        name: '监控系统',
+        name: 'Finance',
         value: 123,
       },
       {
-        name: '供配电系统',
+        name: 'Markect',
         value: 72,
       },
       {
