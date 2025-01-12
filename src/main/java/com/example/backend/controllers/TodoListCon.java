@@ -22,6 +22,7 @@ import com.example.backend.services.TodoService;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 
 import com.itextpdf.text.*;
@@ -208,6 +209,19 @@ public class TodoListCon {
         return res;
     }
 
+    @PostMapping("/getTodoStatistics")
+    public ResponseBase getTodoStatistics() {
+        HashMap<String, Integer> statistics = new HashMap<>();
+        ResponseBase res = new ResponseBase();
+
+        statistics.put("自己布置未完成", my_service.getUnfinSelf());
+        statistics.put("自己布置已完成", my_service.getFinishedSelf());
+        statistics.put("上级布置已完成", my_service.getFinishedMana());
+        statistics.put("上级布置未完成", my_service.getUnfinMana());
+        res.pushData(my_service.getTotal());
+        res.pushData(statistics);
+        return res;
+    }
 
     @PostMapping("/deleteTodo")
     public ResponseBase deleteRec(@RequestBody TodoRecord record) {

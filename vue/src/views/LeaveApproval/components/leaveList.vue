@@ -39,8 +39,30 @@
         <el-table-column prop="username" label="提交用户" width="180" truncated> </el-table-column>
         <el-table-column prop="leave_submitted_at" label="提交日期" sortable width="180" column-key="leave_submitted_at"></el-table-column>
         <el-table-column prop="leave_start_time" label="开始时间" width="180" truncated> </el-table-column>
-        <el-table-column prop="leave_end_time" label="结束时间" truncated> </el-table-column>
+        <el-table-column prop="leave_end_time" label="结束时间" width="180" truncated> </el-table-column>
         <el-table-column prop="leave_reason" label="原因" truncated> </el-table-column>
+        <el-table-column
+            prop="leave_status"
+            label="处理状态"
+            width="100"
+            :filters="[
+    { text: '已通过', value: '已通过' },
+    { text: '未通过', value: '未通过' },
+    { text: '未审核', value: '未审核' },
+  ]"
+            :filter-method="filterStatus"
+            :filter-multiple="true"
+            :filtered-value="filters.status ? [filters.status] : []"
+            filter-placement="bottom-end"
+        >
+          <template #default="scope">
+            <el-tag
+                :type="scope.row.leave_status === '已通过' ? 'success' : (scope.row.leave_status === '未审核' ? 'primary' : 'danger')"
+                disable-transitions>
+              {{ scope.row.leave_status }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column align="right">
           <template #header>
             <el-input v-model="search" size="small" placeholder="搜索" />
@@ -55,25 +77,6 @@
             </el-popconfirm>
           </template>
         </el-table-column>
-        <el-table-column
-            prop="leave_status"
-            label="处理状态"
-            width="100"
-            :filters="[
-            { text: '已通过', value: '已通过' },
-            { text: '未通过', value: '未通过' },
-            { text: '未审核', value: '未审核' },
-          ]"
-            :filter-method="filterStatus"
-            filter-placement="bottom-end"
-        >
-          <template #default="scope">
-            <el-tag
-                :type="scope.row.leave_status === '已通过' ? 'success' : (scope.row.leave_status === '未审核' ? 'primary' : 'danger')"
-                disable-transitions>
-              {{ scope.row.leave_status }}
-            </el-tag>           </template>
-        </el-table-column>
       </el-table>
       <!---------------------------------------我的请假列表--------------------------------------->
       <el-table ref="filterTableRef"
@@ -87,8 +90,30 @@
         <el-table-column prop="username" label="提交用户" width="180" truncated> </el-table-column>
         <el-table-column prop="leave_submitted_at" label="提交日期" sortable width="180" column-key="leave_submitted_at"></el-table-column>
         <el-table-column prop="leave_start_time" label="开始时间" width="180" truncated> </el-table-column>
-        <el-table-column prop="leave_end_time" label="结束时间" truncated> </el-table-column>
+        <el-table-column prop="leave_end_time" label="结束时间" width="180" truncated> </el-table-column>
         <el-table-column prop="leave_reason" label="原因" truncated> </el-table-column>
+        <el-table-column
+            prop="leave_status"
+            label="处理状态"
+            width="100"
+            :filters="[
+    { text: '已通过', value: '已通过' },
+    { text: '未通过', value: '未通过' },
+    { text: '未审核', value: '未审核' },
+  ]"
+            :filter-method="filterStatus"
+            :filter-multiple="true"
+            :filtered-value="filters.status ? [filters.status] : []"
+            filter-placement="bottom-end"
+        >
+          <template #default="scope">
+            <el-tag
+                :type="scope.row.leave_status === '已通过' ? 'success' : (scope.row.leave_status === '未审核' ? 'primary' : 'danger')"
+                disable-transitions>
+              {{ scope.row.leave_status }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column align="right">
           <template #header>
             <el-input v-model="search" size="small" placeholder="搜索" />
@@ -101,25 +126,6 @@
               </template>
             </el-popconfirm>
           </template>
-        </el-table-column>
-        <el-table-column
-            prop="leave_status"
-            label="处理状态"
-            width="100"
-            :filters="[
-            { text: '已通过', value: '已通过' },
-            { text: '未通过', value: '未通过' },
-            { text: '未审核', value: '未审核' },
-          ]"
-            :filter-method="filterStatus"
-            filter-placement="bottom-end"
-        >
-          <template #default="scope">
-            <el-tag
-                :type="scope.row.leave_status === '已通过' ? 'success' : (scope.row.leave_status === '未审核' ? 'primary' : 'danger')"
-                disable-transitions>
-              {{ scope.row.leave_status }}
-            </el-tag>           </template>
         </el-table-column>
       </el-table>
       <!---------------------------------------我处理的请假列表--------------------------------------->
@@ -134,8 +140,30 @@
         <el-table-column prop="username" label="提交用户" width="180" truncated> </el-table-column>
         <el-table-column prop="leave_submitted_at" label="提交日期" sortable width="180" column-key="leave_submitted_at"></el-table-column>
         <el-table-column prop="leave_start_time" label="开始时间" width="180" truncated> </el-table-column>
-        <el-table-column prop="leave_end_time" label="结束时间" truncated> </el-table-column>
+        <el-table-column prop="leave_end_time" label="结束时间" width="180" truncated> </el-table-column>
         <el-table-column prop="leave_reason" label="原因" truncated> </el-table-column>
+        <el-table-column
+            prop="leave_status"
+            label="处理状态"
+            width="100"
+            :filters="[
+    { text: '已通过', value: '已通过' },
+    { text: '未通过', value: '未通过' },
+    { text: '未审核', value: '未审核' },
+  ]"
+            :filter-method="filterStatus"
+            :filter-multiple="true"
+            :filtered-value="filters.status ? [filters.status] : []"
+            filter-placement="bottom-end"
+        >
+          <template #default="scope">
+            <el-tag
+                :type="scope.row.leave_status === '已通过' ? 'success' : (scope.row.leave_status === '未审核' ? 'primary' : 'danger')"
+                disable-transitions>
+              {{ scope.row.leave_status }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column align="right">
           <template #header>
             <el-input v-model="search" size="small" placeholder="搜索" />
@@ -150,25 +178,7 @@
             </el-popconfirm>
           </template>
         </el-table-column>
-        <el-table-column
-            prop="leave_status"
-            label="处理状态"
-            width="100"
-            :filters="[
-            { text: '已通过', value: '已通过' },
-            { text: '未通过', value: '未通过' },
-            { text: '未审核', value: '未审核' },
-          ]"
-            :filter-method="filterStatus"
-            filter-placement="bottom-end"
-        >
-          <template #default="scope">
-            <el-tag
-                :type="scope.row.leave_status === '已通过' ? 'success' : (scope.row.leave_status === '未审核' ? 'primary' : 'danger')"
-                disable-transitions>
-              {{ scope.row.leave_status }}
-            </el-tag>           </template>
-        </el-table-column>
+
       </el-table>
       <!---------------------------------------抄送给我的请假列表--------------------------------------->
       <el-table ref="filterTableRef"
@@ -182,26 +192,20 @@
         <el-table-column prop="username" label="提交用户" width="180" truncated> </el-table-column>
         <el-table-column prop="leave_submitted_at" label="提交日期" sortable width="180" column-key="leave_submitted_at"></el-table-column>
         <el-table-column prop="leave_start_time" label="开始时间" width="180" truncated> </el-table-column>
-        <el-table-column prop="leave_end_time" label="结束时间" truncated> </el-table-column>
+        <el-table-column prop="leave_end_time" label="结束时间" width="180" truncated> </el-table-column>
         <el-table-column prop="leave_reason" label="原因" truncated> </el-table-column>
-        <el-table-column align="right">
-          <template #header>
-            <el-input v-model="search" size="small" placeholder="搜索" />
-          </template>
-          <template #default="scope">
-            <el-button size="small" @click="detailPop(scope.row)">查看详情</el-button>
-          </template>
-        </el-table-column>
         <el-table-column
             prop="leave_status"
             label="处理状态"
             width="100"
             :filters="[
-            { text: '已通过', value: '已通过' },
-            { text: '未通过', value: '未通过' },
-            { text: '未审核', value: '未审核' },
-          ]"
+    { text: '已通过', value: '已通过' },
+    { text: '未通过', value: '未通过' },
+    { text: '未审核', value: '未审核' },
+  ]"
             :filter-method="filterStatus"
+            :filter-multiple="true"
+            :filtered-value="filters.status ? [filters.status] : []"
             filter-placement="bottom-end"
         >
           <template #default="scope">
@@ -212,6 +216,15 @@
             </el-tag>
           </template>
         </el-table-column>
+        <el-table-column align="right">
+          <template #header>
+            <el-input v-model="search" size="small" placeholder="搜索" />
+          </template>
+          <template #default="scope">
+            <el-button size="small" @click="detailPop(scope.row)">查看详情</el-button>
+          </template>
+        </el-table-column>
+
       </el-table>
 
       <el-dialog v-model="modifyFormVisible" title="修改请假申请">
@@ -451,8 +464,8 @@ export default defineComponent({
       if (sessionStorage.getItem("showPendingLeave") === '1') {
         state.filters.status = "未审核";
       }
-      sessionStorage.setItem("showPendingLeavebursement", String(0));
-    }
+      sessionStorage.setItem("showPendingLeave", String(0));
+    };
 
     const updatePaginatedData = () => {
       let recordsToFilter = [];
@@ -471,7 +484,7 @@ export default defineComponent({
       // 根据搜索条件过滤数据
       if (state.search) {
         recordsToFilter = recordsToFilter.filter((record) =>
-            record.leave_id.toString().includes(state.search.toLowerCase())
+            record.leave_id.toString().toLowerCase().includes(state.search.toLowerCase())
         );
       }
 
@@ -505,8 +518,8 @@ export default defineComponent({
       try {
         Service.postGetMyLeaveRecord().then((res) => {
           if (res) {
-            state.myData = []
-            var data = res.data
+            state.myData = [];
+            var data = res.data;
             for (let i = 0; i < data.length; i++) {
               var record = {
                 leave_id: data[i].leave_id,
@@ -519,18 +532,19 @@ export default defineComponent({
                 leave_status: data[i].status,
                 leave_submitted_at: data[i].submitted_at,
                 username: data[i].username,
-              }
-              state.myData.push(record)
+              };
+              state.myData.push(record);
             }
             updatePaginatedData(); // 更新分页数据
           } else {
-            console.log('postGetLeaveApproval RES MISS')
+            console.log('postGetLeaveApproval RES MISS');
           }
         });
+
         Service.postGetReviewLeaveRecord().then((res) => {
           if (res) {
-            state.reviewData = []
-            var data = res.data
+            state.reviewData = [];
+            var data = res.data;
             for (let i = 0; i < data.length; i++) {
               var record = {
                 leave_id: data[i].leave_id,
@@ -543,18 +557,19 @@ export default defineComponent({
                 leave_status: data[i].status,
                 leave_submitted_at: data[i].submitted_at,
                 username: data[i].username,
-              }
-              state.reviewData.push(record)
+              };
+              state.reviewData.push(record);
             }
             updatePaginatedData(); // 更新分页数据
           } else {
-            console.log('postGetLeaveApproval RES MISS')
+            console.log('postGetLeaveApproval RES MISS');
           }
         });
+
         Service.postGetNotifyLeaveRecord().then((res) => {
           if (res) {
-            state.notifyData = []
-            var data = res.data
+            state.notifyData = [];
+            var data = res.data;
             for (let i = 0; i < data.length; i++) {
               var record = {
                 leave_id: data[i].leave_id,
@@ -567,26 +582,27 @@ export default defineComponent({
                 leave_status: data[i].status,
                 leave_submitted_at: data[i].submitted_at,
                 username: data[i].username,
-              }
-              state.notifyData.push(record)
+              };
+              state.notifyData.push(record);
             }
             updatePaginatedData(); // 更新分页数据
           } else {
-            console.log('postGetLeaveApproval RES MISS')
+            console.log('postGetLeaveApproval RES MISS');
           }
         });
       } catch (err) {
         ElMessage({
           type: 'warning',
-          message: err.message
-        })
+          message: err.message,
+        });
       }
-      if (isAdmin) {
+
+      if (isAdmin.value) {
         try {
           Service.postGetAdminLeaveRecord().then((res) => {
             if (res) {
-              state.adminData = []
-              var data = res.data
+              state.adminData = [];
+              var data = res.data;
               for (let i = 0; i < data.length; i++) {
                 var record = {
                   leave_id: data[i].leave_id,
@@ -599,22 +615,22 @@ export default defineComponent({
                   leave_status: data[i].status,
                   leave_submitted_at: data[i].submitted_at,
                   username: data[i].username,
-                }
-                state.adminData.push(record)
+                };
+                state.adminData.push(record);
               }
               updatePaginatedData(); // 更新分页数据
             } else {
-              console.log('postGetLeaveApproval RES MISS')
+              console.log('postGetLeaveApproval RES MISS');
             }
           });
         } catch (err) {
           ElMessage({
             type: 'warning',
-            message: err.message
-          })
+            message: err.message,
+          });
         }
       }
-    }
+    };
 
     const getCurrentTableData = () => {
       if (state.isMyLeaveShow) {
@@ -638,7 +654,14 @@ export default defineComponent({
     };
     watch(() => state.search, watchSearch);
 
-    const filterStatus = (value: any, row: { status: any }) => row.leave_status === value
+    const handleFilterChange = (filters: any) => {
+      if (filters.leave_status && filters.leave_status.length > 0) {
+        state.filters.status = filters.leave_status[0]; // 取第一个筛选值
+      } else {
+        state.filters.status = ''; // 如果没有筛选值，清空状态
+      }
+      updatePaginatedData();
+    };
 
     const modifyPop = (row) => {
       state.modifyFormVisible = true
@@ -859,6 +882,8 @@ export default defineComponent({
         }
       });
     };
+
+    const filterStatus = (value: any, row: { leave_status: any }) => row.leave_status === value;
 
     return {
       formInline,

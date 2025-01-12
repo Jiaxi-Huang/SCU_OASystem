@@ -1,15 +1,15 @@
 <template>
   <div class="right-chart-2">
     <div class="rc1-header">
-      孙七收费站
+      员工待办事项
     </div>
 
     <div class="rc1-chart-container">
       <div class="left">
         <div class="number">
-          267
+          {{ state.total }}
         </div>
-        <div>设备运行总数</div>
+        <div>员工待办事项总数</div>
       </div>
 
       <charts class="right" :option="state.option" />
@@ -19,19 +19,14 @@
 
 <script lang="ts" setup>
 import {Charts} from "@kjgl77/datav-vue3";
-import {reactive} from "vue";
+import {onMounted, reactive} from "vue";
+import Service from '../api/index'
 const state = reactive({
   option: {
     series: [
       {
         type: 'pie',
-        data: [
-          { name: '收费系统', value: 93 },
-          { name: '通信系统', value: 66 },
-          { name: '监控系统', value: 52 },
-          { name: '供配电系统', value: 34 },
-          { name: '其他', value: 22 },
-        ],
+        data: [],
         radius: ['45%', '65%'],
         insideLabel: {
           show: false,
@@ -46,9 +41,17 @@ const state = reactive({
         },
       },
     ],
-    color: ['#00baff', '#3de7c9', '#fff', '#ffc530', '#469f4b'],
+    color: ['#00baff', '#3de7c9', '#469f4b', '#ffc530', ],
   },
 })
+
+onMounted(async () => {
+  const statistics = await Service.getTodoStatistics();
+  if (statistics) {
+    state.total = statistics[1];
+    state.option.series[0].data = statistics[0];
+  }
+});
 </script>
 
 <style lang="less">
@@ -71,7 +74,7 @@ const state = reactive({
   }
 
   .left {
-    width: 30%;
+    width: 20%;
     font-size: 16px;
     display: flex;
     flex-direction: column;

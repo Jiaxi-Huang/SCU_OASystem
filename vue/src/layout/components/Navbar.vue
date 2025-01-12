@@ -245,7 +245,7 @@ export default defineComponent({
       langConfig,
       logout,
       pendingTodos: computed(() => todos.value.filter(todo => todo.todo_fin === '未完成')),
-      pendingLeaveApprovals: computed(() => leaveApprovals.value.filter(leave => leave.status === '待审批')),
+      pendingLeaveApprovals: computed(() => leaveApprovals.value.filter(leave => leave.status === '未审核')),
       pendingReimbursement: computed(() => reimbursements.value.filter(reimbursement => reimbursement.status == '未审核' || reimbursement.status == '未通过')),
       pendingMeetings: computed(() => meetings.value.filter(meeting => meeting.mtin_fin === '未完成')),
       navigateTo
