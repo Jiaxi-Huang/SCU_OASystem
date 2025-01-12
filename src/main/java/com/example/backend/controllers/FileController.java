@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -228,6 +229,34 @@ public class FileController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
+    @PostMapping("/getFileStatistics")
+    public ResponseBase getFileStatistics() {
+        HashMap<String, Integer> statistics = new HashMap<>();
+        ResponseBase res = new ResponseBase();
+        System.out.println("12232");
+        List<Files> records = fileService.getFile();
+        int count=0;
+        for (Files record : records) {
+            String fileExtension = record.getExt();
+            // 如果map中已经存在该扩展名的记录，数量加1，否则初始化为1
+            statistics.put(fileExtension, statistics.getOrDefault(fileExtension, 0) + 1);
+            count++;
+        }
+        res.pushData(statistics);
+        res.pushData(count);
+        return res;
+    }
+
+//        Files files = loadFile();
+//
+//        statistics.put("自己布置未完成", my_service.getUnfinSelf());
+//        statistics.put("自己布置已完成", my_service.getFinishedSelf());
+//        statistics.put("上级布置已完成", my_service.getFinishedMana());
+//        statistics.put("上级布置未完成", my_service.getUnfinMana());
+//        res.pushData(my_service.getTotal());
+//        res.pushData(statistics);
+
 }
 
 

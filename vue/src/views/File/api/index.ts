@@ -127,6 +127,9 @@ class Service {
             if (res.status === -1){
                 ElMessage.error('您的权限不够，无法移动文件夹')
             }
+            if(res.status === -2){
+                ElMessage.error('无法移动总文件夹')
+            }
             return null
         })
     }

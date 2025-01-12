@@ -1,10 +1,10 @@
 <template>
   <div class="left-chart-2">
     <div class="lc2-header">
-      李四收费站
+      今日考勤情况
     </div>
     <div class="lc2-details">
-      设备运行总数<span>245</span>
+      考勤人数<span>{{totalCount}}</span>
     </div>
     <charts class="lc2-chart" :option="state.option" />
     <decoration-2 style="height:10px;" />
@@ -13,20 +13,15 @@
 
 <script lang="ts" setup>
 import {Charts,Decoration2} from "@kjgl77/datav-vue3";
-import {reactive} from "vue";
+import {onMounted, reactive, ref} from "vue";
+import Service from "@/views/Dashboard/api";
 
 const state = reactive({
   option: {
     series: [
       {
         type: 'pie',
-        data: [
-          { name: '收费系统', value: 93 },
-          { name: '通信系统', value: 32 },
-          { name: '监控系统', value: 65 },
-          { name: '供配电系统', value: 44 },
-          { name: '其他', value: 52 },
-        ],
+        data: [] as { name: string; value: number }[],
         radius: ['45%', '65%'],
         insideLabel: {
           show: false,
@@ -44,6 +39,22 @@ const state = reactive({
     color: ['#00baff', '#3de7c9', '#fff', '#ffc530', '#469f4b'],
   },
 })
+const totalCount = ref(0);
+
+onMounted(async () => {
+  try {
+    const res = await Service.getAdminAttendanceList();
+    if (res) {
+      totalCount.value = res[1];
+      state.option.series[0].data = res[0];
+      console.log("123")
+      console.log(state.config.data)
+      console.log(res[1])
+    }
+  } catch (error) {
+    console.error("获取考勤数据失败:", error);
+  }
+});
 </script>
 
 <style lang="less">

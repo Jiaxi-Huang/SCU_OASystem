@@ -142,6 +142,11 @@ public class FolderController {
         int userId = accessService.getAuthenticatedId(accessToken);
         System.out.println("moveFoleder"+userId);
         User userInfo = userMapper.findByUserId(userId);
+
+        if(record.getId()==0||record.getId()==-1||record.getId()==-2){
+            response.setStatus(-2);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
         String[] result = folderService.moveFolder(userInfo,record);
         int res_code = Integer.parseInt(result[0]);
         if(res_code==0){

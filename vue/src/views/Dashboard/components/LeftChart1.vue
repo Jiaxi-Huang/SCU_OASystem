@@ -1,10 +1,10 @@
 <template>
   <div class="left-chart-1">
     <div class="lc1-header">
-      张三收费站
+      文件统计
     </div>
     <div class="lc1-details">
-      设备运行总数<span>430</span>
+      服务器文件总数<span>{{ totalCount }}</span>
     </div>
     <capsule-chart class="lc1-chart" :config="state.config" />
     <decoration-2 style="height:10px;" />
@@ -13,36 +13,29 @@
 
 <script lang="ts" setup>
 import {Decoration2,CapsuleChart} from "@kjgl77/datav-vue3";
-import {reactive} from "vue";
+import {onMounted, reactive, ref} from "vue";
+import Service from "@/views/Dashboard/api";
 
 const state = reactive({
   config: {
-    data: [
-      {
-        name: '收费系统',
-        value: 167,
-      },
-      {
-        name: '通信系统',
-        value: 67,
-      },
-      {
-        name: '监控系统',
-        value: 123,
-      },
-      {
-        name: '供配电系统',
-        value: 55,
-      },
-      {
-        name: '其他',
-        value: 98,
-      },
-    ],
+    data: [] as { name: string; value: number }[],
     colors: ['#00baff', '#3de7c9', '#fff', '#ffc530', '#469f4b'],
-    unit: '件',
+    unit: '个',
   },
 })
+const totalCount = ref(0);
+
+onMounted(async () => {
+  try {
+    const res = await Service.getAdminFileList();
+    if (res) {
+      totalCount.value = res[1];
+      state.config.data = res[0];
+    }
+  } catch (error) {
+    console.error("获取文件数据失败:", error);
+  }
+});
 </script>
 
 <style lang="less">

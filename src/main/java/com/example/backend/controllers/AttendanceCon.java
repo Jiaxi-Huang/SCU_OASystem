@@ -36,6 +36,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -134,14 +135,19 @@ public class AttendanceCon {
     @PostMapping("/addAttendance")
     public ResponseEntity<ResponseBase> addAttendance(@RequestBody Attendance record) {
         ResponseBase res = new ResponseBase();
-
+        int is_exist=0;
         User userInfo = null;
         List<User> userList=userMapper.findAllUser();
         for (User user : userList) {
             if(Objects.equals(user.getUsername(), record.getUserName())){
                 userInfo=user;
+                is_exist=1;
                 break;
             }
+        }
+        if(is_exist==0){
+            res.setStatus(-2);
+            return ResponseEntity.status(HttpStatus.OK).body(res);
         }
         record.setUserId(userInfo.getUserId());
         record.setStatus(setStatus(record));
@@ -163,7 +169,6 @@ public class AttendanceCon {
         ResponseBase res = new ResponseBase();
         // 调用AttendanceService添加考勤记录
         int res_code = attendanceService.delAttendance(id);
-
 
         if (res_code==0) {
             res.setStatus(-1);
@@ -477,6 +482,38 @@ public class AttendanceCon {
         }
     }
 
+    @PostMapping("/getAttendanceStatistics")
+    public ResponseBase getAttendanceStatistics(@RequestParam String pickDate) {
+        HashMap<String, Integer> statistics = new HashMap<>();
+        ResponseBase res = new ResponseBase();
+        if(pickDate==null|| pickDate.isEmpty()|| pickDate.equals("Invalid Date")){
+            Calendar calendar = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            pickDate=sdf.format(calendar.getTime());
+            System.out.println(pickDate);
+        }
+        // 定义日期格式
+        try {
+            int count=0;
+            List<Attendance> records=attendanceService.getAttendanceRecord(pickDate);
+            for (Attendance record : records) {
+                record.setStatus(setStatus(record));
+
+                // 如果map中已经存在该扩展名的记录，数量加1，否则初始化为1
+                statistics.put(record.getStatus(), statistics.getOrDefault(record.getStatus(), 0) + 1);
+                count++;
+            }
+            res.pushData(statistics);
+            res.pushData(count);
+            return res;
+        }
+        catch (Exception e) {
+            res.setStatus(-1);
+            System.out.println(e);
+            res.setMessage(e.getMessage());
+        }
+        return res;
+    }
 
 
 

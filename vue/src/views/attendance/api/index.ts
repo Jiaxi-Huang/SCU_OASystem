@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-import {dayjs} from "element-plus";
+import {dayjs, ElMessage} from "element-plus";
 
 const attendanceApi = {
   localHost:'http://localhost:8080',
@@ -43,6 +43,9 @@ class Service {
     }).then((res) => {
       if (res.status === 0) {
         return Promise.resolve(res)
+      }
+      if(res.status === -2){
+        ElMessage.error('未找到该用户')
       }
       return Promise.reject(res)
     })
