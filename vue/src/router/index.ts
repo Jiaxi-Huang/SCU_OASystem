@@ -6,6 +6,32 @@ export const constantRoutes: Array<RouteRecordRaw> = [
   {
     path: '/',
     component: layout,
+    redirect: '/home',
+    meta: {
+      title: {
+        '/zh-CN': '首页',
+        '/en-US': 'Home Page'
+      },
+      icon: 'ic ic-homepage-fill'
+    },
+    children: [
+      {
+        path: '/home',
+        name: 'home',
+        component: () => import(/* webpackChunkName: "home" */ '@/views/Home/home.vue'),
+        meta: {
+          title: {
+            '/zh-CN': '首页',
+            '/en-US': 'Home Page'
+          },
+          icon: 'ic ic-homepage-fill'
+        }
+      }
+    ]
+  },
+  {
+    path: '/',
+    component: layout,
     redirect: '/personal/personalCenter',
     meta: {
       title: {
