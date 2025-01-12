@@ -97,7 +97,7 @@ export default defineComponent({
         {
           required: true,
           message: '标题不能为空',
-          trigger: 'change',
+          trigger: 'blur',
         },
         {
           validator: (rule, value, callback) => {
@@ -107,14 +107,14 @@ export default defineComponent({
               callback();
             }
           },
-          trigger: 'blur',
+          trigger: 'change',
         },
       ],
       mtin_loc: [
         {
           required: true,
           message: '地点不能为空',
-          trigger: 'change',
+          trigger: 'blur',
         },
         {
           validator: (rule, value, callback) => {
@@ -124,7 +124,7 @@ export default defineComponent({
               callback();
             }
           },
-          trigger: 'blur',
+          trigger: 'change',
         },
       ],
       mtin_ctnt: [
@@ -141,7 +141,7 @@ export default defineComponent({
               callback();
             }
           },
-          trigger: 'blur',
+          trigger: 'change',
         },
       ],
     });
@@ -170,6 +170,12 @@ export default defineComponent({
               type: 'success',
               message: '创建会议成功，已经添加至您的会议列表'
             })
+            sizeForm.mtin_title = '';
+            sizeForm.mtin_ctnt = '';
+            sizeForm.date1 = '';
+            sizeForm.date2 = '';
+            sizeForm.mtin_loc = '';
+            sizeForm.mtin_len = '';
           }
           else{
             ElMessage({
