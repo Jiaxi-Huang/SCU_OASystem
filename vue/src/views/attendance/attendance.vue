@@ -1,10 +1,7 @@
 <template>
   <div>
-    <el-alert title="Tips:点击【新增】按钮进行新增员工；点击【编辑】按钮，对员工的部门以及职能信息进行操作！" type="warning"> </el-alert>
-    <el-alert title="Tips:权限控制体验：【管理员账号为：admin@outlook.com】、【超级管理员账号为：super@outlook.com】" type="info"> </el-alert>
     <el-card class="card-ctrl">
       <el-row style="margin: 15px">
-
       </el-row>
       <el-row>
         <el-col :span="10" style="text-align: left">
