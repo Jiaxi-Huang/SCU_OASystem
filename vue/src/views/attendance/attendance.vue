@@ -76,6 +76,7 @@ import {Download, Edit, InfoFilled, Minus, Odometer, Plus, Printer, Refresh, Sea
 import PersonalAttendanceDetail from "@/views/attendance/personalAttendanceDetail.vue";
 import Service from './api/index'
 import AttendanceStatistic from "./attendanceStatistic.vue"
+import axios from "axios";
 
 export default defineComponent({
   name: 'Attendance',
@@ -152,9 +153,17 @@ export default defineComponent({
         });
 
         if (confirm) {
-          const data = {'accessToken': sessionStorage.getItem('accessToken')};
-          const res = await Service.postCheckInAttendance(data.accessToken);
-
+          const response = await axios.get("https://restapi.amap.com/v3/ip", {
+            params: {
+              key: "112f7278845a2b4a727d04cffeb63b0b",
+            },
+          })
+          console.log(response)
+          const data = {
+            'accessToken': sessionStorage.getItem('accessToken'),
+            'inLocation': response.data.city
+          };
+          const res = await Service.postCheckInAttendance(data);
           if (res.status === 0) {
             ElMessage({
               type: 'success',
@@ -190,8 +199,17 @@ export default defineComponent({
         type: 'warning'
       })
           .then(async () => {
-            const data = {'accessToken': sessionStorage.getItem('accessToken')}
-            const res = await Service.postCheckOutAttendance(data.accessToken);
+            const response = await axios.get("https://restapi.amap.com/v3/ip", {
+              params: {
+                key: "112f7278845a2b4a727d04cffeb63b0b",
+              },
+            })
+            console.log(response)
+            const data = {
+              'accessToken': sessionStorage.getItem('accessToken'),
+              'outLocation': response.data.city
+            }
+            const res = await Service.postCheckOutAttendance(data);
             if (res.status === 0) {
               ElMessage({
                 type: 'success',
@@ -267,9 +285,16 @@ export default defineComponent({
       const data = {'accessToken': sessionStorage.getItem('accessToken')}
       const adminUserInfo = await Service.postPersonalAttendance(data)
       if (adminUserInfo.status === 0) {
+        const response = await axios.get("https://restapi.amap.com/v3/ip", {
+          params: {
+            key: "112f7278845a2b4a727d04cffeb63b0b",
+          },
+        })
+        console.log(response)
         state.data = adminUserInfo.data
         state.userIds = adminUserInfo.data.map((item: any) => item.id)
         state.param.total = state.data.length
+
       }
     }
     const onCurrentChange = (val:number) => {

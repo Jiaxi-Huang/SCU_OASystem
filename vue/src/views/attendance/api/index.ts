@@ -97,11 +97,12 @@ class Service {
     }
 
 
-    static postCheckInAttendance(accessToken:String) {
+    static postCheckInAttendance(data:any) {
         return request({
-            url: `${attendanceApi.localHost + attendanceApi.checkInAttendance}?accessToken=${accessToken}`,
+            url: attendanceApi.localHost + attendanceApi.checkInAttendance,
             method: 'POST',
             json: true,
+            data
         }).then((res) => {
             if (res.status === 0||res.status === -1) {
                 return Promise.resolve(res)
@@ -111,11 +112,12 @@ class Service {
     }
 
 
-    static postCheckOutAttendance(accessToken:String) {
+    static postCheckOutAttendance(data:any) {
         return request({
-            url: `${attendanceApi.localHost + attendanceApi.checkOutAttendance}?accessToken=${accessToken}`,
+            url: attendanceApi.localHost + attendanceApi.checkOutAttendance,
             method: 'POST',
             json: true,
+            data
         }).then((res) => {
             if (res.status === 0||res.status === -1||res.status === -2) {
                 return Promise.resolve(res)

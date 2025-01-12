@@ -123,6 +123,7 @@ public class AttendanceCon {
                 record.setStatus(setStatus(record));
                 res.pushData(record);
             }
+
         }
         catch (Exception e) {
             res.setStatus(-1);
@@ -214,10 +215,10 @@ public class AttendanceCon {
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
     @PostMapping("/checkInAttendance")
-    public ResponseEntity<ResponseBase> checkInAttendance(@RequestParam String accessToken) throws UnknownHostException {
+    public ResponseEntity<ResponseBase> checkInAttendance(@RequestBody Attendance record1) throws UnknownHostException {
         ResponseBase res = new ResponseBase();
         System.out.println("checkInAttendance");
-        int userId = accessService.getAuthenticatedId(accessToken);
+        int userId = accessService.getAuthenticatedId(record1.getAccessToken());
         System.out.println(userId);
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -247,18 +248,18 @@ public class AttendanceCon {
         record.setCheckIn(LocalTime.parse(formattedTime));
         record.setAttendanceDate(LocalDate.parse(date));
         record.setStatus(setStatus(record));
-        record.setInLocation(ipRegion);
+        record.setInLocation(record1.getInLocation());
 
         int res_code=attendanceService.addAttendance(record);
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
     @PostMapping("/checkOutAttendance")
-    public ResponseEntity<ResponseBase> checkOutAttendance(@RequestParam String accessToken) throws UnknownHostException {
+    public ResponseEntity<ResponseBase> checkOutAttendance(@RequestBody Attendance record1) throws UnknownHostException {
         ResponseBase res = new ResponseBase();
         Attendance attendance = new Attendance();
         System.out.println("checkOutAttendance");
-        int userId = accessService.getAuthenticatedId(accessToken);
+        int userId = accessService.getAuthenticatedId(record1.getAccessToken());
         System.out.println(userId);
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -296,7 +297,7 @@ public class AttendanceCon {
 
         attendance.setCheckOut(LocalTime.parse(formattedTime));
         attendance.setStatus(setStatus(attendance));
-        attendance.setOutLocation(ipRegion);
+        attendance.setOutLocation(record1.getOutLocation());
 
         int res_code=attendanceService.editAttendance(attendance);
         return ResponseEntity.status(HttpStatus.OK).body(res);
