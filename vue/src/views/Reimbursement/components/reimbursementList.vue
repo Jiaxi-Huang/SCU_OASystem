@@ -37,6 +37,7 @@
       >
       </el-table-column>
       <el-table-column prop="user_id" label="提交用户id" width="180" truncated> </el-table-column>
+      <el-table-column prop="username" label="提交用户" width="180" truncated> </el-table-column>
       <el-table-column prop="amount" label="金额" truncated> </el-table-column>
       <el-table-column prop="description" label="描述" truncated> </el-table-column>
       <el-table-column
@@ -84,6 +85,7 @@
       >
       </el-table-column>
       <el-table-column prop="user_id" label="提交用户id" width="180" truncated> </el-table-column>
+      <el-table-column prop="username" label="提交用户" width="180" truncated> </el-table-column>
       <el-table-column prop="amount" label="金额" truncated> </el-table-column>
       <el-table-column prop="description" label="描述" truncated> </el-table-column>
       <el-table-column
@@ -131,6 +133,7 @@
       >
       </el-table-column>
       <el-table-column prop="user_id" label="抄送用户id" width="180" truncated> </el-table-column>
+      <el-table-column prop="username" label="抄送用户" width="180" truncated> </el-table-column>
       <el-table-column prop="amount" label="金额" truncated> </el-table-column>
       <el-table-column prop="description" label="描述" truncated> </el-table-column>
       <el-table-column
@@ -173,6 +176,7 @@
       >
       </el-table-column>
       <el-table-column prop="user_id" label="提交用户id" width="180" truncated> </el-table-column>
+      <el-table-column prop="username" label="提交用户" width="180" truncated> </el-table-column>
       <el-table-column prop="amount" label="金额" truncated> </el-table-column>
       <el-table-column prop="description" label="描述" truncated> </el-table-column>
       <el-table-column
@@ -499,6 +503,7 @@ export default defineComponent({
                 description: data[i].description,
                 status: data[i].status,
                 submitted_at: data[i].submitted_at,
+                username: data[i].username,
               };
               myReimData.push(record);
             }
@@ -522,6 +527,7 @@ export default defineComponent({
                 description: data[i].description,
                 status: data[i].status,
                 submitted_at: data[i].submitted_at,
+                username: data[i].username,
               };
               reviewReimData.push(record);
             }
@@ -545,6 +551,7 @@ export default defineComponent({
                 description: data[i].description,
                 status: data[i].status,
                 submitted_at: data[i].submitted_at,
+                username: data[i].username,
               };
               notifyReimData.push(record);
             }
@@ -576,6 +583,7 @@ export default defineComponent({
                   description: data[i].description,
                   status: data[i].status,
                   submitted_at: data[i].submitted_at,
+                  username: data[i].username,
                 };
                 adminReimData.push(record);
               }

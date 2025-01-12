@@ -37,26 +37,21 @@ const getWeather = async (cityName: string) => {
   const today = new Date().toISOString().split('T')[0];
   try {
     const response = await axios.get(`http://localhost:8080/api/weather?city=${cityName}&date=${today}`);
-    console.log("Request URL:", `http://localhost:8080/api/weather?city=${cityName}&date=${today}`);
     const data = response.data;
-    console.log("Weather API response:", data);
     if (data) {
       weatherDescription.value = data.humidity;
       temperature.value = data.temperature;
     }
   } catch (error) {
-    console.error("Error fetching weather data:", error);
     temperature.value = 'Error';
   }
 };
 
 const renderChart = (data: ChartData) => {
   if (!chart.value) {
-    console.error('Chart element is not available.');
     return;
   }
 
-  console.log('Initializing chart with data:', data);
   const myChart = echarts.init(chart.value as HTMLElement);
 
   const option = {
@@ -119,7 +114,6 @@ const getSevenDayWeather = async (cityName: string) => {
     for (const date of pastDates) {
       const response = await axios.get(`http://localhost:8080/api/weather?city=${cityName}&date=${date}`);
       const data = response.data;
-      console.log(`Weather data for ${date}:`, data);
 
       if (data && data.temperature) {
         const [minTemp, maxTemp] = data.temperature.split('~').map((temp: string) => parseInt(temp));
@@ -128,10 +122,8 @@ const getSevenDayWeather = async (cityName: string) => {
       }
     }
 
-    console.log("Formatted Chart Data:", chartData);
     renderChart(chartData);
   } catch (error) {
-    console.error("Error fetching seven-day weather data:", error);
   }
 };
 
@@ -143,12 +135,10 @@ const getCityAndWeather = async () => {
       },
     });
     const data = response.data;
-    console.log(data);
     city.value = data.city.replace('市', '');
     getWeather(city.value);
     getSevenDayWeather(city.value); // 获取城市后调用 getSevenDayWeather 函数
   } catch (error) {
-    console.error("Error fetching city data:", error);
   }
 };
 

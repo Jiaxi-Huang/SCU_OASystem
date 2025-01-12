@@ -10,6 +10,7 @@ import com.example.backend.entity.todoList.TodoRecord;
 import com.example.backend.entity.userInfo.adminUserInfoRequest;
 import com.example.backend.services.AccessService;
 import com.example.backend.services.ReimbursementService;
+import com.example.backend.services.UserService;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Font;
@@ -44,12 +45,14 @@ public class ReimbursementCon {
     @Autowired
     private AccessService accessService;
 
+    @Autowired
+    private UserService userService;
+
     @PostMapping("/getReimbursementList")
     public ResponseBase getReimbursementRecord(@RequestBody ReimbursementRecordWithAccessToken request) {
         ResponseBase res = new ResponseBase();
         try {
             String accessToken = request.getAccessToken();
-//            System.out.println("getReimbursementList accessToken: "+accessToken);
             int userId = accessService.getAuthenticatedId(accessToken);
             request.setUser_id(userId);
             List<ReimbursementRecord> records = reimbursementService.getReimbursementRecordByUserId(userId);  // 获取所有记录
@@ -69,7 +72,6 @@ public class ReimbursementCon {
         ResponseBase res = new ResponseBase();
         try {
             String accessToken = request.getAccessToken();
-//            System.out.println("getReviewReimbursementList accessToken:"+accessToken);
             int userId = accessService.getAuthenticatedId(accessToken);
             request.setUser_id(userId);
             List<ReimbursementRecord> records = reimbursementService.getReviewReimbursementRecordByUserId(userId);
@@ -91,7 +93,7 @@ public class ReimbursementCon {
             String accessToken = request.getAccessToken();
             int userId = accessService.getAuthenticatedId(accessToken);
             request.setUser_id(userId);
-            System.out.println("getNotifyReimbursementList user_id: "+userId);
+//            System.out.println("getNotifyReimbursementList user_id: "+userId);
             List<ReimJoinNotifyRecord> records = reimbursementService.getNotifyReimbursementRecordByUserId(userId);
             res.setStatus(200);
             for (ReimJoinNotifyRecord record : records) {
@@ -139,15 +141,15 @@ public class ReimbursementCon {
             res.setStatus(200);
             res.setMessage("Reimbursement record added successfully.");
             res.pushData(reimbursement_id);
-            System.out.println("addRec reimbursement_id: " + reimbursement_id);
 
+            User user = userService.userInfo(userId);
             // 处理抄送人
-            if (request.getCc_user() != null && request.getCc_user().length > 0) {
+            if (request.getCc_user() != null) {
                 for (int ccUserId : request.getCc_user()) {
                     ReimJoinNotifyRecord ccRecord = new ReimJoinNotifyRecord(
                             0, userId, request.getAmount(), request.getDescription(),
                             request.getStatus(), request.getSubmitted_at(), 0, ccUserId,
-                            "reimbursement", reimbursement_id, request.getSubmitted_at(), 0
+                            "reimbursement", reimbursement_id, request.getSubmitted_at(), 0, user.getUsername()
                     );
                     reimbursementService.addNotification(ccRecord);
                 }

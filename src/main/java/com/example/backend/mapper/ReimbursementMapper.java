@@ -12,8 +12,69 @@ import java.util.List;
 @Mapper
 public interface ReimbursementMapper extends BaseMapper<ReimbursementRecord> {
 
-    @Select("SELECT * FROM reimbursement_requests")
+    @Select("""
+            SELECT rr.reimbursement_id,
+               rr.user_id,
+               rr.amount,
+               rr.description,
+               rr.status,
+               rr.submitted_at,
+               ui.username
+        FROM reimbursement_requests rr
+        JOIN user_infos ui ON rr.user_id = ui.user_id
+            """)
     List<ReimbursementRecord> getAll();
+
+    @Select("""
+        SELECT rr.reimbursement_id,
+               rr.user_id,
+               rr.amount,
+               rr.description,
+               rr.status,
+               rr.submitted_at,
+               ui.username
+        FROM reimbursement_requests rr
+        JOIN user_infos ui ON rr.user_id = ui.user_id
+        WHERE rr.review_user_id = #{user_id}
+        AND rr.user_id = #{user_id}
+        """)
+    List<ReimbursementRecord> getReimbursementRecordByUserId(int user_id);
+
+    @Select("""
+        SELECT rr.reimbursement_id,
+               rr.user_id,
+               rr.amount,
+               rr.description,
+               rr.status,
+               rr.submitted_at,
+               nc.notification_id,
+               nc.notified_user_id,
+               nc.request_type,
+               nc.request_id,
+               nc.notified_at,
+               nc.cc_user_id,
+               ui.username
+        FROM reimbursement_requests rr
+        JOIN notification_chain nc ON rr.reimbursement_id = nc.request_id
+        JOIN user_infos ui ON rr.user_id = ui.user_id
+        WHERE nc.notified_user_id = #{userId} AND nc.request_type = 'reimbursement'
+       """)
+    List<ReimJoinNotifyRecord> getNotifyReimbursementRecordByUserId(int userId);
+
+
+    @Select("""
+        SELECT rr.reimbursement_id,
+               rr.user_id,
+               rr.amount,
+               rr.description,
+               rr.status,
+               rr.submitted_at,
+               ui.username
+        FROM reimbursement_requests rr
+        JOIN user_infos ui ON rr.user_id = ui.user_id
+        WHERE rr.review_user_id = #{user_id}
+        """)
+    List<ReimbursementRecord> getReviewReimbursementRecordByUserId(int user_id);
 
     @Update("UPDATE reimbursement_requests " +
             "SET description = #{description} , amount = #{amount}," +
@@ -37,30 +98,4 @@ public interface ReimbursementMapper extends BaseMapper<ReimbursementRecord> {
 
     @Delete("DELETE from reimbursement_requests WHERE reimbursement_id = #{reimbursement_id}")
     int deleteReimbursementRecord(int reimbursement_id);
-
-    @Select("SELECT * FROM reimbursement_requests WHERE user_id = #{user_id}")
-    List<ReimbursementRecord> getReimbursementRecordByUserId(int user_id);
-
-    @Select("""
-        SELECT rr.reimbursement_id,
-               rr.user_id,
-               rr.amount,
-               rr.description,
-               rr.status,
-               rr.submitted_at,
-               nc.notification_id,
-               nc.notified_user_id,
-               nc.request_type,
-               nc.request_id,
-               nc.notified_at,
-               nc.cc_user_id
-        FROM reimbursement_requests rr
-        JOIN notification_chain nc ON rr.reimbursement_id = nc.request_id
-        WHERE nc.notified_user_id = #{userId} AND nc.request_type = 'reimbursement'
-       """)
-    List<ReimJoinNotifyRecord> getNotifyReimbursementRecordByUserId(int userId);
-
-
-    @Select("SELECT * FROM reimbursement_requests WHERE review_user_id = #{user_id}")
-    List<ReimbursementRecord> getReviewReimbursementRecordByUserId(int user_id);
 }
