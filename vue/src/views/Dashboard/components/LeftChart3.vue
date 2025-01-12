@@ -56,6 +56,9 @@ const processReimbursementData = (records: any[]) => {
     }
   });
 
+  // 将本月报销总额保留两位小数
+  currentMonthTotal.value = parseFloat(currentMonthTotal.value.toFixed(2));
+
   // 更新图表数据
   state.config.data = months.map((month, index) => ({
     name: month,
