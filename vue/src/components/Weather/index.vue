@@ -63,9 +63,7 @@ const getWeather = async (cityName: string) => {
   const today = getLocalDate(); // 使用本地时区的日期
   try {
     const response = await axios.get(`http://localhost:8080/api/weather?city=${cityName}&date=${today}`);
-    console.log("Request URL:", `http://localhost:8080/api/weather?city=${cityName}&date=${today}`);
     const data = response.data;
-    console.log("Weather API response:", data);
     if (data) {
       weatherDescription.value = data.humidity;
       temperature.value = data.temperature;
@@ -73,7 +71,6 @@ const getWeather = async (cityName: string) => {
       weatherIconUrl.value = getWeatherIcon(data.humidity);
     }
   } catch (error) {
-    console.error("Error fetching weather data:", error);
     temperature.value = 'Error';
   }
 };
@@ -86,17 +83,13 @@ const getCityAndWeather = async () => {
       },
     });
     const data = response.data;
-    console.log(data);
 
-    // 检查 data.city 是否为字符串
     if (typeof data.city === 'string') {
       city.value = data.city.replace('市', '');
       getWeather(city.value); // 获取城市后调用 getWeather 函数
     } else {
-      console.error('City data is not a string:', data.city);
     }
   } catch (error) {
-    console.error("Error fetching city data:", error);
   }
 };
 
