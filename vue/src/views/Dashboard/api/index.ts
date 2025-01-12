@@ -95,10 +95,25 @@ class Service {
             if (res.status === 0) {
                 const statics = [];
                 Object.entries(res.data[0]).forEach(([key, value]) => {
+                    let tmp;
+                    if(key=="Absent"){
+                        tmp="缺席"
+                    }
+                    if(key=="Late"){
+                        tmp="迟到"
+                    }
+                    if(key=="Leave Early"){
+                        tmp="早退"
+                    }
+                    if(key=="On Time"){
+                        tmp="准时"
+                    }
+                    if(key=="Late And Leave Early"){
+                        tmp="迟到早退"
+                    }
                     statics.push({
-                        name: key,
+                        name: tmp,
                         value: value,
-
                     })
                 });
                 console.log(statics)
