@@ -3,7 +3,7 @@
     <h3>文件管理</h3>
     <vuecmf-fileexplorer
         root_path="个人文件管理"
-        :page_size="7"
+        :page_size="10"
         list_show="list"
         :tool_config="['new_folder','update_folder','move_folder','del_folder','upload','move_file','del_file','remark_file']"
         upload_api="http://localhost:8080/api/file/upload"

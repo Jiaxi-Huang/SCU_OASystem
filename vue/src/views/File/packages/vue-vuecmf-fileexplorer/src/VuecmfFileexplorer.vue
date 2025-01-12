@@ -7,8 +7,8 @@
         </template>
         <el-button @click="service.changeListShow('card')"><i class="bi bi-card-image"></i> 缩略图</el-button>
         <el-button @click="service.changeListShow('list')"><i class="bi bi-card-checklist"></i> 列表</el-button>
-        <el-button id="copy-file-link"><i class="bi bi-link-45deg"></i> 复制文件链接</el-button>
-        <el-button @click="is_help_dlg = true"><i class="bi bi-question-square"></i> 帮助</el-button>
+<!--        <el-button id="copy-file-link"><i class="bi bi-link-45deg"></i> 复制文件链接</el-button>-->
+<!--        <el-button @click="is_help_dlg = true"><i class="bi bi-question-square"></i> 帮助</el-button>-->
       </el-header>
       <el-container>
         <el-aside :width="folder_list_width">
