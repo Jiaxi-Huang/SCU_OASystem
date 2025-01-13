@@ -29,10 +29,6 @@
               </border-box-4>
             </div>
           </div>
-
-          <border-box-4 class="rmc-bottom-container">
-            <Bottom-Charts />
-          </border-box-4>
         </div>
       </border-box-1>
   </div>
@@ -75,8 +71,11 @@ export default defineComponent({
   height: 98vh; /* 设置高度为视口高度 */
   width: 96.5vw; /* 设置宽度为视口宽度 */
   margin: 0; /* 去除默认的边距 */
-  padding: 0; /* 去除默认的填充 */
+  padding: 10px; /* 去除默认的填充 */
   overflow: hidden; /* 隐藏溢出内容 */
+  display: flex;
+  flex-direction: column;
+
   .main-header {
     height: 80px;
     display: flex;
@@ -86,7 +85,7 @@ export default defineComponent({
   }
 
   .main-container {
-    height: calc(~"100% - 80px");
+    display: flex;
 
     .border-box-content {
       padding: 20px;
@@ -96,40 +95,48 @@ export default defineComponent({
   }
 
   .left-chart-container {
-    width: 22%;
-    padding: 10px;
+    width: 25%;
+    height: 100%;
+    padding: 20px;
     box-sizing: border-box;
 
     .border-box-content {
       flex-direction: column;
+      height: 100%;
     }
   }
 
   .right-main-container {
-    width: 78%;
+    width: 75%;
+    height: 100%;
     padding-left: 5px;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
   }
 
   .rmc-top-container {
-    height: 65%;
+    height: 100%;
     display: flex;
   }
 
   .rmctc-left-container {
-    width: 65%;
+    width: 60%;
+    height: 100%;
   }
 
   .rmctc-right-container {
-    width: 35%;
-  }
-
-  .rmc-bottom-container {
-    height: 35%;
+    width: 40%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
   }
 
   .rmctc-chart-1, .rmctc-chart-2 {
     height: 50%;
+    padding: 5px;
+    box-sizing: border-box;
   }
 }
+
 </style>

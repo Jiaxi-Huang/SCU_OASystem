@@ -96,15 +96,15 @@ onMounted(async () => {
 
   .lc3-details {
     height: 40px;
-    font-size: 16px;
+    font-size: 15px;
     display: flex;
     align-items: center;
-    text-indent: 20px;
+    text-indent: 5px;
 
     span {
       color: #096dd9;
       font-weight: bold;
-      font-size: 35px;
+      font-size: 30px;
       margin-left: 20px;
     }
   }

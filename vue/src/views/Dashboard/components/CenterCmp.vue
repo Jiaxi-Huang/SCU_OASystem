@@ -5,7 +5,6 @@
       <div>用户总数</div>
       <decoration-1 style="width:200px;height:50px;" />
     </div>
-
     <div class="cc-details">
       <div>在线用户总数</div>
       <div class="card">
@@ -42,7 +41,6 @@
           <span>{{state.config.data[2].value}}</span>员工
         </div>
       </div>
-
       <Label-Tag :config="state.labelConfig" />
     </div>
   </div>
@@ -79,8 +77,8 @@ const state = reactive({
     },
     color: ['#00baff', '#3de7c9', '#ffc530', '#469f4b'],
     lineWidth: 30,
-    radius: '55%',
-    activeRadius: '60%',
+    radius: '75%',
+    activeRadius: '70%',
   },
   labelConfig: {
     data: ['管理员', '部门经理', '员工'],
