@@ -126,7 +126,6 @@ public class FolderController {
                     array[0] = file.getId();
                     file.setIds(Collections.singletonList(array[0]));
                     List<Integer> arr = file.getIds();
-                    System.out.println("111"+ arr.get(0));
                     fileService.delFile(userInfo,file);
                 }
             }
@@ -144,7 +143,6 @@ public class FolderController {
 
     @PostMapping("/loadFolder")
     public ResponseBase loadFolder(@RequestBody adminUserInfoRequest request) {
-        System.out.println("[loadFolder] receive");
         ResponseBase res = new ResponseBase();
         try {
             String accessToken = request.getAccessToken();
@@ -180,7 +178,6 @@ public class FolderController {
     @PostMapping("/modifyFolder")
     public ResponseEntity<ResponseBase> modifyFolder(@RequestBody Folder record) {
         ResponseBase response = new ResponseBase();
-        System.out.println(record.getTitle());
         String accessToken = record.getAcsTkn();
         int userId = accessService.getAuthenticatedId(accessToken);
         User userInfo = userMapper.findByUserId(userId);
@@ -193,10 +190,8 @@ public class FolderController {
     @PostMapping("/moveFolder")
     public ResponseEntity<ResponseBase> moveFolder(@RequestBody Folder record) {
         ResponseBase response = new ResponseBase();
-        System.out.println(record.getId());
         String accessToken = record.getAcsTkn();
         int userId = accessService.getAuthenticatedId(accessToken);
-        System.out.println("moveFoleder"+userId);
         User userInfo = userMapper.findByUserId(userId);
 
         if(record.getId()==0||record.getId()==-1||record.getId()==-2){
@@ -217,10 +212,8 @@ public class FolderController {
     @PostMapping("/delFolder")
     public ResponseEntity<ResponseBase> delFolder(@RequestBody Folder record) {
         ResponseBase response = new ResponseBase();
-        System.out.println(record.getId());
         String accessToken = record.getAcsTkn();
         int userId = accessService.getAuthenticatedId(accessToken);
-        System.out.println("moveFoleder"+userId);
         User userInfo = userMapper.findByUserId(userId);
         if(record.getId()==0||record.getId()==-1||record.getId()==-2){
             response.setStatus(-2);

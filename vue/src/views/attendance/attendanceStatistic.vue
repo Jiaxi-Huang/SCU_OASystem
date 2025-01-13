@@ -89,7 +89,6 @@ export default defineComponent({
         if (refRolesChart.value) {
           useInitPieChart(refRolesChart.value, rolesChartData);
         } else {
-          console.log("refRolesChart not exist!");
         }
       });
     };

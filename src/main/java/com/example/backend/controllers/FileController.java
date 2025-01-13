@@ -64,8 +64,6 @@ public class FileController {
             res.pushData(FolderType);
             res.pushData(userInfo.getUserId());
             res.pushData(userInfo.getDepartment());
-            System.out.println(userInfo.getUsername());
-
         }
         catch (Exception e) {
             res.setStatus(-1);
@@ -80,7 +78,6 @@ public class FileController {
         String accessToken = record.getAcsTkn();
         int userId = accessService.getAuthenticatedId(accessToken);
         User userInfo = userMapper.findByUserId(userId);
-        System.out.println("moveFile beforeDirId"+record.getBeforeDirId());
         int res_code = fileService.moveFile(userInfo,record);
         if (res_code==0) {
             response.setStatus(-1);
@@ -131,10 +128,8 @@ public class FileController {
     }
     @PostMapping("/judgeFileType")
     public ResponseEntity<ResponseBase> judgeFileType(@RequestBody Files record) {
-        System.out.println("judgeFileType进入");
         ResponseBase response = new ResponseBase();
         int res_code = folderService.judgeFolder(record.getId());
-        System.out.println("judgeFileType进入："+res_code);
         response.pushData(res_code);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -142,8 +137,6 @@ public class FileController {
     @PostMapping("/uploadFile")
     public ResponseEntity<ResponseBase> uploadFile(@RequestBody Files record) {
         ResponseBase response = new ResponseBase();
-        System.out.println(record);
-        System.out.println(record.getFileName());
         int res_code = fileService.uploadFile(null,record);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }//写错的
@@ -159,36 +152,26 @@ public class FileController {
 
         ResponseBase response = new ResponseBase();
         int user_id = accessService.getAuthenticatedId(accessToken);
-        System.out.println("new userid "+user_id);
         // 定义文件保存路径
-       // System.out.println("upload folder"+accessToken);
         User userInfo = userMapper.findByUserId(user_id);
         String uploadDir = System.getProperty("user.dir") + "/uploads/";  // 相对于项目根目录的路径
         File uploadDirectory = new File(uploadDir);
-        System.out.println("Absolute path: " + uploadDirectory.getAbsolutePath());
-        System.out.println("Can write: " + uploadDirectory.canWrite());
         if (!uploadDirectory.exists()) {
             uploadDirectory.mkdirs(); // 确保上传目录存在
         }
 
         String allFileName = file.getOriginalFilename();
         String filePath = uploadDir + allFileName;
-        System.out.println("11111");
         try {
             // 保存文件到服务器
-            System.out.println("111222211");
-            System.out.println("File path: " + filePath);
-            System.out.println("All file name: " + allFileName);
 
             File targetFile = new File(filePath);
             file.transferTo(targetFile);
-            System.out.println("11111");
             // 生成文件的 URL
 //            String fileUrl = "http://localhost:8080/" + allFileName;  // 根据你实际的 URL 配置修改
 //            System.out.println(fileUrl);
 //            response.pushData(fileUrl);
             String fileUrl = "http://localhost:8080/" + allFileName;  // 相对路径的 URL
-            System.out.println(fileUrl);
             response.pushData(fileUrl);
 
             Files record = new Files();
@@ -196,19 +179,15 @@ public class FileController {
             record.setFilePath(filePath);
             int dotIndex = allFileName.lastIndexOf('.');
             int dotIndex1 = fileName.lastIndexOf('.');
-            System.out.println(fileName);
             // 分离文件名和扩展名
             if (Objects.isNull(fileName) || fileName.isEmpty()) {
                 fileName = allFileName.substring(0, dotIndex);
-                System.out.println(fileName);
             }else{
                 fileName = fileName.substring(0,dotIndex1);
             }
             //区分web和wechat
 
             String ext = allFileName.substring(dotIndex + 1);
-            System.out.println(fileName);
-            System.out.println(ext);
             record.setUrl(fileUrl);
             record.setUserId(user_id);
             record.setDirId(Integer.valueOf(folderId));
@@ -216,14 +195,11 @@ public class FileController {
             record.setFileName(fileName);
             record.setSize(String.valueOf(file.getSize()));
             record.setDepartment(userInfo.getDepartment());
-            System.out.println(file.getSize());
-            System.out.println(record);
 
             int res_code=0;
             res_code = fileService.uploadFile(userInfo,record);
             if(res_code==0) {
                 response.setStatus(-1);
-                System.out.println("无权限");
             }
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (IOException e) {
@@ -237,7 +213,6 @@ public class FileController {
     public ResponseBase getFileStatistics() {
         HashMap<String, Integer> statistics = new HashMap<>();
         ResponseBase res = new ResponseBase();
-        System.out.println("12232");
         List<Files> records = fileService.getFile();
         int count=0;
         for (Files record : records) {

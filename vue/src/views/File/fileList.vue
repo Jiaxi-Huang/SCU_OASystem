@@ -45,7 +45,6 @@ export default defineComponent({
 
     //加载文件夹列表
     const loadFolder = (folderObj: AnyObject): void => {
-      console.log("loadFile exc")
       Service.loadFolder().then((res) => {
         if (res) {
 
@@ -55,7 +54,6 @@ export default defineComponent({
               userId:data[data.length-2],
               department:data[data.length-1]
             }
-            console.log(user)
             data.pop();
             data.pop();
             //0是个人，1是部门，2是公司，文件夹id是0，-1，-2
@@ -111,14 +109,11 @@ export default defineComponent({
               if(folderObj.keywords){
                 //这部分是搜索还没做
                 folderObj.searchData[i].children=[];
-                console.log("进入查询")
                 folderObj.searchData[i].children=folderObj.data[i].children;
-                console.log(folderObj.searchData)
                 folderObj.data[i].children=[];
                 let FolderArr = data.filter((record) =>
                     record.title.toLowerCase().includes(folderObj.keywords.toLowerCase())
                 );
-                console.log(FolderArr)
                 FolderArr.forEach(item => {
                   if(i===0
                       &&((item.department===null)||(item.department===""))
@@ -155,7 +150,6 @@ export default defineComponent({
 
           }
         } else {
-          console.log("getPersonalFolders RES MISS");
 
         }
 
@@ -183,12 +177,10 @@ export default defineComponent({
 
     //加载文件列表
     const loadFile = (folderObj: AnyObject): void => {
-      console.log("loadFile exc")
       let dir_id=0
       if(folderObj.filter.dir_id!=null){
         dir_id = folderObj.filter.dir_id
       }
-      console.log("dir_id "+dir_id)
       Service.loadFile(dir_id).then((res) => {
         if (res) {
           // 处理返回的结果
@@ -204,20 +196,18 @@ export default defineComponent({
           if (data && Array.isArray(data)) {
             folderObj.data=[];
             let tmp = []
-            console.log(folderObj.keywords)
-            console.log(folderObj.current_page)
-            console.log(folderObj.page_size)
+
             if(folderType===0){
               //个人
               //folderObj.total = data.length;
-              console.log(folderObj.filter.dir_id)
+
               if(folderObj.keywords){
                 //keywords是搜索的关键词，这部分是搜索，else是文件加载，后面同理
                 // if(folderObj.keywords === data[i].fileName){
                 data=data.filter((record) =>
                     record.fileName.toLowerCase().includes(folderObj.keywords.toLowerCase()));
                 // 忽略大小写
-                console.log(data);
+
                 for(let i=0;i<data.length;i++){
                   if(data[i].dirId === dir_id
                       &&data[i].userId===user.userId
@@ -266,14 +256,14 @@ export default defineComponent({
             if(folderType===-1){
               //个人
               //folderObj.total = data.length;
-              console.log(folderObj.filter.dir_id)
+
               if(folderObj.keywords){
                 //keywords是搜索的关键词，这部分是搜索，else是文件加载，后面同理
                 // if(folderObj.keywords === data[i].fileName){
                 data=data.filter((record) =>
                     record.fileName.toLowerCase().includes(folderObj.keywords.toLowerCase()));
                 // 忽略大小写
-                console.log(data);
+
                 for(let i=0;i<data.length;i++){
                   if(data[i].dirId === folderObj.filter.dir_id
                       &&data[i].department===user.department
@@ -320,14 +310,14 @@ export default defineComponent({
             if(folderType===-2){
               //个人
               //folderObj.total = data.length;
-              console.log(folderObj.filter.dir_id)
+
               if(folderObj.keywords){
                 //keywords是搜索的关键词，这部分是搜索，else是文件加载，后面同理
                 // if(folderObj.keywords === data[i].fileName){
                 data=data.filter((record) =>
                     record.fileName.toLowerCase().includes(folderObj.keywords.toLowerCase()));
                 // 忽略大小写
-                console.log(data);
+
                 for(let i=0;i<data.length;i++){
                   if(data[i].dirId === folderObj.filter.dir_id
                       &&((data[i].department==="")||(data[i].department===null))
@@ -370,11 +360,10 @@ export default defineComponent({
                 }
               }
             }
-            console.log(folderType)
-            console.log(tmp)
+
             // 提取表格数据中的扩展名
             const extensions = tmp.map((item: { ext: string }) => item.ext);
-            console.log(extensions);
+
 
 // 去重并生成过滤器选项
             const uniqueExtensions = [...new Set(extensions)];
@@ -386,13 +375,12 @@ export default defineComponent({
             }));
 
 
-            console.log(folderObj.extFilter)
+
             let filteredData = tmp.filter(item => {
               return folderObj.extFilter.includes(item.ext); // 根据扩展名进行筛选
             });
 
 
-            console.log(filteredData);
 
             if(folderObj.isExt){
               for (let i = (folderObj.current_page-1)*folderObj.page_size;
@@ -428,7 +416,7 @@ export default defineComponent({
                   "user_name": tmp[i].user_name,
                 })
               }
-              console.log("page_size:"+folderObj.page_size)
+
               folderObj.total=tmp.length;
             }
 
@@ -436,7 +424,7 @@ export default defineComponent({
 
           }
         } else {
-          console.log("FileLoader RES MISS");
+
         }
       }).catch(err => {
         ElMessage({
@@ -449,13 +437,13 @@ export default defineComponent({
     //保存文件夹
     const saveFolder = (folderData: AnyObject):void => {
       //创建
-      console.log(folderData.is_new)
+
       if(folderData.is_new === true){
         // true代表创建
         try {
           Service.createFolder(folderData).then((res) => {
             if (res) {
-              // console.log(res)
+
               folderData.loadFolder();
             } else {
             }
@@ -471,7 +459,7 @@ export default defineComponent({
         try {
           Service.modifyFolder(folderData).then((res) => {
             if (res) {
-              // console.log(res)
+
               folderData.loadFolder();
             } else {
             }
@@ -483,18 +471,18 @@ export default defineComponent({
           })
         }
       }
-      console.log(folderData)
+
 
     }
 
     //移动文件夹
     const moveFolder = (data:AnyObject):void => {
-      console.log(data)
+
       //重新加载文件夹列表及文件列表
       try {
         Service.moveFolder(data).then((res) => {
           if (res) {
-            // console.log(res)
+
             data.loadFolder()
           } else {
           }
@@ -511,11 +499,11 @@ export default defineComponent({
 
     //删除文件夹
     const delFolder = (folderData: AnyObject):void => {
-      console.log(folderData)
+
       try {
         Service.delFolder(folderData).then((res) => {
           if (res) {
-            // console.log(res)
+
             folderData.loadFolder();
           } else {
           }
@@ -533,18 +521,18 @@ export default defineComponent({
 
     //选择文件事件
     const selectFile = (files:AnyObject):void => {
-      console.log('当前选择的文件信息：', files)
+
     }
 
     //移动文件
     const moveFile = (data:AnyObject):void => {
-      console.log(data)
+
       //重新加载文件列表
       try {
         Service.moveFile(data).then((res) => {
           if (res) {
             data.loadFile()
-            // console.log(res)
+
           } else {
           }
         });
@@ -560,14 +548,14 @@ export default defineComponent({
 
     //删除文件
     const delFile = (data:AnyObject):void => {
-      console.log(data)
+
       //重新加载文件列表
 
       try {
         Service.delFile(data).then((res) => {
           if (res) {
             data.loadFile()
-            // console.log(res)
+
           } else {
           }
         });
@@ -582,11 +570,11 @@ export default defineComponent({
 
     //保存文件
     const saveFile = (data:AnyObject):void => {
-      console.log(data)
+
       try {
         Service.modifyFile(data).then((res) => {
           if (res) {
-            // console.log(res)
+
           } else {
           }
         });
@@ -600,13 +588,13 @@ export default defineComponent({
 
     //备注文件
     const remarkFile = (data:AnyObject):void => {
-      console.log(data)
+
       //重新加载文件列表
       try {
         Service.remarkFile(data).then((res) => {
           if (res) {
             data.loadFile()
-            // console.log(res)
+
           } else {
           }
         });
@@ -623,22 +611,21 @@ export default defineComponent({
 
     //上传文件前
     const beforeUpload = (data:AnyObject):void => {
-      console.log("before upload: ",data)
-      console.log(data.folder_id)
+
     }
 
     //上传文件成功返回数据时
     const onUploadSuccess = (data:AnyObject):void => {
-      console.log('success = ',data)
+
     }
 
     //上传文件失败
     const onUploadError = (data:AnyObject):void => {
-      console.log('error = ', data)
+
     }
 
     const judgeFileType = (data:AnyObject):void => {
-      console.log("judgeFileType"+data)
+
       try {
         Service.judgeFileType(data).then((res) => {
           if (res) {

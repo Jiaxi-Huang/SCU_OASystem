@@ -136,7 +136,6 @@ export default defineComponent({
      * @description 保存当前角色信息
      */
     const saveData = async() => {
-      console.log('form is ', state.menu.form)
       //  省略接口：向后端接口传递已经授权菜单名称；  state.menu.form
       const data = {
         attendanceDate: state.form.attendanceDate,
@@ -147,7 +146,6 @@ export default defineComponent({
         userId: row.value.userId,
         id: row.value.id
       }
-      console.log(data);
       const res = await Service.postEditAttendance(data)
       if(res.status === 0) {
         emit('success')

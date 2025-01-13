@@ -16,25 +16,23 @@ const attendanceApi = {
 
 class Service {
   static postAttendanceList(pickDate:String) {
-    console.log("进入attend record")
     let formattedDate = dayjs(pickDate).format('YYYY-MM-DD');
-    console.log(formattedDate);  // 输出：2024-12-28
     return request({
       url: `${attendanceApi.localHost + attendanceApi.getAttendanceRecord}?pickDate=${formattedDate}`,
       method: 'POST',
       json: true,
     }).then((res) => {
       if (res.status === 0) {
-        console.log(res)
+
         return res;
       }
       else{
-        console.log(res)
+
       }
     })
   }
   static postAddAttendance(data: any) {
-    console.log(data)
+
     return request({
       url: attendanceApi.localHost + attendanceApi.addAttendance,
       method: 'POST',

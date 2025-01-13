@@ -155,7 +155,6 @@ export default defineComponent({
               key: "112f7278845a2b4a727d04cffeb63b0b",
             },
           })
-          console.log(response)
           const data = {
             'accessToken': sessionStorage.getItem('accessToken'),
             'inLocation': response.data.city
@@ -180,7 +179,6 @@ export default defineComponent({
           }
         }
       } catch (error) {
-        console.log(error);
         ElMessage({
           type: 'info',
           message: '已取消打卡'
@@ -201,7 +199,6 @@ export default defineComponent({
                 key: "112f7278845a2b4a727d04cffeb63b0b",
               },
             })
-            console.log(response)
             const data = {
               'accessToken': sessionStorage.getItem('accessToken'),
               'outLocation': response.data.city
@@ -272,7 +269,6 @@ export default defineComponent({
      */
     const handleSelectionChange = (selection:any[]) => {
       state.selectionRows = selection.map(item => item.id)
-      console.log("SelectionRows",state.selectionRows)
     }
     /**
      * @description 请求接口获取当前设置角色，默认始终有超级管理员角色
@@ -287,7 +283,6 @@ export default defineComponent({
             key: "112f7278845a2b4a727d04cffeb63b0b",
           },
         })
-        console.log(response)
         state.data = adminUserInfo.data
         state.userIds = adminUserInfo.data.map((item: any) => item.id)
         state.param.total = state.data.length
@@ -324,7 +319,6 @@ export default defineComponent({
       }
     }
     const onDetail = (index: any, row: any) => {
-      console.log('row', row)
       state.posted.userRow.attendanceDate = row.attendanceDate
       state.posted.userRow.checkIn = row.checkIn
       state.posted.userRow.inLocation= row.inLocation
