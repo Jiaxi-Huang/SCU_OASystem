@@ -47,9 +47,6 @@ onMounted(async () => {
     if (res) {
       totalCount.value = res[1];
       state.option.series[0].data = res[0];
-      console.log("123")
-      console.log(state.config.data)
-      console.log(res[1])
     }
   } catch (error) {
     console.error("获取考勤数据失败:", error);
