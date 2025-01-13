@@ -7,7 +7,7 @@
     <div class="rc1-chart-container">
       <div class="left">
         <div class="number">
-          262
+          {{ totalDepartments }}
         </div>
         <div>各部门数</div>
       </div>
@@ -18,36 +18,68 @@
 </template>
 
 <script lang="ts" setup>
-import {CapsuleChart} from "@kjgl77/datav-vue3";
-import {reactive} from "vue";
+import { ref, reactive, onMounted, computed } from 'vue';
+import { CapsuleChart } from '@kjgl77/datav-vue3';
+import Service from "../api/index";
 
+// 定义状态
 const state = reactive({
   config: {
-    data: [
-      {
-        name: 'HR',
-        value: 25,
-      },
-      {
-        name: 'IT',
-        value: 66,
-      },
-      {
-        name: 'Finance',
-        value: 123,
-      },
-      {
-        name: 'Markect',
-        value: 72,
-      },
-      {
-        name: '其他',
-        value: 99,
-      },
-    ],
-    unit: '件',
+    data: [] as { name: string; value: number }[], // 动态数据
+    unit: '人',
   },
-})
+});
+
+// 计算总部门数
+const totalDepartments = computed(() => {
+  return state.config.data.length;
+});
+
+// 获取用户列表并计算各部门人数
+const fetchUserList = async () => {
+  const accessToken = sessionStorage.getItem('accessToken'); // 从 sessionStorage 获取 accessToken
+  if (!accessToken) {
+    console.error('未找到 accessToken，请先登录');
+    return;
+  }
+
+  try {
+    const data = { accessToken }; // 构造请求体
+    const response = await Service.getUserList(data); // 调用接口获取用户列表
+    console.log('完整响应:', response); // 打印完整响应
+
+    if (response) {
+      const userList = response; // 获取用户列表数据
+
+      // 计算每个部门的人数
+      const departmentCounts: Record<string, number> = {};
+
+      userList.forEach((user: any) => {
+        const department = user.userDepartment; // 假设 userDepartment 是部门字段
+        if (departmentCounts[department]) {
+          departmentCounts[department]++;
+        } else {
+          departmentCounts[department] = 1;
+        }
+      });
+
+      // 更新图表数据
+      state.config.data = Object.keys(departmentCounts).map((key) => ({
+        name: key,
+        value: departmentCounts[key],
+      }));
+    } else {
+      console.error('获取用户列表失败');
+    }
+  } catch (error) {
+    console.error('请求失败:', error);
+  }
+};
+
+// 组件加载时调用
+onMounted(() => {
+  fetchUserList();
+});
 </script>
 
 <style lang="less">

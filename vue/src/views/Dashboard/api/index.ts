@@ -7,7 +7,8 @@ const Api = {
     getAdminUserList: '/api/admin/user/statistic',
     getTodoStatistics: '/api/todolist/getTodoStatistics',
     getFileStatistics: '/api/file/getFileStatistics',
-    getAdminAttendanceList: '/api/attendance/getAttendanceStatistics'
+    getAdminAttendanceList: '/api/attendance/getAttendanceStatistics',
+    getUserList: '/api/admin/user/list',
 }
 
 
@@ -124,6 +125,28 @@ class Service {
         })
     }
 
-
+    static getUserList(data: any) {
+        return request({
+            url: Api.localHost + Api.getUserList, // 使用 Api 对象中的 URL
+            method: 'POST',
+            json: true,
+            data, // 传递请求体
+        })
+            .then((res) => {
+                // 检查响应状态码
+                if (res.status === 0) {
+                    return res.data; // 返回用户列表数据
+                } else {
+                    // 如果状态码不是 0，打印错误信息
+                    console.error('获取用户列表失败:', res.message || '未知错误');
+                    return null;
+                }
+            })
+            .catch((error) => {
+                // 捕获请求失败的错误
+                console.error('请求失败:', error.response?.data || error.message);
+                return null;
+            });
+    }
 }
 export default Service
