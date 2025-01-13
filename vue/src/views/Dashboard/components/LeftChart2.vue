@@ -44,10 +44,14 @@ const totalCount = ref(0);
 onMounted(async () => {
   try {
     const res = await Service.getAdminAttendanceList();
-    if (res) {
+    if (res[1]) {
       totalCount.value = res[1];
       state.option.series[0].data = res[0];
+    }else{
+      totalCount.value = 0;
+      state.option.series[0].data = [{ name: "今日无人打卡", value: 0 }];
     }
+
   } catch (error) {
     console.error("获取考勤数据失败:", error);
   }
