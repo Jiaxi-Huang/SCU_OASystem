@@ -85,6 +85,62 @@ public class FolderController {
         }
     }
 
+    public void delFolderBFS(int folderId,int userId) {
+        User userInfo = userMapper.findByUserId(userId);
+        // 获取所有文件夹和文件数据
+        List<Folder> folderList = folderService.getFolder();
+        List<Files> filesList = fileService.getFile();
+
+        // 使用队列进行广度优先搜索
+        Queue<Integer> queue = new LinkedList<>();
+        queue.offer(folderId);
+
+        // 存储文件夹ID和文件夹映射，便于快速查找子文件夹
+        Map<Integer, List<Folder>> folderMap = new HashMap<>();
+        for (Folder folder : folderList) {
+            folderMap.computeIfAbsent(folder.getPid(), k -> new ArrayList<>()).add(folder);
+        }
+
+        // 存储文件夹ID和文件映射，便于快速查找文件
+        Map<Integer, List<Files>> fileMap = new HashMap<>();
+        for (Files file : filesList) {
+            fileMap.computeIfAbsent(file.getDirId(), k -> new ArrayList<>()).add(file);
+        }
+
+        // 广度优先搜索更新子文件夹和文件
+        while (!queue.isEmpty()) {
+            int currentFolderId = queue.poll();
+
+            // 更新当前文件夹
+            Folder folder = new Folder();
+            folder.setId(currentFolderId);
+            folderService.delFolder(userInfo,folder);
+
+            // 更新当前文件夹中的文件
+            List<Files> filesInCurrentFolder = fileMap.get(currentFolderId);
+
+            if (filesInCurrentFolder != null) {
+                for (Files file : filesInCurrentFolder) {
+                    file.setBeforeDirId(-3);
+                    int[] array = new int[1];
+                    array[0] = file.getId();
+                    file.setIds(Collections.singletonList(array[0]));
+                    List<Integer> arr = file.getIds();
+                    System.out.println("111"+ arr.get(0));
+                    fileService.delFile(userInfo,file);
+                }
+            }
+
+            // 将子文件夹加入队列
+            List<Folder> subFolders = folderMap.get(currentFolderId);
+            if (subFolders != null) {
+                for (Folder subFolder : subFolders) {
+                    queue.offer(subFolder.getId());
+                }
+            }
+        }
+    }
+
 
     @PostMapping("/loadFolder")
     public ResponseBase loadFolder(@RequestBody adminUserInfoRequest request) {
@@ -170,6 +226,7 @@ public class FolderController {
             response.setStatus(-2);
         }else{
             int res_code = folderService.delFolder(userInfo,record);
+            delFolderBFS(record.getId(),userId);
             if(res_code==0){
                 response.setStatus(-1);
             }

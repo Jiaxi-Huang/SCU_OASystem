@@ -2,11 +2,16 @@
   <div ref="vuecmf_fileexplorer_ref" class="vuecmf-fileexplorer">
     <el-container>
       <el-header>
-        <template v-for="(item,key) in tool">
-          <el-button @click="item.event" :key="key" v-if="item.visible"><i :class="item.icon"></i>{{ item.label }}</el-button>
-        </template>
-        <el-button @click="service.changeListShow('card')"><i class="bi bi-card-image"></i> 缩略图</el-button>
-        <el-button @click="service.changeListShow('list')"><i class="bi bi-card-checklist"></i> 列表</el-button>
+        <el-button type="primary" @click="tool[0].event" :key="key" v-if="tool[0].visible"><i :class="tool[0].icon"></i>{{ tool[0].label }}</el-button>
+        <el-button type="info" @click="tool[1].event" :key="key" v-if="tool[1].visible"><i :class="tool[1].icon"></i>{{ tool[1].label }}</el-button>
+        <el-button type="info" @click="tool[2].event" :key="key" v-if="tool[2].visible"><i :class="tool[2].icon"></i>{{ tool[2].label }}</el-button>
+        <el-button type="danger" @click="tool[3].event" :key="key" v-if="tool[3].visible"><i :class="tool[3].icon"></i>{{ tool[3].label }}</el-button>
+        <el-button type="success" @click="tool[4].event" :key="key" v-if="tool[4].visible"><i :class="tool[4].icon"></i>{{ tool[4].label }}</el-button>
+        <el-button type="info" @click="tool[5].event" :key="key" v-if="tool[5].visible"><i :class="tool[5].icon"></i>{{ tool[5].label }}</el-button>
+        <el-button type="danger" @click="tool[6].event" :key="key" v-if="tool[6].visible"><i :class="tool[6].icon"></i>{{ tool[6].label }}</el-button>
+        <el-button type="info" @click="tool[7].event" :key="key" v-if="tool[7].visible"><i :class="tool[7].icon"></i>{{ tool[7].label }}</el-button>
+        <el-button type="info" @click="service.changeListShow('card')"><i class="bi bi-card-image"></i> 缩略图</el-button>
+        <el-button type="info" @click="service.changeListShow('list')"><i class="bi bi-card-checklist"></i> 列表</el-button>
 <!--        <el-button id="copy-file-link"><i class="bi bi-link-45deg"></i> 复制文件链接</el-button>-->
 <!--        <el-button @click="is_help_dlg = true"><i class="bi bi-question-square"></i> 帮助</el-button>-->
       </el-header>
