@@ -37,12 +37,10 @@ class Service {
             data: data
         }).then((res) => {
             if (res.status === 0) {
-                console.log("loadFile success")
-                console.log(res)
+
                 return res
             }else{
-                console.log("loadFile error111")
-                console.log(res.status)
+
             }
             return null
         })
@@ -56,11 +54,10 @@ class Service {
             data: data
         }).then((res) => {
             if (res.status === 0) {
-                console.log("loadFolder success")
-                console.log(res)
+
                 return res
             }else{
-                console.log("loadFolder error111")
+
             }
             return null
         })
@@ -236,7 +233,7 @@ class Service {
             dirId:Data.dir_id,
             acsTkn: sessionStorage.getItem('accessToken')
         }
-        console.log(record)
+
         return request({
             url: fileApi.localHost + fileApi.modifyFile,
             method: 'POST',
@@ -265,7 +262,7 @@ class Service {
             data: record,
         }).then((res) => {
             if (res.status === 0) {
-                console.log(res.data[0])
+
                 return res.data[0]
             }
             return null
@@ -284,8 +281,7 @@ class Service {
         let fileName = data.file.name.substring(0, dotIndex);
         let ext = data.file.name.substring(dotIndex + 1);
 
-        console.log(fileName)
-        console.log(ext)
+
         let record = {
             fileName:fileName,
             ext:ext,
@@ -293,7 +289,7 @@ class Service {
             userId:data.data.user,
             dirId: data.data.folder_id
         }
-        console.log(record)
+
         return request({
             url: fileApi.localHost + fileApi.uploadFile,
             method: 'POST',

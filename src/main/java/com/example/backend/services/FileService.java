@@ -112,7 +112,6 @@ public class FileService extends ServiceImpl<FileMapper, Files> {
     }
 
     public int remarkFile(User userinfo,Files record) {
-        System.out.println(record.getIds());
         int res_code = 0;
         int FileType=folderService.judgeFolder(record.getBeforeDirId());
         if(FileType==-2){
@@ -131,7 +130,6 @@ public class FileService extends ServiceImpl<FileMapper, Files> {
 
 
     public int uploadFile(User userinfo,Files record) {
-        System.out.println(record.getFileName());
         int fileType = folderService.judgeFolder(record.getDirId());
         int res_code=0;
         if(fileType==-2){
@@ -177,7 +175,6 @@ public class FileService extends ServiceImpl<FileMapper, Files> {
     }
 
     public void updateFileDepartmentAndShared(Integer id, String department, int isShared, int userId) {
-        System.out.println("updateFileDepartmentAndShared"+id);
         int res_code = fileMapper.updateFolderDepartmentAndShared(id,department,isShared,userId);
     }
 }

@@ -221,7 +221,6 @@ export default defineComponent({
      */
     const handleSelectionChange = (selection:any[]) => {
       state.selectionRows = selection.map(item => item.id)
-      console.log("SelectionRows",state.selectionRows)
     }
     /**
      * @description 请求接口获取当前设置角色，默认始终有超级管理员角色
@@ -229,7 +228,6 @@ export default defineComponent({
     const fetchData = async () => {
       state.is_search = false
       const data = {'accessToken': sessionStorage.getItem('accessToken')}
-      console.log(state.pickDate)
       const adminUserInfo = await Service.postAttendanceList(state.pickDate)
       if (adminUserInfo.status === 0) {
         state.data = adminUserInfo.data
@@ -284,7 +282,6 @@ export default defineComponent({
       }
     }
     const onDetail = (index: any, row: any) => {
-      console.log('row', row)
       state.posted.userRow.userId = row.userId
       state.posted.userRow.userName = row.userName
       state.posted.userRow.userRole = row.role
@@ -297,7 +294,6 @@ export default defineComponent({
       state.detail_visible = true
     }
     const onEdit = (index: any, row: any) => {
-      console.log('row', row)
       state.posted.userRow.id = row.id
       state.posted.userRow.userName = row.userName
       state.posted.userRow.checkIn = row.checkIn
@@ -312,7 +308,6 @@ export default defineComponent({
       })
           .then(async () => {
             // 此处执行接口异步删除员工
-            console.log(row.id)
             const res = await Service.postDeleteAttendance(row.id);
             if (res.status === 0) {
               ElMessage({
@@ -335,7 +330,6 @@ export default defineComponent({
           })
     }
     const onDelete = (index: any, row: any) => {
-      console.log(index, row)
       useConfirmDelete(row)
     }
     /**

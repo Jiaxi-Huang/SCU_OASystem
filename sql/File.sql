@@ -8,8 +8,8 @@ CREATE TABLE `folders` (
                            `user_id` int,                                    -- 用户ID
                            `department` varchar(255),                        -- 部门
                            `is_shared` int,
-                           PRIMARY KEY (`id`),
-                          -- 删除文件夹时级联删除子文件夹
+                           PRIMARY KEY (`id`),-- 删除文件夹时级联删除子文件夹
+                           FOREIGN KEY (user_id) REFERENCES user_infos(`user_id`)
 );
 
 -- 创建文件表
@@ -27,5 +27,6 @@ CREATE TABLE `files` (
                          `department` varchar(255),                        -- 部门
                          `is_shared` int,
                          PRIMARY KEY (`id`),
+                         FOREIGN KEY (user_id) REFERENCES user_infos(`user_id`)
 );
--- 建表后在folders里添加id为-2，-1，0的数据，分别代表公司文件夹，部门文件夹，个人文件夹。
+

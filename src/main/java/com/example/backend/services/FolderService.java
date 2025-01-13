@@ -22,7 +22,6 @@ public class FolderService extends ServiceImpl<FolderMapper, Folder> {
     }
 
     public int createFolder(User userinfo, Folder record) {
-        System.out.println(record.getId());
         int FolderType=judgeFolder(record.getPid());
         int res_code=0;
         if(FolderType==0){
@@ -40,12 +39,10 @@ public class FolderService extends ServiceImpl<FolderMapper, Folder> {
             }
 
         }
-        System.out.println("res code"+res_code);
         return res_code;
     }
 
     public int modifyFolder(User userinfo, Folder record) {
-        System.out.println(record.getId());
         int FolderType=judgeFolder(record.getId());
         int res_code=0;
         if(FolderType==0||FolderType==-1){
@@ -57,17 +54,14 @@ public class FolderService extends ServiceImpl<FolderMapper, Folder> {
             }
 
         }
-        System.out.println("res code"+res_code);
         return res_code;
 
     }
 
     public String[] moveFolder(User userinfo, Folder record) {
-        System.out.println(record.getId());
         int FolderTypeFrom=judgeFolder(record.getId());
         int FolderTypeTo=judgeFolder(record.getPid());
         String department = userinfo.getDepartment();
-        System.out.println("department"+department);
         int res_code=0;
         String[] result = new String[3]; // 初始化一个固定大小的字符串数组
         if(FolderTypeTo==0){
@@ -110,7 +104,6 @@ public class FolderService extends ServiceImpl<FolderMapper, Folder> {
 
 
     public int delFolder(User userinfo,Folder record) {
-        System.out.println(record.getId());
         int res_code=0;
         int FolderType=judgeFolder(record.getId());
         if(FolderType==-2){
@@ -146,7 +139,6 @@ public class FolderService extends ServiceImpl<FolderMapper, Folder> {
     }
 
     public void updateFolderDepartmentAndShared(int currentFolderId, String department, int isShared,int userId) {
-        System.out.println(currentFolderId);
         int res_code = folderMapper.updateFolderDepartmentAndShared(currentFolderId,department,isShared,userId);
     }
 

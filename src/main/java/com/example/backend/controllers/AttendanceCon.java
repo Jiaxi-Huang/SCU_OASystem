@@ -103,13 +103,10 @@ public class AttendanceCon {
     @PostMapping("/loadAttendance")
     public ResponseBase loadAttendance(@RequestParam String pickDate) {
         ResponseBase res = new ResponseBase();
-        System.out.println(pickDate);
-        System.out.println("进入后端Attendance");
         if(pickDate==null|| pickDate.isEmpty()|| pickDate.equals("Invalid Date")){
             Calendar calendar = Calendar.getInstance();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             pickDate=sdf.format(calendar.getTime());
-            System.out.println(pickDate);
         }
         // 定义日期格式
 
@@ -127,7 +124,6 @@ public class AttendanceCon {
         }
         catch (Exception e) {
             res.setStatus(-1);
-            System.out.println(e);
             res.setMessage(e.getMessage());
         }
         return res;
@@ -192,9 +188,7 @@ public class AttendanceCon {
     @PostMapping("/personalAttendance")
     public ResponseEntity<ResponseBase> personalAttendance(@RequestParam String accessToken) {
         ResponseBase res = new ResponseBase();
-        System.out.println("personalAttendance");
         int userId = accessService.getAuthenticatedId(accessToken);
-        System.out.println(userId);
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String date=sdf.format(calendar.getTime());
@@ -209,7 +203,6 @@ public class AttendanceCon {
                 record.setRole(userInfo.getRole());
                 record.setStatus(setStatus(record));
                 res.pushData(record);
-                System.out.println("id:"+record.getId());
             }
         }
         return ResponseEntity.status(HttpStatus.OK).body(res);
@@ -217,9 +210,7 @@ public class AttendanceCon {
     @PostMapping("/checkInAttendance")
     public ResponseEntity<ResponseBase> checkInAttendance(@RequestBody Attendance record1) throws UnknownHostException {
         ResponseBase res = new ResponseBase();
-        System.out.println("checkInAttendance");
         int userId = accessService.getAuthenticatedId(record1.getAccessToken());
-        System.out.println(userId);
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String date=sdf.format(calendar.getTime());
@@ -229,7 +220,6 @@ public class AttendanceCon {
             if(record.getUserId()==userId&&AttendanceDate.equals(date)) {
                 res.setStatus(-1);
                 res.setMessage("You have already checked in today.");
-                System.out.println("You have already checked in today.");
                 return ResponseEntity.status(HttpStatus.OK).body(res);
             }
         }
@@ -239,9 +229,7 @@ public class AttendanceCon {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         String formattedTime = currentTime.format(formatter);
         InetAddress addr = InetAddress.getLocalHost();
-        System.out.println("Local HostAddress: "+addr.getHostAddress());
         String ipRegion = IpUtil.getIpRegion(addr.getHostAddress());
-        System.out.println(ipRegion);
 
         Attendance record=new Attendance();
         record.setUserId(userId);
@@ -258,9 +246,7 @@ public class AttendanceCon {
     public ResponseEntity<ResponseBase> checkOutAttendance(@RequestBody Attendance record1) throws UnknownHostException {
         ResponseBase res = new ResponseBase();
         Attendance attendance = new Attendance();
-        System.out.println("checkOutAttendance");
         int userId = accessService.getAuthenticatedId(record1.getAccessToken());
-        System.out.println(userId);
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String date=sdf.format(calendar.getTime());
@@ -291,9 +277,7 @@ public class AttendanceCon {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         String formattedTime = currentTime.format(formatter);
         InetAddress addr = InetAddress.getLocalHost();
-        System.out.println("Local HostAddress: "+addr.getHostAddress());
         String ipRegion = IpUtil.getIpRegion(addr.getHostAddress());
-        System.out.println(ipRegion);
 
         attendance.setCheckOut(LocalTime.parse(formattedTime));
         attendance.setStatus(setStatus(attendance));
@@ -311,7 +295,6 @@ public class AttendanceCon {
             int userId = accessService.getAuthenticatedId(accessToken);
             String role = userService.getById(userId).getRole();
             List<Attendance> attendances=attendanceService.excelAttendance(ids);
-            System.out.println(attendances.size());
             // Create an Excel Workbook
             Workbook workbook = new HSSFWorkbook();
             Sheet sheet = workbook.createSheet("考勤列表");
@@ -491,7 +474,6 @@ public class AttendanceCon {
             Calendar calendar = Calendar.getInstance();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             pickDate=sdf.format(calendar.getTime());
-            System.out.println(pickDate);
         }
         // 定义日期格式
         try {
@@ -510,7 +492,6 @@ public class AttendanceCon {
         }
         catch (Exception e) {
             res.setStatus(-1);
-            System.out.println(e);
             res.setMessage(e.getMessage());
         }
         return res;
