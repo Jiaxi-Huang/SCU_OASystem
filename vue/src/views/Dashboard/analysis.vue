@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref, reactive, onMounted} from 'vue'
+import {defineComponent} from 'vue'
 import {BorderBox1,BorderBox2,BorderBox3,BorderBox4} from "@kjgl77/datav-vue3";
 import LeftChart1 from './components/LeftChart1.vue'
 import LeftChart2 from './components/LeftChart2.vue'
@@ -43,7 +43,6 @@ import LeftChart3 from './components/LeftChart3.vue'
 import CenterCmp from './components/CenterCmp.vue'
 import RightChart1 from './components/RightChart1.vue'
 import RightChart2 from './components/RightChart2.vue'
-import BottomCharts from './components/BottomCharts.vue'
 export default defineComponent({
   components: {
     BorderBox1,BorderBox2,BorderBox3,BorderBox4,
@@ -52,8 +51,7 @@ export default defineComponent({
     LeftChart3,
     CenterCmp,
     RightChart1,
-    RightChart2,
-    BottomCharts
+    RightChart2
   },
   setup() {
     // return

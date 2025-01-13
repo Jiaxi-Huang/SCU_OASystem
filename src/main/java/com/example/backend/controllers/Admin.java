@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -197,10 +198,12 @@ public class Admin {
         try {
             String accessToken = request.getAccessToken();
             int adminId = accessService.getAuthenticatedId(accessToken);
+            int departmentId = request.getDepartmentId();
             String username = request.getUserName();
             String userdepartment = request.getUserDepartment();
             String userrole = request.getUserRole();
-            int isSuccess = userService.adminUserAdd(username, userdepartment, userrole, adminId);
+            int userId = userService.adminUserAdd(username, userdepartment, userrole, adminId);
+            int isSuccess =departmentService.adminUserDepartmentBind(userId, departmentId);
             if (isSuccess > 0) {
                 adminUserInfoResponse response = new adminUserInfoResponse(
                         0,
@@ -275,7 +278,8 @@ public class Admin {
             String accessToken = request.getAccessToken();
             int userId = request.getUserId();
             int adminId = accessService.getAuthenticatedId(accessToken);
-            int isSuccess = userService.adminUserDelete(adminId, userId);
+            int isSuccess = departmentService.adminUserDepartmentUnbind(userId);
+            isSuccess = userService.adminUserDelete(adminId, userId);
             if (isSuccess > 0) {
                 adminUserInfoResponse response = new adminUserInfoResponse(
                         0,
@@ -573,6 +577,75 @@ public class Admin {
             }
         }
         catch (Exception e) {
+            AuthedRoutesResponse response = new AuthedRoutesResponse(
+                    2,
+                    "服务器内部错误",
+                    false,
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    @PostMapping("/wechat/routes")
+    public ResponseEntity<AuthedRoutesResponse> wechatAutheredRoutes(@RequestBody AuthedRoutesRequest request) {
+        //获取邮箱
+        try{
+            String accessToken = request.getAccessToken();
+            int adminId = accessService.getAuthenticatedId(accessToken);
+            int user_id = request.getUserId();
+            String admin = userService.getById(adminId).getRole();
+            String roleName = userService.getById(user_id).getRole();
+            if (admin.equals("admin")) {
+                if (roleName.equals("admin")) {
+                    AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
+                    List<String> authedRoutes = Arrays.asList(
+                            "user","worker", "todo","meeting","reimbursement","leave","file","attendance"
+                    );
+                    data.setAuthedRoutes(authedRoutes);
+                    AuthedRoutesResponse response = new AuthedRoutesResponse(
+                            0,
+                            "获取职位信息成功",
+                            true,
+                            data
+                    );
+                    return ResponseEntity.status(HttpStatus.OK).body(response);
+                } else if (roleName.equals("manager")) {
+                    AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
+                    List<String> authedRoutes = Arrays.asList(
+                            "worker", "todo","meeting","reimbursement","leave","file","attendance"
+                    );
+                    data.setAuthedRoutes(authedRoutes);
+                    AuthedRoutesResponse response = new AuthedRoutesResponse(
+                            0,
+                            "获取职位信息成功",
+                            true,
+                            data
+                    );
+                    return ResponseEntity.status(HttpStatus.OK).body(response);
+                } else {
+                    AuthedRoutesResponse.Data data = new AuthedRoutesResponse.Data();
+                    List<String> authedRoutes = Arrays.asList(
+                            "todo","meeting","reimbursement","leave","file","attendance");
+                    data.setAuthedRoutes(authedRoutes);
+                    AuthedRoutesResponse response = new AuthedRoutesResponse(
+                            0,
+                            "获取职位信息成功",
+                            true,
+                            data
+                    );
+                    return ResponseEntity.status(HttpStatus.OK).body(response);
+                }
+            } else {
+                // 构建失败响应
+                AuthedRoutesResponse response = new AuthedRoutesResponse(
+                        1,
+                        "获取职位信息失败",
+                        false,
+                        null
+                );
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+        }catch (Exception e) {
             AuthedRoutesResponse response = new AuthedRoutesResponse(
                     2,
                     "服务器内部错误",

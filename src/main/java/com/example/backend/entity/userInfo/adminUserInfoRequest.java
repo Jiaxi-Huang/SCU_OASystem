@@ -9,6 +9,7 @@ import java.util.List;
 @Setter
 public class adminUserInfoRequest {
     private int userId;
+    private int departmentId;
     private String accessToken;
     private String userName;
     private String userRole;

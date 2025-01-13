@@ -17,4 +17,8 @@ public interface DepartmentMapper extends BaseMapper<Department>{
     int adminInsertDepartment(String department_name);
     @Delete("DELETE FROM department_infos WHERE department_id=#{department_id}")
     int adminDeleteDepartment(int department_id);
+    @Insert("INSERT INTO user_department_infos (user_id,department_id) VALUES(#{user_id}, #{department_id})")
+    int adminUserDepartmentBind(int user_id,int department_id);
+    @Delete("DELETE FROM user_department_infos WHERE user_id=#{user_id}")
+    int adminUserDepartmentUnbind(int user_id);
 }

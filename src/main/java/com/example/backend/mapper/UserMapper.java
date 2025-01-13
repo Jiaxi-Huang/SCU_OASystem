@@ -22,6 +22,8 @@ public interface UserMapper extends BaseMapper<User>{
     User findByOpenid(String openid);
     @Select("SELECT avatar FROM user_avatar WHERE user_id = #{user_id}")
     String findAvatarByUserId(int user_id);
+    @Select("SELECT MAX(user_id) FROM user_infos ")
+    int findLastUserId();
     @Insert("INSERT INTO user_infos (email, password, role) VALUES(#{email}, #{password}, #{role})")
     //@Options(useGeneratedKeys = true, keyProperty = "user_id")
     int insertUser(String email, String password, String role);

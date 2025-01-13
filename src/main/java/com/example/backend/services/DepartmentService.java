@@ -62,5 +62,23 @@ public class DepartmentService extends ServiceImpl<DepartmentMapper, Department>
             return 0;
         }
     }
+    public int adminUserDepartmentBind(int user_id,int departmentId){
+        try {
+            return departmentMapper.adminUserDepartmentBind(user_id,departmentId);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return 0;
+        }
+    }
+    public int adminUserDepartmentUnbind(int user_id){
+        try {
+            return departmentMapper.adminUserDepartmentUnbind(user_id);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return 0;
+        }
+    }
 
 }

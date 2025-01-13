@@ -188,7 +188,10 @@ public class UserService extends ServiceImpl<UserMapper, User> {
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
             String passwordBCrypt = encoder.encode(password);
             if (adminRole.equals("admin")){
-                return userMapper.adminInsertUser(username,passwordBCrypt,department,role);
+                int isInsert = userMapper.adminInsertUser(username,passwordBCrypt,department,role);
+                if(isInsert>0){
+                    return userMapper.findLastUserId();
+                }
             }
             return -1;
         }

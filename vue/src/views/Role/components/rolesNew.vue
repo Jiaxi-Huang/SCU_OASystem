@@ -5,7 +5,7 @@
         <el-input v-model="form.userName" placeholder="请输入员工名"></el-input>
       </el-form-item>
       <el-form-item label="员工部门" prop="userDepartment">
-        <el-select v-model="form.userDepartment" placeholder="请选择部门">
+        <el-select v-model="form.departmentId" placeholder="请选择部门">
           <el-option v-for="department in departments" :key="department.value" :label="department.label" :value="department.value"></el-option>
         </el-select>
       </el-form-item>
@@ -21,7 +21,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, toRefs, ref } from 'vue'
+import {defineComponent, reactive, toRefs, ref, onMounted} from 'vue'
 import Service from '../api'
 export default defineComponent({
   name: 'RoleNew',
@@ -31,7 +31,7 @@ export default defineComponent({
       userName: [
         { required: true, message: '请输入员工名', trigger: 'blur' },
       ],
-      userDepartment: [
+      departmentId: [
         { required: true, message: '请选择部门', trigger: 'change' },
       ],
       userRole: [
@@ -39,9 +39,7 @@ export default defineComponent({
       ]
     }
     const departments = [
-      { value: 'IT', label: '技术部' },
-      { value: 'Market', label: '市场部' },
-      { value: 'HR', label: '人力资源部' }
+      { value: '1', label: 'HR' },
     ]
 
     const roles = [
@@ -55,7 +53,7 @@ export default defineComponent({
     const state = reactive({
       form: {
         userName: '',
-        userDepartment: '',
+        departmentId: null,
         userRole: ''
       },
       loading: false
@@ -69,8 +67,9 @@ export default defineComponent({
           const data ={
             accessToken : sessionStorage.getItem('accessToken'),
             userName: state.form.userName,
-            userDepartment: state.form.userDepartment,
-            userRole: state.form.userRole
+            userDepartment: departments.find((item: any) => item.value === state.form.departmentId)?.label,
+            userRole: state.form.userRole,
+            departmentId: state.form.departmentId,
           }
           const res = await Service.postAdminAddUser(data)
           if(res.status ===0) {
@@ -79,8 +78,21 @@ export default defineComponent({
         }
       })
     }
+    const getDepartments = async() => {
+      const res = await Service.postAdminQueryDepartmentList({accessToken: sessionStorage.getItem('accessToken')})
+      if(res.status === 0) {
+        departments.splice(0,departments.length)
+        for(let i = 0; i < res.data.length; i++) {
+          departments.push({value: res.data[i].departmentId, label: res.data[i].departmentName})
+        }
+      }
+    }
+    onMounted(()=>{
+      getDepartments()
+    })
     return {
       submitForm,
+      getDepartments,
       rules,
       departments,
       roles,

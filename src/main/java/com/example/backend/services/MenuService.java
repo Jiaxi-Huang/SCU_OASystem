@@ -1,6 +1,7 @@
 package com.example.backend.services;
 
 import com.example.backend.annotation.LogOperation;
+import com.example.backend.annotation.LogOperationWithId;
 import com.example.backend.mapper.PermissionMapper;
 import com.example.backend.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +17,17 @@ public class MenuService {
      *
      * @description:更新用户授权时
      */
-    @LogOperation("修改用户权限")
+    @LogOperationWithId(value="修改用户权限",idParamIndex=1)
     public int updateMenu(int userId,int adminId,String permissions){
         try{
             String role = userMapper.findByUserId(adminId).getRole();
-            System.out.println(role);
             if(role.equals("admin")||role.equals("manager")) {
-                return permissionMapper.updatePermission(userId, permissions);
+                if(permissionMapper.findPermission(userId)!=null) {
+                    return permissionMapper.updatePermission(userId, permissions);
+                }
+                else{
+                    return permissionMapper.insertPermission(userId, permissions);
+                }
             }
             else{
                 return 0;

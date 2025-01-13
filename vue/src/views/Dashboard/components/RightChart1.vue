@@ -46,7 +46,6 @@ const fetchUserList = async () => {
   try {
     const data = { accessToken }; // 构造请求体
     const response = await Service.getUserList(data); // 调用接口获取用户列表
-    console.log('完整响应:', response); // 打印完整响应
 
     if (response) {
       const userList = response; // 获取用户列表数据
