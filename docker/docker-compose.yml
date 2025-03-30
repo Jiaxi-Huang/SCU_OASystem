@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: scu_oasystem_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ../frontend/dist:/usr/share/nginx/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+    networks:
+      - scu_oasystem_network
+
+  backend:
+    image: openjdk:21
+    container_name: scu_oasystem_backend
+    working_dir: /app
+    volumes:
+      - ../backend:/app
+    ports:
+      - "8080:8080"
+    command: java -jar backend.jar
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/oa_database?useSSL=false&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=123456
+      - SPRING_REDIS_HOST=redis
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - scu_oasystem_network
+
+  db:
+    image: mysql:8.4.2
+    container_name: scu_oasystem_db
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=oa_database
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # 添加此行以挂载 init.sql 文件
+      - ./mysqld:/var/run/mysqld
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 5
+    networks:
+      - scu_oasystem_network
+
+  redis:
+    image: redis:latest
+    container_name: scu_oasystem_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - scu_oasystem_network
+
+volumes:
+  db_data:
+
+networks:
+  scu_oasystem_network:
+    driver: bridge
