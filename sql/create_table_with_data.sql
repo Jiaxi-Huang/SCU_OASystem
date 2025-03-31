@@ -20,6 +20,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 -- Table structure for department_infos
 -- ----------------------------
+
 DROP TABLE IF EXISTS `department_infos`;
 CREATE TABLE `department_infos`  (
   `department_id` int NOT NULL AUTO_INCREMENT,
@@ -275,7 +276,6 @@ CREATE TABLE `usertodo`  (
   CONSTRAINT `usertodo_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user_infos` (`user_id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `usertodo_ibfk_2` FOREIGN KEY (`adder_id`) REFERENCES `user_infos` (`user_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 22 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
-
 -- ----------------------------
 -- Records of usertodo
 -- ----------------------------
@@ -298,5 +298,17 @@ INSERT INTO `usertodo` VALUES (3, 18, 7, '紧急加班', '所有人给我狠狠�
 INSERT INTO `usertodo` VALUES (4, 19, 7, '紧急加班', '所有人给我狠狠加班', '未完成', '2024-12-07 23:25:23', '2024-12-13 23:25');
 INSERT INTO `usertodo` VALUES (6, 20, 7, '紧急加班', '所有人给我狠狠加班', '未完成', '2024-12-07 23:25:23', '2024-12-13 23:25');
 INSERT INTO `usertodo` VALUES (7, 21, 7, '紧急加班', '所有人给我狠狠加班修改', '未完成', '2024-12-07 23:25:23', '2024-12-13 23:25');
+-- ----------------------------
+-- Table structure for userlogs
+-- ----------------------------
+DROP TABLE IF EXISTS `user_logs`;
+CREATE TABLE `user_logs`  (
+  id int PRIMARY KEY AUTO_INCREMENT,
+  user_id int,
+  date varchar(255) ,
+  content varchar(255),
+  FOREIGN KEY (user_id) REFERENCES user_infos(`user_id`)
+);
 
 SET FOREIGN_KEY_CHECKS = 1;
+

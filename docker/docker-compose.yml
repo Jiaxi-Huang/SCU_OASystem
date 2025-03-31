@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+
   nginx:
     image: nginx:latest
     container_name: scu_oasystem_nginx
@@ -25,10 +26,12 @@ services:
       - "8080:8080"
     command: java -jar backend.jar --spring.config.location=/app/application.properties
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/oa_database?useSSL=false
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/oa_database?useSSL=false&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=123456
       - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+      - SPRING_REDIS_PASSWORD=123456
     depends_on:
       db:
         condition: service_started
@@ -37,33 +40,35 @@ services:
     networks:
       - oasystem_network
 
+  redis:
+    image: redis:6.0
+    container_name: scu_oasystem_redis
+    ports:
+      - "6379:6379"
+    volumes:
+    - ./redis.conf:/etc/redis/redis.conf
+    - ./redis/data:/data
+    - ./redis/logs:/logs
+    command: redis-server /etc/redis/redis.conf
+    depends_on:
+      db:
+        condition: service_started
+    networks:
+      - oasystem_network
+
   db:
-    image: mysql:8.4.2
+    image: mysql:5.7
     container_name: scu_oasystem_db
     ports:
       - "3306:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=123456
     volumes:
-      - db_data:/var/lib/mysql
+      - /usr/local/mysql/conf:/etc/mysql/conf.d
+      - ./mysql/data:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # 添加此行以挂载 init.sql 文件
-      - ./mysqld:/var/run/mysqld
     networks:
       - oasystem_network
-
-  redis:
-    image: redis:latest
-    container_name: scu_oasystem_redis
-    ports:
-      - "6379:6379"
-    volumes:
-    - ./redis.conf:/etc/redis/redis.conf
-    command: redis-server /etc/redis/redis.conf
-    networks:
-      - oasystem_network
-
-volumes:
-  db_data:
 
 networks:
   oasystem_network:
